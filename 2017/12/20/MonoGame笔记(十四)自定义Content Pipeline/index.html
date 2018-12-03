@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="编程,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="XNA内置的Importer和Processor已经很够满足大部分需求 关于自定义Content Pipeline, 官方的介绍最为简介明了https://msdn.microsoft.com/en-us/library/ff433775.aspx 摘录如下:自定义Content Pipeline有如下几种情形: 1. Supporting a New File FormatIn this exa">
+<meta name="keywords" content="编程">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MonoGame笔记(十四)自定义Content Pipeline">
+<meta property="og:url" content="http://yoursite.com/2017/12/20/MonoGame笔记(十四)自定义Content Pipeline/index.html">
+<meta property="og:site_name" content="远">
+<meta property="og:description" content="XNA内置的Importer和Processor已经很够满足大部分需求 关于自定义Content Pipeline, 官方的介绍最为简介明了https://msdn.microsoft.com/en-us/library/ff433775.aspx 摘录如下:自定义Content Pipeline有如下几种情形: 1. Supporting a New File FormatIn this exa">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://yoursite.com/img/monogame-contentpipeline-buildin-importer.png">
+<meta property="og:image" content="http://yoursite.com/img/monogame-contentpipeline-buildin-processor.png">
+<meta property="og:image" content="http://yoursite.com/img/monogame-contentpipeline-custom1.png">
+<meta property="og:image" content="http://yoursite.com/img/monogame-contentpipeline-custom2.png">
+<meta property="og:image" content="http://yoursite.com/img/monogame-contentpipeline-processor-dependency.jpeg">
+<meta property="og:image" content="http://yoursite.com/img/monogame-contentpipeline-custom3.png">
+<meta property="og:updated_time" content="2017-12-20T03:25:02.406Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="MonoGame笔记(十四)自定义Content Pipeline">
+<meta name="twitter:description" content="XNA内置的Importer和Processor已经很够满足大部分需求 关于自定义Content Pipeline, 官方的介绍最为简介明了https://msdn.microsoft.com/en-us/library/ff433775.aspx 摘录如下:自定义Content Pipeline有如下几种情形: 1. Supporting a New File FormatIn this exa">
+<meta name="twitter:image" content="http://yoursite.com/img/monogame-contentpipeline-buildin-importer.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/12/20/MonoGame笔记(十四)自定义Content Pipeline/">
+
+
+
+
+
+  <title>MonoGame笔记(十四)自定义Content Pipeline | 远</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">远</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/20/MonoGame笔记(十四)自定义Content Pipeline/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zmapleaf">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="远">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">MonoGame笔记(十四)自定义Content Pipeline</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-12-20T09:31:37+08:00">
+                2017-12-20
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/编程/" itemprop="url" rel="index">
+                    <span itemprop="name">编程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>XNA内置的Importer和Processor已经很够满足大部分需求<br><img src="/img/monogame-contentpipeline-buildin-importer.png" alt=""><br><img src="/img/monogame-contentpipeline-buildin-processor.png" alt=""></p>
+<p>关于自定义Content Pipeline, 官方的介绍最为简介明了<a href="https://msdn.microsoft.com/en-us/library/ff433775.aspx" target="_blank" rel="noopener">https://msdn.microsoft.com/en-us/library/ff433775.aspx</a></p>
+<p>摘录如下:<br>自定义Content Pipeline有如下几种情形:</p>
+<h4 id="1-Supporting-a-New-File-Format"><a href="#1-Supporting-a-New-File-Format" class="headerlink" title="1. Supporting a New File Format"></a>1. Supporting a New File Format</h4><p>In this example, a nonstandard file format contains information that can be represented by a standard Content DOM type.<br><img src="/img/monogame-contentpipeline-custom1.png" alt=""><br>As illustrated, only a custom importer that can read the nonstandard file format and output a Content DOM object (in this case, a TextureContent object) is required. The remainder of the Content Pipeline process can be performed by a standard content processor and content loader.</p>
+<p>只需要增加一个自定义的Importer.<br>官方样例:ObjImpoter(<a href="http://xbox.create.msdn.com/en-us/education/catalog/sample/custom_model_importer" target="_blank" rel="noopener">http://xbox.create.msdn.com/en-us/education/catalog/sample/custom_model_importer</a>)</p>
+<p>ObjImporter.cs的Import方法<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> The importer's entry point.</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> Called by the framework when importing a game asset.</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;param name="filename"&gt;</span>Name of a game asset file.<span class="doctag">&lt;/param&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;param name="context"&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> Contains information for importing a game asset, such as a logger interface.</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/param&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;returns&gt;</span>Resulting game asset.<span class="doctag">&lt;/returns&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">override</span> NodeContent <span class="title">Import</span>(<span class="params"><span class="keyword">string</span> filename,</span></span></span><br><span class="line"><span class="function"><span class="params">    ContentImporterContext context</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// Uncomment the following line to debug:</span></span><br><span class="line">    <span class="comment">//System.Diagnostics.Debugger.Launch();</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// Store the context for use in other methods</span></span><br><span class="line">    importerContext = context;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Reset all importer state</span></span><br><span class="line">    <span class="comment">// See field declarations for more information</span></span><br><span class="line">    rootNode = <span class="keyword">new</span> NodeContent();            </span><br><span class="line">    positions = <span class="keyword">new</span> List&lt;Vector3&gt;();</span><br><span class="line">    texCoords = <span class="keyword">new</span> List&lt;Vector2&gt;();</span><br><span class="line">    normals = <span class="keyword">new</span> List&lt;Vector3&gt;();</span><br><span class="line">    meshBuilder = <span class="literal">null</span>;</span><br><span class="line">    <span class="comment">// StartMesh sets positionMap, textureCoordinateDataIndex, normalDataIndex</span></span><br><span class="line">    materials = <span class="keyword">new</span> Dictionary&lt;<span class="keyword">string</span>, MaterialContent&gt;();</span><br><span class="line">    <span class="comment">// ImportMaterials resets materialContent</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// Model identity is tied to the file it is loaded from</span></span><br><span class="line">    rootNode.Identity = <span class="keyword">new</span> ContentIdentity(filename);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">try</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// Loop over each tokenized line of the OBJ file</span></span><br><span class="line">        <span class="keyword">foreach</span> (String[] lineTokens <span class="keyword">in</span></span><br><span class="line">            GetLineTokens(filename, rootNode.Identity))</span><br><span class="line">        &#123;</span><br><span class="line">            ParseObjLine(lineTokens);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// If the file did not provide a model name (through an 'o' line),</span></span><br><span class="line">        <span class="comment">// then use the file name as a default</span></span><br><span class="line">        <span class="keyword">if</span> (rootNode.Name == <span class="literal">null</span>)</span><br><span class="line">            rootNode.Name = Path.GetFileNameWithoutExtension(filename);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Finish the last mesh</span></span><br><span class="line">        FinishMesh();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Done with entire model!</span></span><br><span class="line">        <span class="keyword">return</span> rootNode;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">catch</span> (InvalidContentException)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// InvalidContentExceptions do not need further processing</span></span><br><span class="line">        <span class="keyword">throw</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">catch</span> (Exception e)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// Wrap exception with content identity (includes line number)</span></span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> InvalidContentException(</span><br><span class="line">            <span class="string">"Unable to parse obj file. Exception:\n"</span> + e.Message,</span><br><span class="line">            rootNode.Identity, e);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h4 id="2-Creating-Special-Purpose-Data-from-Standard-Objects"><a href="#2-Creating-Special-Purpose-Data-from-Standard-Objects" class="headerlink" title="2.Creating Special-Purpose Data from Standard Objects"></a>2.Creating Special-Purpose Data from Standard Objects</h4><p>For this example, a texture object that represents a map of normalized vectors derived from the original texture object is created<br><img src="/img/monogame-contentpipeline-custom2.png" alt=""></p>
+<p>Since the texture is contained in a standard format for the game asset, a standard importer can be used to create the TextureContent object. A custom content processor (NormalMapProcessor) creates the special-purpose data, but uses the standard TextureContent class to contain the result so that it can be loaded by the standard content loader. </p>
+<p>就是上一篇笔记中的扩展.<br>官方样例: Normal Mapping<br>(<a href="http://xbox.create.msdn.com/en-us/education/catalog/sample/normal_mapping" target="_blank" rel="noopener">http://xbox.create.msdn.com/en-us/education/catalog/sample/normal_mapping</a>)</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> The NormalMappingModelProcessor is used to change the material/effect applied</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> to a model. After going through this processor, the output model will be set</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> up to be rendered with NormalMapping.fx.</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">NormalMappingModelProcessor</span> : <span class="title">ModelProcessor</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">//override, 注意NormalMappingMaterialProcessor</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">override</span> MaterialContent <span class="title">ConvertMaterial</span>(<span class="params">MaterialContent material,</span></span></span><br><span class="line"><span class="function"><span class="params">            ContentProcessorContext context</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        EffectMaterialContent normalMappingMaterial = <span class="keyword">new</span> EffectMaterialContent();</span><br><span class="line">        normalMappingMaterial.Effect = <span class="keyword">new</span> ExternalReference&lt;EffectContent&gt;</span><br><span class="line">            (Path.Combine(directory, <span class="string">"NormalMapping.fx"</span>));</span><br><span class="line"></span><br><span class="line">        OpaqueDataDictionary processorParameters = <span class="keyword">new</span> OpaqueDataDictionary();</span><br><span class="line">        processorParameters[<span class="string">"ColorKeyColor"</span>] = <span class="keyword">this</span>.ColorKeyColor;</span><br><span class="line">        processorParameters[<span class="string">"ColorKeyEnabled"</span>] = <span class="keyword">this</span>.ColorKeyEnabled;</span><br><span class="line">        processorParameters[<span class="string">"TextureFormat"</span>] = <span class="keyword">this</span>.TextureFormat;</span><br><span class="line">        processorParameters[<span class="string">"GenerateMipmaps"</span>] = <span class="keyword">this</span>.GenerateMipmaps;</span><br><span class="line">        processorParameters[<span class="string">"ResizeTexturesToPowerOfTwo"</span>] =</span><br><span class="line">                                                    <span class="keyword">this</span>.ResizeTexturesToPowerOfTwo;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// copy the textures in the original material to the new normal mapping</span></span><br><span class="line">        <span class="comment">// material. this way the diffuse texture is preserved. The</span></span><br><span class="line">        <span class="comment">// PreprocessSceneHierarchy function has already added the normal map</span></span><br><span class="line">        <span class="comment">// texture to the Textures collection, so that will be copied as well.</span></span><br><span class="line">        <span class="keyword">foreach</span> (KeyValuePair&lt;String, ExternalReference&lt;TextureContent&gt;&gt; texture</span><br><span class="line">            <span class="keyword">in</span> material.Textures)</span><br><span class="line">        &#123;</span><br><span class="line">            normalMappingMaterial.Textures.Add(texture.Key, texture.Value);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// and convert the material using the NormalMappingMaterialProcessor,</span></span><br><span class="line">        <span class="comment">// who has something special in store for the normal map.</span></span><br><span class="line">        <span class="keyword">return</span> context.Convert&lt;MaterialContent, MaterialContent&gt;</span><br><span class="line">            (normalMappingMaterial, <span class="keyword">typeof</span>(NormalMappingMaterialProcessor).Name,</span><br><span class="line">            processorParameters);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> The NormalMappingMaterialProcessor is very simple.  It extends the regular</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> MaterialProcessor, overriding BuildTexture so that normal maps can go through</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> the NormalMapTextureProcessor and be converted to a signed normalmap format.</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line">[<span class="meta">ContentProcessor</span>]</span><br><span class="line">[<span class="meta">DesignTimeVisible(false)</span>]</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">NormalMappingMaterialProcessor</span> : <span class="title">MaterialProcessor</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">//注意NormalMapTextureProcessor</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">override</span> ExternalReference&lt;TextureContent&gt; BuildTexture</span><br><span class="line">        (<span class="keyword">string</span> textureName, ExternalReference&lt;TextureContent&gt; texture,</span><br><span class="line">        ContentProcessorContext context)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span> (textureName == NormalMappingModelProcessor.NormalMapKey)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="comment">// put the normal map through the special NormalMapTextureProcessor,</span></span><br><span class="line">            <span class="comment">// which will convert it to a signed format.</span></span><br><span class="line">            <span class="keyword">return</span> context.BuildAsset&lt;TextureContent, TextureContent&gt;(texture,</span><br><span class="line">                <span class="keyword">typeof</span>(NormalMapTextureProcessor).Name);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Apply default processing to all other textures.</span></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">base</span>.BuildTexture(textureName, texture, context);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>NormalMappingModelProcessor内部引用了NormalMappingMaterialProcessor, 后者内部又引用NormalMapTextureProcessor. 这种依赖关系可以参见下图:<br><img src="/img/monogame-contentpipeline-processor-dependency.jpeg" alt=""></p>
+<h4 id="3-Supporting-Custom-Data-from-a-Nonstandard-Game-Asset"><a href="#3-Supporting-Custom-Data-from-a-Nonstandard-Game-Asset" class="headerlink" title="3.Supporting Custom Data from a Nonstandard Game Asset"></a>3.Supporting Custom Data from a Nonstandard Game Asset</h4><p>Illustrated in this example is a nonstandard game asset file containing data that does not correspond to any standard data types.<br><img src="/img/monogame-contentpipeline-custom3.png" alt=""><br>To read the nonstandard game asset file, a custom importer is required that outputs a CustomContent object. Since the output of the importer is a custom class, a custom content processor also is needed, and the ContentManager.Load method must be extended to support the custom data object.</p>
+<p>这个相对比较复杂一些.</p>
+<p>官方样例: Creating a Custom Importer and Processor (<a href="https://msdn.microsoft.com/en-us/library/bb447754.aspx" target="_blank" rel="noopener">https://msdn.microsoft.com/en-us/library/bb447754.aspx</a>)</p>
+<blockquote>
+<p>The goal of the example in this tutorial is to import a pixel shader (in a file with the .psh extension), and to produce compiled effect data that can be assigned to an instance of Effect.</p>
+</blockquote>
+<p>这里就不贴代码了.</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/编程/" rel="tag"># 编程</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/12/20/MonoGame笔记(十三)扩展Content Pipeline/" rel="next" title="MonoGame笔记(十三)扩展Content Pipeline">
+                <i class="fa fa-chevron-left"></i> MonoGame笔记(十三)扩展Content Pipeline
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/12/20/MonoGame笔记(十五)XML in the  Content Pipeline/" rel="prev" title="MonoGame笔记(十五)XML in the Content Pipeline">
+                MonoGame笔记(十五)XML in the Content Pipeline <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">zmapleaf</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">66</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-Supporting-a-New-File-Format"><span class="nav-number">1.</span> <span class="nav-text">1. Supporting a New File Format</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-Creating-Special-Purpose-Data-from-Standard-Objects"><span class="nav-number">2.</span> <span class="nav-text">2.Creating Special-Purpose Data from Standard Objects</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-Supporting-Custom-Data-from-a-Nonstandard-Game-Asset"><span class="nav-number">3.</span> <span class="nav-text">3.Supporting Custom Data from a Nonstandard Game Asset</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zmapleaf</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

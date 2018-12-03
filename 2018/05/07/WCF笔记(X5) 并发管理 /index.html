@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="WCF,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="上一篇笔记中提到了ConcurrencyMode, WCF中的并发指的是同一个服务实例上下文同时处理多个服务调用请求. 这里再进一步介绍一下ConcurrencyMode, 特别是ConcurrencyMode与InstanceContextMode之间的关系 WCF并发框架解决的是如何有效地处理被分发到同一个服务实例上下文的多个服务调用请求. 这些并行的调用请求可能来自不同的客户端(服务代理),">
+<meta name="keywords" content="WCF">
+<meta property="og:type" content="article">
+<meta property="og:title" content="WCF笔记(X5) 并发管理">
+<meta property="og:url" content="http://yoursite.com/2018/05/07/WCF笔记(X5) 并发管理 /index.html">
+<meta property="og:site_name" content="远">
+<meta property="og:description" content="上一篇笔记中提到了ConcurrencyMode, WCF中的并发指的是同一个服务实例上下文同时处理多个服务调用请求. 这里再进一步介绍一下ConcurrencyMode, 特别是ConcurrencyMode与InstanceContextMode之间的关系 WCF并发框架解决的是如何有效地处理被分发到同一个服务实例上下文的多个服务调用请求. 这些并行的调用请求可能来自不同的客户端(服务代理),">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://yoursite.com/img/wcf-call-reentrancy.png">
+<meta property="og:updated_time" content="2018-05-13T04:58:05.588Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="WCF笔记(X5) 并发管理">
+<meta name="twitter:description" content="上一篇笔记中提到了ConcurrencyMode, WCF中的并发指的是同一个服务实例上下文同时处理多个服务调用请求. 这里再进一步介绍一下ConcurrencyMode, 特别是ConcurrencyMode与InstanceContextMode之间的关系 WCF并发框架解决的是如何有效地处理被分发到同一个服务实例上下文的多个服务调用请求. 这些并行的调用请求可能来自不同的客户端(服务代理),">
+<meta name="twitter:image" content="http://yoursite.com/img/wcf-call-reentrancy.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/05/07/WCF笔记(X5) 并发管理 /">
+
+
+
+
+
+  <title>WCF笔记(X5) 并发管理 | 远</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">远</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/05/07/WCF笔记(X5) 并发管理 /">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zmapleaf">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="远">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">WCF笔记(X5) 并发管理</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-05-07T19:41:51+08:00">
+                2018-05-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/编程/" itemprop="url" rel="index">
+                    <span itemprop="name">编程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>上一篇笔记中提到了ConcurrencyMode, WCF中的并发指的是同一个服务实例上下文同时处理多个服务调用请求. 这里再进一步介绍一下ConcurrencyMode, 特别是ConcurrencyMode与InstanceContextMode之间的关系</p>
+<p>WCF并发框架解决的是如何有效地处理被分发到同一个服务实例上下文的多个服务调用请求. 这些并行的调用请求可能来自不同的客户端(服务代理), 也可能来自相同的客户端.</p>
+<h3 id="Instance-Management-and-Concurrency"><a href="#Instance-Management-and-Concurrency" class="headerlink" title="Instance Management and Concurrency"></a>Instance Management and Concurrency</h3><p>Service-instance thread safety is closely related to the service instancing mode. A per-call service instance is thread-safe by definition, because each call gets its own dedicated instance. That instance is accessible only by its assigned worker thread, and because no other threads will be accessing it, it has no need for synchronization. 对实例资源不需要同步</p>
+<p>However, a per-call service is typically state-aware. The state store can be an inmemory resource such as static dictionary, and it can be subject to multithreaded access because the service can sustain concurrent calls, whether from the same client or from multiple clients. Consequently, you must synchronize access to the state store. 对静态资源仍然需要同步</p>
+<p>A per-session service always requires concurrency management and synchronization, because the client may use the same proxy and yet dispatch calls to the service on multiple client-side threads. 在同一个Client端发起多个线程, 但使用的是同一个Proxy. 这种情况下, 调用的是同一个Service Instance. 所以需要同步; 如果每个线程都new一个Porxy, 那么它们调用的是不同的Service Instance, 不需要对实例资源进行同步.</p>
+<p>A singleton service is even more susceptible(敏感) to concurrent access, and must support synchronized access. The singleton has some inmemory state that all clients implicitly share. On top of the possibility of the client dispatching calls on multiple threads, as with a per-session service, a singleton may simply have multiple clients in different execution contexts, each using its own thread to call the service. All of these calls will enter the singleton on different threads from the I/O completion thread pool—hence the need for synchronization. 单例模式下, 即使是不同的Proxy, 调用的都是同一个Service Instance. 需要同步.</p>
+<p>CurrentMode有以下三种<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">enum</span> ConcurrencyMode</span><br><span class="line">&#123;</span><br><span class="line">    Single,<span class="comment">//默认加锁</span></span><br><span class="line">    Reentrant, <span class="comment">//可重入</span></span><br><span class="line">    Multiple</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h4 id="ConcurrencyMode-Single"><a href="#ConcurrencyMode-Single" class="headerlink" title="ConcurrencyMode.Single"></a>ConcurrencyMode.Single</h4><p>When the service is configured with ConcurrencyMode.Single, WCF will provide automatic synchronization to the service context and disallow concurrent calls by associating the context containing the service instance with a synchronization lock. Every call coming into the service must first try to acquire the lock. If the lock is unowned, the caller will be allowed in. Once the operation returns, WCF will unlock the lock, thus allowing in another caller.</p>
+<p>The important thing is that only one caller at a time is ever allowed. If there are multiple concurrent callers while the lock is locked, the callers are all placed in a queue and are served out of the queue in order. If a call times out while blocked, WCF will remove the caller from the queue and the client will get a TimeoutException. </p>
+<p>Because the default concurrency mode is synchronized access, the susceptible instancing modes of per-session and singleton are also synchronized by default. Note that even calls to a per-call service instance are synchronized by default.</p>
+<h4 id="ConcurrencyMode-Multiple"><a href="#ConcurrencyMode-Multiple" class="headerlink" title="ConcurrencyMode.Multiple"></a>ConcurrencyMode.Multiple</h4><p>When the service is configured with ConcurrencyMode.Multiple, WCF will stay out of the way and will not synchronize access to the service instance in any way. <strong>ConcurrencyMode.Multiple simply means that the service instance is not associated with any synchronization lock, so concurrent calls are allowed on the service instance</strong>. Put differently, when a service instance is configured with ConcurrencyMode.Multiple WCF will not queue up the client messages and dispatch them to the service instance as soon as they arrive.</p>
+<p>Multiple选项不提供任何同步措施, 需要手动同步, 例如:<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">[<span class="meta">ServiceContract(SessionMode = SessionMode.Required)</span>]</span><br><span class="line"><span class="keyword">interface</span> <span class="title">IMyContract</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="function"><span class="keyword">void</span> <span class="title">MyMethod</span>(<span class="params"></span>)</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">[<span class="meta">ServiceBehavior(ConcurrencyMode = ConcurrencyMode.Multiple)</span>]</span><br><span class="line"><span class="keyword">class</span> <span class="title">MyService</span> : <span class="title">IMyContract</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">int</span>[] m_Numbers;</span><br><span class="line">	List&lt;<span class="keyword">string</span>&gt; m_Names;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">MyMethod</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>	&#123;</span><br><span class="line">		<span class="keyword">lock</span>(<span class="keyword">this</span>)</span><br><span class="line">		&#123;</span><br><span class="line">		...</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>While this code is thread-safe, you actually gain little from the use of ConcurrencyMode.Multiple: the net effect in terms of synchronization is similar to using ConcurrencyMode.Single, yet you have increased the overall code complexity and reliance on developers’ discipline. <strong>In general, you should avoid ConcurrencyMode.Multiple</strong>. However, there are cases where ConcurrencyMode.Multiple is useful.</p>
+<h4 id="ConcurrencyMode-Reentrant"><a href="#ConcurrencyMode-Reentrant" class="headerlink" title="ConcurrencyMode.Reentrant"></a>ConcurrencyMode.Reentrant</h4><p>The ConcurrencyMode.Reentrant value is a refinement of the ConcurrencyMode.Single value. <strong>Similarly to ConcurrencyMode.Single, ConcurrencyMode.Reentrantassociates the service instance with a synchronization lock</strong>, so that concurrent calls on the same instance are never allowed. However, if the reentrant service calls out to another service or a callback, and that call chain (or causality) somehow winds its way back to the service instance 如下图所示, WCF silently releases the synchronization lock that is associated with the instance.it is allowed to reenter the service instance.<br><img src="/img/wcf-call-reentrancy.png" alt=""></p>
+<p>ConcurrencyMode.Reentrant is designed to avoid the potential deadlock of reentrancy.</p>
+<p>A service configured with ConcurrencyMode.Multiple is by definition also reentrant, because no lock is held during the callout.However, unlike a reentrant service, which is inherently threadsafe, a service configured with ConcurrencyMode.Multiple must provide for its own synchronization (for example, by locking the instance during every call, as explained previously). It is up to the developer of such a service to decide if it should release the lock before calling out to avoid a reentrancy deadlock. <strong>ConcurrencyMode.Multiple本身也是可重入的</strong></p>
+<p>可重入不是说两个线程可以并发调用该方法, 它仍然是single模式, 后一个会等前一个执行完之后再进入<br>可重入是说, 在方法内部调用其他Service或者回调, 当Service或者回调返回时, 仍然能够回到该Context中. 如果不能返回, 就是死锁.</p>
+<p>上一篇笔记中提到, 即使Callback中加了ConcurrencyMode.Reentrant, 仍有可能发生死锁.</p>
+<h3 id="Instances-and-Concurrent-Access"><a href="#Instances-and-Concurrent-Access" class="headerlink" title="Instances and Concurrent Access"></a>Instances and Concurrent Access</h3><p>Using the same proxy, a single client can issue multiple concurrent calls to a service. The client can use multiple threads to invoke calls on the service, or it can issue oneway calls in rapid succession on the same thread. In both of these cases, whether the calls from the same client are processed concurrently is the product of the service’s configured instancing mode, the service’s concurrency mode, and the configured delivery mode (that is, the transport session). The following discussion applies equally to request-reply and one-way calls.</p>
+<h4 id="Per-Call-Services"><a href="#Per-Call-Services" class="headerlink" title="Per-Call Services"></a>Per-Call Services</h4><p>In the case of a per-call service, if there is no transport-level session, concurrent processing of calls is allowed. Calls are dispatched as they arrive, each to a new instance, and execute concurrently. This is the case regardless of the service concurrency mode.</p>
+<p>If the service is configured with ConcurrencyMode.Single, concurrent processing of the pending calls is not allowed, and the calls are dispatched one at a time. </p>
+<p>If the service is configured with ConcurrencyMode.Multiple, concurrent processing is allowed. Calls are dispatched as they arrive, each to a new instance, and execute concurrently. it is a good idea to configure a per-call service with Concurrency Mode.Multiple—the instance itself will still be thread-safe (so you will not incur the synchronization liability), yet you will allow concurrent calls from the same client</p>
+<p>When the service is configured with ConcurrencyMode.Reentrant, if the service does not call out, it behaves similarly to a service configured with ConcurrencyMode.Single. If the service does call out, the next call is allowed in, and the returning call has to negotiate the lock like all other pending calls</p>
+<h4 id="Sessionful-and-Singleton-Services"><a href="#Sessionful-and-Singleton-Services" class="headerlink" title="Sessionful and Singleton Services"></a>Sessionful and Singleton Services</h4><p>In the case of a sessionful or a singleton service, the configured concurrency mode alone governs the concurrent execution of pending calls. If the service is configured with ConcurrencyMode.Single, calls will be dispatched to the service instance one at a time, and pending calls will be placed in a queue. You should avoid lengthy processing of calls, because it may risk call timeouts.</p>
+<p>If the service instance is configured with ConcurrencyMode.Multiple, concurrent processing of calls from the same client is allowed. Calls will be executed by the service instance as fast as they come off the channel (up to the throttle limit). Of course, as is always the case with a stateful unsynchronized service instance, you must synchronize access to the service instance or risk state corruption.</p>
+<p>If the service instance is configured with ConcurrencyMode.Reentrant, it behaves just as it would with ConcurrencyMode.Single. However, if the service calls out, the next call is allowed to execute. You must follow the guidelines discussed previously regarding programming in a reentrant environment.</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/WCF/" rel="tag"># WCF</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/05/06/WCF笔记(X4) 双工通信/" rel="next" title="WCF笔记(X4) 双工通信">
+                <i class="fa fa-chevron-left"></i> WCF笔记(X4) 双工通信
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/05/11/2D Visualization笔记(X2) OxyPlot(一)/" rel="prev" title="2D Visualization笔记(X2) OxyPlot(一)">
+                2D Visualization笔记(X2) OxyPlot(一) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">zmapleaf</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">66</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Instance-Management-and-Concurrency"><span class="nav-number">1.</span> <span class="nav-text">Instance Management and Concurrency</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#ConcurrencyMode-Single"><span class="nav-number">1.1.</span> <span class="nav-text">ConcurrencyMode.Single</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ConcurrencyMode-Multiple"><span class="nav-number">1.2.</span> <span class="nav-text">ConcurrencyMode.Multiple</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ConcurrencyMode-Reentrant"><span class="nav-number">1.3.</span> <span class="nav-text">ConcurrencyMode.Reentrant</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Instances-and-Concurrent-Access"><span class="nav-number">2.</span> <span class="nav-text">Instances and Concurrent Access</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Per-Call-Services"><span class="nav-number">2.1.</span> <span class="nav-text">Per-Call Services</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Sessionful-and-Singleton-Services"><span class="nav-number">2.2.</span> <span class="nav-text">Sessionful and Singleton Services</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zmapleaf</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

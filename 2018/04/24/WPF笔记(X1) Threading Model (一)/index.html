@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="WPF,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="学习官方MSDN的文档https://docs.microsoft.com/en-us/dotnet/framework/wpf/advanced/threading-model wpf程序默认有2个线程:  Render线程和UI线程. Render线程运行在后台, 负责wpf的绘制. UI线程负责接收用户输入, 处理事件监听, 重绘屏幕(Repaint事件), 还有运行wpf程序的逻辑代码.">
+<meta name="keywords" content="WPF">
+<meta property="og:type" content="article">
+<meta property="og:title" content="WPF笔记(X1) Threading Model (一)">
+<meta property="og:url" content="http://yoursite.com/2018/04/24/WPF笔记(X1) Threading Model (一)/index.html">
+<meta property="og:site_name" content="远">
+<meta property="og:description" content="学习官方MSDN的文档https://docs.microsoft.com/en-us/dotnet/framework/wpf/advanced/threading-model wpf程序默认有2个线程:  Render线程和UI线程. Render线程运行在后台, 负责wpf的绘制. UI线程负责接收用户输入, 处理事件监听, 重绘屏幕(Repaint事件), 还有运行wpf程序的逻辑代码.">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://yoursite.com/img/wpf-threadingmodel-1.png">
+<meta property="og:image" content="http://yoursite.com/img/wpf-threadingmodel-1.png">
+<meta property="og:updated_time" content="2018-05-08T03:21:39.956Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="WPF笔记(X1) Threading Model (一)">
+<meta name="twitter:description" content="学习官方MSDN的文档https://docs.microsoft.com/en-us/dotnet/framework/wpf/advanced/threading-model wpf程序默认有2个线程:  Render线程和UI线程. Render线程运行在后台, 负责wpf的绘制. UI线程负责接收用户输入, 处理事件监听, 重绘屏幕(Repaint事件), 还有运行wpf程序的逻辑代码.">
+<meta name="twitter:image" content="http://yoursite.com/img/wpf-threadingmodel-1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/04/24/WPF笔记(X1) Threading Model (一)/">
+
+
+
+
+
+  <title>WPF笔记(X1) Threading Model (一) | 远</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">远</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/24/WPF笔记(X1) Threading Model (一)/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zmapleaf">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="远">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">WPF笔记(X1) Threading Model (一)</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-24T08:23:37+08:00">
+                2018-04-24
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/编程/" itemprop="url" rel="index">
+                    <span itemprop="name">编程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>学习官方MSDN的文档<a href="https://docs.microsoft.com/en-us/dotnet/framework/wpf/advanced/threading-model" target="_blank" rel="noopener">https://docs.microsoft.com/en-us/dotnet/framework/wpf/advanced/threading-model</a></p>
+<p>wpf程序默认有2个线程:  Render线程和UI线程. Render线程运行在后台, 负责wpf的绘制. UI线程负责接收用户输入, 处理事件监听, 重绘屏幕(Repaint事件), 还有运行wpf程序的逻辑代码. 大多数wpf程序只需要一个UI线程即可, 少数应用场景需要多个UI线程.</p>
+<p>UI线程将需要处理的任务以”work item”的方式放到队列中, 然后根据work item的优先级从队列中取出执行, 执行完毕后再取出下一个work item, 循环往复. 这部分功能是封装在一个叫 Dispatcher的对象中. 每个UI线程至少有一个Dispatcher, 每个Dispatcher只在一个线程中执行work item. 什么样的work item呢? 可以见下图左边部分</p>
+<p><img src="/img/wpf-threadingmodel-1.png" alt=""></p>
+<p>可以看到, 用户逻辑代码和系统消息处理都是在dispatcher queue当中. 为了保持UI的及时响应. 用户逻辑代码和系统消息处理都不应该是耗时的操作. 否则UI就会失去响应. 对于那些耗时的操作, 例如复杂计算(long runing)或者远程数据查询(blocking), 可以启动work Thread执行. 当耗时操作完成时,  再通知UI线程去更新显示.</p>
+<p>而对于UI元素, Windows系统只允许构建该UI元素的线程才能访问, 其他线程不能访问(thread affinity) . 这样做是为了确保UI元素的完整性, 可以想象一个listbox, 绘制的同时, 它的内容也在被其他线程更改, 这样就会显得很奇怪.</p>
+<p>那work Thread怎么将执行的结果告知给UI线程呢? 它是将”更新”的操作封装成一个work item, 放到dispatcher的队列中. dispatcher提供了2种放的方式: Invoke 和 BeginInvoke. 前者是同步的, 放了之后要执行完才能返回. 后者是异步的, 放了之后, 立马返回.</p>
+<p>那么如何得知该对象是否只能由UI线程访问呢?  看它的基类. wpf中大部分类都继承自DispatcherObject. 例如 Brush和Geometry都是继承DispatcherObject,  其他线程不能访问. 而*Color类不是, 其他线程可以访问. DispatcherObject对象会保存创建它的线程的Dispatcher引用, 并且在每一个DispatcherObject的方法调用之前, 会通过VerifyAccess方法验证当前线程的Dispatcher对象与它保存的Dispatcher引用是否一致. 如果不一致,则抛出异常. </p>
+<p>以上就是wpf线程模型的概要. 下面是几个样例(位于wpf-sample的Threading目录中)</p>
+<ol>
+<li>远程查询</li>
+<li>利用UI程序的idle时间执行耗时操作</li>
+<li>多个UI线程</li>
+</ol>
+<p><strong>1. 远程查询</strong><br>这个例子是使用dispatcher最常见的那种情况: 后台线程通过dispatcher.BeginInvoke将更新操作委托给UI线程</p>
+<p>UsingDispatcher样例<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">    <span class="comment">// Start fetching the weather forecast asynchronously.</span></span><br><span class="line">    <span class="keyword">var</span> fetcher = <span class="keyword">new</span> NoArgDelegate(</span><br><span class="line">        FetchWeatherFromServer);</span><br><span class="line"></span><br><span class="line">    fetcher.BeginInvoke(<span class="literal">null</span>, <span class="literal">null</span>);<span class="comment">//异步委托，实际是起一个线程</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">FetchWeatherFromServer</span>(<span class="params"></span>)<span class="comment">//该方法是在非UI线程中执行</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// Simulate the delay from network access.</span></span><br><span class="line">    Thread.Sleep(<span class="number">4000</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Tried and true method for weather forecasting - random numbers.</span></span><br><span class="line">    <span class="keyword">var</span> rand = <span class="keyword">new</span> Random();</span><br><span class="line">    <span class="keyword">string</span> weather;</span><br><span class="line"></span><br><span class="line">    weather = rand.Next(<span class="number">2</span>) == <span class="number">0</span> ? <span class="string">"rainy"</span> : <span class="string">"sunny"</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Schedule the update function in the UI thread. 注意这里用到Schedule</span></span><br><span class="line">    tomorrowsWeather.Dispatcher.BeginInvoke(<span class="comment">//wpf元素的Dispatcher可以在非UI线程中获取，但不能访问其他东西</span></span><br><span class="line">        DispatcherPriority.Normal,</span><br><span class="line">        <span class="keyword">new</span> OneArgDelegate(UpdateUserInterface),</span><br><span class="line">        weather);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><strong>2. 利用UI程序的idle时间执行耗时操作</strong></p>
+<p>这个例子演示了<strong>即使是单个UI线程, 也可以在保持UI响应的同时, 做一些耗时的操作. 关键是利用好UI线程idle的时间</strong>. 就是前面用到的图:<br><img src="/img/wpf-threadingmodel-1.png" alt=""></p>
+<p>SingleThreadedApplication样例</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">CheckNextNumber</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">if</span> (_continueCalculating)</span><br><span class="line">        &#123;</span><br><span class="line">            startStopButton.Dispatcher.BeginInvoke(</span><br><span class="line">                DispatcherPriority.SystemIdle,</span><br><span class="line">                <span class="keyword">new</span> NextPrimeDelegate(CheckNextNumber));</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">通过这种方式，可以多次调度CheckNextNumber方法</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">StartOrStop</span>(<span class="params"><span class="keyword">object</span> sender, EventArgs e</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">if</span> (_continueCalculating)</span><br><span class="line">        &#123;</span><br><span class="line">            _continueCalculating = <span class="literal">false</span>;</span><br><span class="line">            startStopButton.Content = <span class="string">"Resume"</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">        &#123;</span><br><span class="line">            _continueCalculating = <span class="literal">true</span>;</span><br><span class="line">            startStopButton.Content = <span class="string">"Stop"</span>;</span><br><span class="line">            startStopButton.Dispatcher.BeginInvoke(</span><br><span class="line">                DispatcherPriority.Normal,</span><br><span class="line">                <span class="keyword">new</span> NextPrimeDelegate(CheckNextNumber));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">CheckNextNumber</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">var</span> x = <span class="keyword">new</span> Stopwatch();</span><br><span class="line">        x.Start();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Reset flag.</span></span><br><span class="line">        _notAPrime = <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">long</span> i = <span class="number">3</span>; i &lt;= Math.Sqrt(_num); i++)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span> (_num%i == <span class="number">0</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="comment">// Set not a prime flag to ture.</span></span><br><span class="line">                _notAPrime = <span class="literal">true</span>;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// If a prime number.</span></span><br><span class="line">        <span class="keyword">if</span> (!_notAPrime)</span><br><span class="line">        &#123;</span><br><span class="line">            x.Stop();</span><br><span class="line">            elapsed.Text = x.ElapsedMilliseconds.ToString();</span><br><span class="line">            bigPrime.Text = _num.ToString();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        _num += <span class="number">2</span>;</span><br><span class="line">        <span class="keyword">if</span> (_continueCalculating)</span><br><span class="line">        &#123;</span><br><span class="line">            startStopButton.Dispatcher.BeginInvoke(</span><br><span class="line">                DispatcherPriority.SystemIdle,</span><br><span class="line">                <span class="keyword">new</span> NextPrimeDelegate(CheckNextNumber));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p><strong>3. 多个UI线程</strong></p>
+<p>MultiThreadingWebBrowser</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">NewWindowHandler</span>(<span class="params"><span class="keyword">object</span> sender, RoutedEventArgs e</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">var</span> newWindowThread = <span class="keyword">new</span> Thread(ThreadStartingPoint);</span><br><span class="line">        newWindowThread.SetApartmentState(ApartmentState.STA);</span><br><span class="line">        newWindowThread.IsBackground = <span class="literal">true</span>;</span><br><span class="line">        newWindowThread.Start();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">ThreadStartingPoint</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">var</span> tempWindow = <span class="keyword">new</span> MainWindow();</span><br><span class="line">        tempWindow.Show();</span><br><span class="line">        Dispatcher.Run();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">这一样例在Multiple UI Threads and Dispatchers 一节中讲到（Programming WPF）</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>Each thread that hosts UI objects needs a dispatcher in order for those UI objects to function. In a single-threaded application, you don’t need to do anything special to create a dispatcher. The Application class creates one for you at startup, and shuts it down automatically on exit.</p>
+</blockquote>
+<blockquote>
+<p>However, <strong>if you create multiple user interface threads, you will need to start up and shut down the dispatcher for those manually</strong></p>
+</blockquote>
+<blockquote>
+<p>The Dispatcher for a thread is created automatically the first time an object derived from the DispatcherObject base class is created. All WPF classes derive from this base class. So, the Dispatcher for the new thread will come into existence when the Window is created. All we have to do is call the static Dispatcher.Run method to ensure that messages are delivered to any UI objects created on the thread. </p>
+</blockquote>
+<p>大多数情况下，我们是不需要多UI线程的，所谓多UI线程，就是指有两个或者两个以上的线程创建了UI对象。这种做法的好处是两个UI线程会分别进入各自的GetMessage循环，如果是需要多个监视实时数据的UI，或者说使用了DirectShow一些事件密集的程序，可以考虑新创建一个UI线程（GetMessage循环）来减轻单一消息泵的压力。当然，这样做的坏处也很多，不同UI线程中的UI对象互相访问是需要进行Invoke通信的，为了解决这个问题，WPF提供了VisualTarget来用于跨线程将一个对象树连接到另一个对象树，如：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">VisualHost</span> : <span class="title">FrameworkElement</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> Visual Child</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">get</span> &#123; <span class="keyword">return</span> _child; &#125;</span><br><span class="line">        <span class="keyword">set</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span> (_child != <span class="literal">null</span>)</span><br><span class="line">                RemoveVisualChild(_child);</span><br><span class="line">            _child = <span class="keyword">value</span>;</span><br><span class="line">            <span class="keyword">if</span> (_child != <span class="literal">null</span>)</span><br><span class="line">                AddVisualChild(_child);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">override</span> Visual <span class="title">GetVisualChild</span>(<span class="params"><span class="keyword">int</span> index</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">if</span> (_child != <span class="literal">null</span> &amp;&amp; index == <span class="number">0</span>)</span><br><span class="line">            <span class="keyword">return</span> _child;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> ArgumentOutOfRangeException(<span class="string">"index"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">override</span> <span class="keyword">int</span> VisualChildrenCount</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">get</span> &#123; <span class="keyword">return</span> _child != <span class="literal">null</span> ? <span class="number">1</span> : <span class="number">0</span>; &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> Visual _child;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在另一个UI线程下的VisualTarget<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">Window win = <span class="keyword">new</span> Window();</span><br><span class="line"></span><br><span class="line">win.Loaded += (s, ex) =&gt;</span><br><span class="line">    &#123;</span><br><span class="line">        VisualHost vh = <span class="keyword">new</span> VisualHost();</span><br><span class="line">        HostVisual hostVisual = <span class="keyword">new</span> HostVisual();</span><br><span class="line">        vh.Child = hostVisual;</span><br><span class="line">        win.Content = vh;</span><br><span class="line">        Thread thread = <span class="keyword">new</span> Thread(<span class="keyword">new</span> ThreadStart(() =&gt;</span><br><span class="line">        &#123;</span><br><span class="line">            VisualTarget visualTarget = <span class="keyword">new</span> VisualTarget(hostVisual);</span><br><span class="line">            DrawingVisual dv = <span class="keyword">new</span> DrawingVisual();</span><br><span class="line"></span><br><span class="line">            <span class="keyword">using</span> (<span class="keyword">var</span> dc = dv.RenderOpen())</span><br><span class="line">            &#123;</span><br><span class="line">                dc.DrawText(<span class="keyword">new</span> FormattedText(<span class="string">"UI from another UI thread"</span>,</span><br><span class="line">                    System.Globalization.CultureInfo.GetCultureInfo(<span class="string">"en-us"</span>),</span><br><span class="line">                    FlowDirection.LeftToRight,</span><br><span class="line">                    <span class="keyword">new</span> Typeface(<span class="string">"Verdana"</span>),</span><br><span class="line">                    <span class="number">32</span>,</span><br><span class="line">                    Brushes.Black), <span class="keyword">new</span> Point(<span class="number">10</span>, <span class="number">0</span>));</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            visualTarget.RootVisual = dv;</span><br><span class="line">            Dispatcher.Run();  <span class="comment">//启动Dispatcher</span></span><br><span class="line"> </span><br><span class="line">        &#125;));</span><br><span class="line"></span><br><span class="line">        thread.SetApartmentState(ApartmentState.STA);</span><br><span class="line">        thread.IsBackground = <span class="literal">true</span>;</span><br><span class="line">        thread.Start();</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">win.Show();</span><br></pre></td></tr></table></figure></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/WPF/" rel="tag"># WPF</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/04/22/P&P笔记(X1) Exception Handle (三)/" rel="next" title="P&P笔记(X1) Exception Handle (三)">
+                <i class="fa fa-chevron-left"></i> P&P笔记(X1) Exception Handle (三)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/04/24/CSharp笔记(X1) IDisposable/" rel="prev" title="CSharp笔记(X1) IDisposable">
+                CSharp笔记(X1) IDisposable <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">zmapleaf</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">66</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zmapleaf</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

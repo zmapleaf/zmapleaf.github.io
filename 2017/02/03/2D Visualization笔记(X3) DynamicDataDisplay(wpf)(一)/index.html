@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="可视化,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Hello World Demo 分析 MainWindow.xaml1234567891011121314&amp;lt;Window x:Class=&quot;Simplest.MainWindow&quot;    xmlns=&quot;http://schemas.microsoft.com/winfx/2006/xaml/presentation&quot;    xmlns:x=&quot;http://schemas.microsoft">
+<meta name="keywords" content="可视化">
+<meta property="og:type" content="article">
+<meta property="og:title" content="2D Visualization笔记(X3) DynamicDataDisplay(wpf)(一)">
+<meta property="og:url" content="http://yoursite.com/2017/02/03/2D Visualization笔记(X3) DynamicDataDisplay(wpf)(一)/index.html">
+<meta property="og:site_name" content="远">
+<meta property="og:description" content="Hello World Demo 分析 MainWindow.xaml1234567891011121314&amp;lt;Window x:Class=&quot;Simplest.MainWindow&quot;    xmlns=&quot;http://schemas.microsoft.com/winfx/2006/xaml/presentation&quot;    xmlns:x=&quot;http://schemas.microsoft">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-05-13T04:54:59.608Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="2D Visualization笔记(X3) DynamicDataDisplay(wpf)(一)">
+<meta name="twitter:description" content="Hello World Demo 分析 MainWindow.xaml1234567891011121314&amp;lt;Window x:Class=&quot;Simplest.MainWindow&quot;    xmlns=&quot;http://schemas.microsoft.com/winfx/2006/xaml/presentation&quot;    xmlns:x=&quot;http://schemas.microsoft">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/02/03/2D Visualization笔记(X3) DynamicDataDisplay(wpf)(一)/">
+
+
+
+
+
+  <title>2D Visualization笔记(X3) DynamicDataDisplay(wpf)(一) | 远</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">远</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/03/2D Visualization笔记(X3) DynamicDataDisplay(wpf)(一)/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zmapleaf">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="远">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">2D Visualization笔记(X3) DynamicDataDisplay(wpf)(一)</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-02-03T16:03:57+08:00">
+                2017-02-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/编程/" itemprop="url" rel="index">
+                    <span itemprop="name">编程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Hello World Demo 分析</p>
+<h4 id="MainWindow-xaml"><a href="#MainWindow-xaml" class="headerlink" title="MainWindow.xaml"></a>MainWindow.xaml</h4><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">Window</span> <span class="attr">x:Class</span>=<span class="string">"Simplest.MainWindow"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">xmlns</span>=<span class="string">"http://schemas.microsoft.com/winfx/2006/xaml/presentation"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">xmlns:x</span>=<span class="string">"http://schemas.microsoft.com/winfx/2006/xaml"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">xmlns:d3</span>=<span class="string">"http://research.microsoft.com/DynamicDataDisplay/1.0"</span>    </span></span><br><span class="line"><span class="tag">    <span class="attr">Title</span>=<span class="string">"Simplest plot sample"</span> <span class="attr">Height</span>=<span class="string">"243"</span> <span class="attr">Width</span>=<span class="string">"416"</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">d3:ChartPlotter</span> <span class="attr">Name</span>=<span class="string">"plotter"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">d3:Header</span> <span class="attr">TextBlock.FontSize</span>=<span class="string">"20"</span>&gt;</span></span><br><span class="line">            Very simple chart</span><br><span class="line">        <span class="tag">&lt;/<span class="name">d3:Header</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">d3:VerticalAxisTitle</span>&gt;</span>Sine value<span class="tag">&lt;/<span class="name">d3:VerticalAxisTitle</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">d3:HorizontalAxisTitle</span>&gt;</span>Sine argument<span class="tag">&lt;/<span class="name">d3:HorizontalAxisTitle</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">d3:ChartPlotter</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">Window</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h4 id="MainWindow-xaml-cs"><a href="#MainWindow-xaml-cs" class="headerlink" title="MainWindow.xaml.cs"></a>MainWindow.xaml.cs</h4><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">namespace</span> <span class="title">Simplest</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span>Interaction logic for simplest plot application<span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">partial</span> <span class="keyword">class</span> <span class="title">MainWindow</span> : <span class="title">Window</span></span><br><span class="line">	&#123;</span><br><span class="line">		<span class="function"><span class="keyword">public</span> <span class="title">MainWindow</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>		&#123;</span><br><span class="line">			InitializeComponent();</span><br><span class="line"></span><br><span class="line">			Loaded += <span class="keyword">new</span> RoutedEventHandler(MainWindow_Loaded);</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="function"><span class="keyword">void</span> <span class="title">MainWindow_Loaded</span>(<span class="params"><span class="keyword">object</span> sender, RoutedEventArgs e</span>)</span></span><br><span class="line"><span class="function"></span>		&#123;</span><br><span class="line">			<span class="comment">// Prepare data in arrays</span></span><br><span class="line">			<span class="keyword">const</span> <span class="keyword">int</span> N = <span class="number">1000</span>;</span><br><span class="line">			<span class="keyword">double</span>[] x = <span class="keyword">new</span> <span class="keyword">double</span>[N];</span><br><span class="line">			<span class="keyword">double</span>[] y = <span class="keyword">new</span> <span class="keyword">double</span>[N];</span><br><span class="line"></span><br><span class="line">			<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; N; i++)</span><br><span class="line">			&#123;</span><br><span class="line">				x[i] = i * <span class="number">0.1</span>;</span><br><span class="line">				y[i] = Math.Sin(x[i]);</span><br><span class="line">			&#125;</span><br><span class="line"></span><br><span class="line">			<span class="comment">// Create data sources:</span></span><br><span class="line">			<span class="keyword">var</span> xDataSource = x.AsXDataSource();</span><br><span class="line">			<span class="keyword">var</span> yDataSource = y.AsYDataSource();</span><br><span class="line"></span><br><span class="line">			CompositeDataSource compositeDataSource = xDataSource.Join(yDataSource);</span><br><span class="line">			<span class="comment">// adding graph to plotter</span></span><br><span class="line">			plotter.AddLineGraph(compositeDataSource,</span><br><span class="line">				Colors.Goldenrod,</span><br><span class="line">				<span class="number">3</span>,</span><br><span class="line">				<span class="string">"zmapleaf"</span>);</span><br><span class="line"></span><br><span class="line">			<span class="comment">// Force evertyhing plotted to be visible</span></span><br><span class="line">			plotter.FitToView();</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在Plot中插入图表<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> LineGraph <span class="title">AddLineGraph</span>(<span class="params"><span class="keyword">this</span> Plotter2D plotter, IPointDataSource pointSource, Pen linePen, Description description</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	LineGraph graph = <span class="keyword">new</span> LineGraph</span><br><span class="line">	&#123;</span><br><span class="line">		DataSource = pointSource,</span><br><span class="line">		LinePen = linePen</span><br><span class="line">	&#125;;</span><br><span class="line">	graph.Filters.Add(<span class="keyword">new</span> InclinationFilter());</span><br><span class="line">	graph.Filters.Add(<span class="keyword">new</span> FrequencyFilter());</span><br><span class="line">	<span class="comment">//graph.Filters.Add(new CountFilter());</span></span><br><span class="line">	plotter.Children.Add(graph);</span><br><span class="line">	<span class="keyword">return</span> graph;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>LineGraph的继承关系<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">System.Object</span><br><span class="line">  System.Windows.Threading.DispatcherObject</span><br><span class="line">    System.Windows.DependencyObject</span><br><span class="line">      System.Windows.Media.Visual</span><br><span class="line">        System.Windows.UIElement</span><br><span class="line">          System.Windows.FrameworkElement</span><br><span class="line">            Microsoft.Research.DynamicDataDisplay.PlotterElement</span><br><span class="line">              Microsoft.Research.DynamicDataDisplay.ViewportElement2D</span><br><span class="line">                Microsoft.Research.DynamicDataDisplay.PointsGraphBase</span><br><span class="line">                  Microsoft.Research.DynamicDataDisplay.LineGraph</span><br></pre></td></tr></table></figure></p>
+<p>ChartPlotter的继承关系<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">System.Object</span><br><span class="line">  System.Windows.Threading.DispatcherObject</span><br><span class="line">    System.Windows.DependencyObject</span><br><span class="line">      System.Windows.Media.Visual</span><br><span class="line">        System.Windows.UIElement</span><br><span class="line">          System.Windows.FrameworkElement</span><br><span class="line">            System.Windows.Controls.Control</span><br><span class="line">              System.Windows.Controls.ContentControl</span><br><span class="line">                Microsoft.Research.DynamicDataDisplay.Plotter</span><br><span class="line">                  Microsoft.Research.DynamicDataDisplay.Plotter2D</span><br><span class="line">                    Microsoft.Research.DynamicDataDisplay.ChartPlotter</span><br></pre></td></tr></table></figure></p>
+<hr>
+<h3 id="LineGraph如何绘制"><a href="#LineGraph如何绘制" class="headerlink" title="LineGraph如何绘制"></a>LineGraph如何绘制</h3><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">filters.CollectionChanged += filters_CollectionChanged;</span><br></pre></td></tr></table></figure>
+<p>调用graph.Filters.Add(new InclinationFilter())之后, 触发filters_CollectionChanged事件<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">filters_CollectionChanged</span>(<span class="params"><span class="keyword">object</span> sender, NotifyCollectionChangedEventArgs e</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	filteredPoints = <span class="literal">null</span>;</span><br><span class="line">	Update();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>Update定义在父类<em>ViewportElement2D</em>中<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">if</span> (Viewport == <span class="literal">null</span>) <span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line">	UpdateCore();</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (!beforeFirstUpdate)</span><br><span class="line">	&#123;</span><br><span class="line">		updateCalled = <span class="literal">true</span>;</span><br><span class="line">		InvalidateVisual();</span><br><span class="line">	&#125;</span><br><span class="line">	beforeFirstUpdate = <span class="literal">false</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">UpdateCore</span>(<span class="params"></span>)</span> &#123; &#125;</span><br></pre></td></tr></table></figure></p>
+<p>LineGraph重写UpdateCore<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> FakePointList filteredPoints;</span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">UpdateCore</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">if</span> (DataSource == <span class="literal">null</span>) <span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line">	Rect output = Viewport.Output;</span><br><span class="line">	<span class="keyword">var</span> transform = GetTransform();</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (filteredPoints == <span class="literal">null</span> || !(transform.DataTransform <span class="keyword">is</span> IdentityTransform))</span><br><span class="line">	&#123;</span><br><span class="line">		IEnumerable&lt;Point&gt; points = GetPoints();</span><br><span class="line"></span><br><span class="line">		ContentBounds = BoundsHelper.GetViewportBounds(points, transform.DataTransform);</span><br><span class="line"></span><br><span class="line">		transform = GetTransform();</span><br><span class="line">		List&lt;Point&gt; transformedPoints = transform.DataToScreen(points);</span><br><span class="line"></span><br><span class="line">		<span class="comment">// Analysis and filtering of unnecessary points</span></span><br><span class="line">		filteredPoints = <span class="keyword">new</span> FakePointList(FilterPoints(transformedPoints),</span><br><span class="line">			output.Left, output.Right);</span><br><span class="line"></span><br><span class="line">		Offset = <span class="keyword">new</span> Vector();</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">else</span></span><br><span class="line">	&#123;...</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>UpdateCore先是将数据转换到窗口, 然后在调用Filter对数据进行过滤(裁剪)</p>
+<p>ViewportElement2D是重点，有Update，UpdateCore(纯虚函数)，OnRender(重写)，OnRenderCore(纯虚函数). OnRender原本是UIElement的纯虚函数, ViewportElement2D重写OnRender<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">bool</span> shouldReRender = <span class="literal">true</span>;</span><br><span class="line"><span class="keyword">private</span> DrawingGroup graphContents;</span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">sealed</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">OnRender</span>(<span class="params">DrawingContext drawingContext</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">if</span> (Viewport == <span class="literal">null</span>) <span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line">	Rect output = Viewport.Output;</span><br><span class="line">	<span class="keyword">if</span> (output.Width == <span class="number">0</span> || output.Height == <span class="number">0</span>) <span class="keyword">return</span>;</span><br><span class="line">	<span class="keyword">if</span> (output.IsEmpty) <span class="keyword">return</span>;</span><br><span class="line">	<span class="keyword">if</span> (Visibility != Visibility.Visible) <span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (shouldReRender || manualTranslate || renderTarget == RenderTo.Image || beforeFirstUpdate || updateCalled)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">if</span> (graphContents == <span class="literal">null</span>)</span><br><span class="line">		&#123;</span><br><span class="line">			graphContents = <span class="keyword">new</span> DrawingGroup();</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">if</span> (beforeFirstUpdate)</span><br><span class="line">		&#123;</span><br><span class="line">			Update();</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">using</span> (DrawingContext context = graphContents.Open())</span><br><span class="line">		&#123;</span><br><span class="line">			<span class="keyword">if</span> (renderTarget == RenderTo.Screen)</span><br><span class="line">			&#123;</span><br><span class="line">				RenderState state = CreateRenderState(Viewport.Visible, RenderTo.Screen);</span><br><span class="line">				OnRenderCore(context, state);</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">else</span></span><br><span class="line">			&#123;</span><br><span class="line">				<span class="comment">// for future use</span></span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		updateCalled = <span class="literal">false</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// thumbnail is not created, if</span></span><br><span class="line">	<span class="comment">// 1) CreateThumbnail is false</span></span><br><span class="line">	<span class="comment">// 2) this graph has IsLayer property, set to false</span></span><br><span class="line">	<span class="keyword">if</span> (ShouldCreateThumbnail)</span><br><span class="line">	&#123;</span><br><span class="line">		RenderThumbnail();</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (!manualClip)</span><br><span class="line">	&#123;</span><br><span class="line">		drawingContext.PushClip(<span class="keyword">new</span> RectangleGeometry(output));</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">bool</span> translate = !manualTranslate &amp;&amp; IsTranslated;</span><br><span class="line">	<span class="keyword">if</span> (translate)</span><br><span class="line">	&#123;</span><br><span class="line">		drawingContext.PushTransform(<span class="keyword">new</span> TranslateTransform(offset.X, offset.Y));</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	drawingContext.DrawDrawing(graphContents);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (translate)</span><br><span class="line">	&#123;</span><br><span class="line">		drawingContext.Pop();</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> (!manualClip)</span><br><span class="line">	&#123;</span><br><span class="line">		drawingContext.Pop();</span><br><span class="line">	&#125;</span><br><span class="line">	shouldReRender = <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">OnRenderCore</span>(<span class="params">DrawingContext dc, RenderState state</span>)</span>;</span><br></pre></td></tr></table></figure></p>
+<p>LineGraph重写OnRenderCore<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">OnRenderCore</span>(<span class="params">DrawingContext dc, RenderState state</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">if</span> (DataSource == <span class="literal">null</span>) <span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (filteredPoints.HasPoints)</span><br><span class="line">	&#123;</span><br><span class="line">		StreamGeometry geometry = <span class="keyword">new</span> StreamGeometry();</span><br><span class="line">		<span class="keyword">using</span> (StreamGeometryContext context = geometry.Open())</span><br><span class="line">		&#123;</span><br><span class="line">			context.BeginFigure(filteredPoints.StartPoint, <span class="literal">false</span>, <span class="literal">false</span>);</span><br><span class="line">			context.PolyLineTo(filteredPoints, <span class="literal">true</span>, <span class="literal">true</span>);</span><br><span class="line">		&#125;</span><br><span class="line">		geometry.Freeze();</span><br><span class="line"></span><br><span class="line">		<span class="keyword">const</span> Brush brush = <span class="literal">null</span>;</span><br><span class="line">		Pen pen = LinePen;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">bool</span> isTranslated = IsTranslated;</span><br><span class="line">		<span class="keyword">if</span> (isTranslated)</span><br><span class="line">		&#123;</span><br><span class="line">			dc.PushTransform(<span class="keyword">new</span> TranslateTransform(Offset.X, Offset.Y));</span><br><span class="line">		&#125;</span><br><span class="line">		dc.DrawGeometry(brush, pen, geometry);</span><br><span class="line">		<span class="keyword">if</span> (isTranslated)</span><br><span class="line">		&#123;</span><br><span class="line">			dc.Pop();</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>参考:<br><strong>UIElement.OnRender Method (DrawingContext)</strong><br><a href="https://msdn.microsoft.com/en-us/library/system.windows.uielement.onrender(v=vs.110).aspx" target="_blank" rel="noopener">https://msdn.microsoft.com/en-us/library/system.windows.uielement.onrender(v=vs.110).aspx</a></p>
+<p><strong>DrawingContext Class</strong><br><a href="https://msdn.microsoft.com/en-us/library/system.windows.media.drawingcontext(v=vs.110).aspx" target="_blank" rel="noopener">https://msdn.microsoft.com/en-us/library/system.windows.media.drawingcontext(v=vs.110).aspx</a></p>
+<p>public abstract class DrawingContext : DispatcherObject, IDisposable<br>Describes visual content using draw, push, and pop commands.</p>
+<p>Use a DrawingContext to populate a Visual or a Drawing with visual content.<br>Although the DrawingContext draw methods appear similar to the draw methods of the System.Drawing.Graphics type, they function very differently:DrawingContext is used with a retained mode graphics system, while the System.Drawing.Graphics type is used with an immediate mode graphics system. When you use a DrawingContext object’s draw commands, you are actually storing a set of rendering instructions (although the exact storage mechanism depends on the type of object that supplies the DrawingContext) that will later be used by the graphics system; you are not drawing to the screen in real-time. For more information about how the Windows Presentation Foundation (WPF) graphics system works, see WPF Graphics Rendering Overview.<br>You never directly instantiate a DrawingContext; you can, however, acquire a drawing context from certain methods, such as DrawingGroup.Openand DrawingVisual.RenderOpen.</p>
+<p><strong>StreamGeometry Class (比Shape更轻量)</strong><br><a href="https://msdn.microsoft.com/en-us/library/system.windows.media.streamgeometry(v=vs.110).aspx" target="_blank" rel="noopener">https://msdn.microsoft.com/en-us/library/system.windows.media.streamgeometry(v=vs.110).aspx</a>)<br>Defines a geometric shape, described using a StreamGeometryContext. This geometry is light-weight alternative to PathGeometry: it does not support data binding, animation, or modification.</p>
+<p><strong>Optimizing Performance: 2D Graphics and Imaging</strong><br><a href="https://msdn.microsoft.com/en-us/library/bb613591(v=vs.110).aspx" target="_blank" rel="noopener">https://msdn.microsoft.com/en-us/library/bb613591(v=vs.110).aspx</a><br>Since Shape objects derive from the FrameworkElement class, using them can add significantly more memory consumption in your application. If you really do not need the FrameworkElement features for your graphical content, consider using the lighter-weight Drawing objects.</p>
+<p><strong>How to: Create a Shape Using a StreamGeometry</strong><br><a href="https://msdn.microsoft.com/en-us/library/ms742199(v=vs.110).aspx" target="_blank" rel="noopener">https://msdn.microsoft.com/en-us/library/ms742199(v=vs.110).aspx</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/可视化/" rel="tag"># 可视化</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/02/03/2D Visualization笔记(X3) DynamicDataDisplay(wpf)(二)/" rel="next" title="2D Visualization笔记(X3) DynamicDataDisplay(wpf)(二)">
+                <i class="fa fa-chevron-left"></i> 2D Visualization笔记(X3) DynamicDataDisplay(wpf)(二)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/02/04/2D Visualization笔记(X3) DynamicDataDisplay(sl)(一)/" rel="prev" title="2D Visualization笔记(X3) DynamicDataDisplay(sl)(一)">
+                2D Visualization笔记(X3) DynamicDataDisplay(sl)(一) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">zmapleaf</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">66</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#MainWindow-xaml"><span class="nav-number">1.</span> <span class="nav-text">MainWindow.xaml</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#MainWindow-xaml-cs"><span class="nav-number">2.</span> <span class="nav-text">MainWindow.xaml.cs</span></a></li></ol><li class="nav-item nav-level-3"><a class="nav-link" href="#LineGraph如何绘制"><span class="nav-number"></span> <span class="nav-text">LineGraph如何绘制</span></a></li></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zmapleaf</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

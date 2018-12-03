@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="编程,MonoGame,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="SpriteFont的使用如下(https://msdn.microsoft.com/en-us/library/bb447673.aspx):12345678910111213141516171819202122232425262728293031SpriteFont Font1;Vector2 FontPos;protected override void LoadContent()&amp;#123">
+<meta name="keywords" content="编程,MonoGame">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MonoGame笔记(X2)SpriteFont">
+<meta property="og:url" content="http://yoursite.com/2017/12/22/MonoGame笔记(X2)SpriteFont/index.html">
+<meta property="og:site_name" content="远">
+<meta property="og:description" content="SpriteFont的使用如下(https://msdn.microsoft.com/en-us/library/bb447673.aspx):12345678910111213141516171819202122232425262728293031SpriteFont Font1;Vector2 FontPos;protected override void LoadContent()&amp;#123">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://yoursite.com/img/monogame-bitmapfont.png">
+<meta property="og:image" content="http://yoursite.com/img/monogame-bitmapfont2.png">
+<meta property="og:updated_time" content="2017-12-22T00:27:51.180Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="MonoGame笔记(X2)SpriteFont">
+<meta name="twitter:description" content="SpriteFont的使用如下(https://msdn.microsoft.com/en-us/library/bb447673.aspx):12345678910111213141516171819202122232425262728293031SpriteFont Font1;Vector2 FontPos;protected override void LoadContent()&amp;#123">
+<meta name="twitter:image" content="http://yoursite.com/img/monogame-bitmapfont.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/12/22/MonoGame笔记(X2)SpriteFont/">
+
+
+
+
+
+  <title>MonoGame笔记(X2)SpriteFont | 远</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">远</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/22/MonoGame笔记(X2)SpriteFont/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zmapleaf">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="远">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">MonoGame笔记(X2)SpriteFont</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-12-22T07:57:37+08:00">
+                2017-12-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/编程/" itemprop="url" rel="index">
+                    <span itemprop="name">编程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>SpriteFont的使用如下(<a href="https://msdn.microsoft.com/en-us/library/bb447673.aspx)" target="_blank" rel="noopener">https://msdn.microsoft.com/en-us/library/bb447673.aspx)</a>:<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">SpriteFont Font1;</span><br><span class="line">Vector2 FontPos;</span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">LoadContent</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// Create a new SpriteBatch, which can be used to draw textures.</span></span><br><span class="line">    spriteBatch = <span class="keyword">new</span> SpriteBatch(GraphicsDevice);</span><br><span class="line">    Font1 = Content.Load&lt;SpriteFont&gt;(<span class="string">"Arial"</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// <span class="doctag">TODO:</span> Load your game content here            </span></span><br><span class="line">    FontPos = <span class="keyword">new</span> Vector2(graphics.GraphicsDevice.Viewport.Width / <span class="number">2</span>,</span><br><span class="line">        graphics.GraphicsDevice.Viewport.Height / <span class="number">2</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Draw</span>(<span class="params">GameTime gameTime</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    GraphicsDevice.Clear(Color.CornflowerBlue);</span><br><span class="line"></span><br><span class="line">    spriteBatch.Begin();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Draw Hello World</span></span><br><span class="line">    <span class="keyword">string</span> output = <span class="string">"Hello World"</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Find the center of the string</span></span><br><span class="line">    Vector2 FontOrigin = Font1.MeasureString(output) / <span class="number">2</span>;</span><br><span class="line">    <span class="comment">// Draw the string</span></span><br><span class="line">    spriteBatch.DrawString(Font1, output, FontPos, Color.LightGreen,</span><br><span class="line">        <span class="number">0</span>, FontOrigin, <span class="number">1.0f</span>, SpriteEffects.None, <span class="number">0.5f</span>);</span><br><span class="line"></span><br><span class="line">    spriteBatch.End();</span><br><span class="line">    <span class="keyword">base</span>.Draw(gameTime);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>Arial.spritefont这个资源文件就是用来描述被加载的Arial字体的各种属性<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span></span><br><span class="line"><span class="comment">&lt;!--</span></span><br><span class="line"><span class="comment">This file contains an xml description of a font, and will be read by the XNA</span></span><br><span class="line"><span class="comment">Framework Content Pipeline. Follow the comments to customize the appearance</span></span><br><span class="line"><span class="comment">of the font in your game, and to change the characters which are available to draw</span></span><br><span class="line"><span class="comment">with.</span></span><br><span class="line"><span class="comment">--&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">XnaContent</span> <span class="attr">xmlns:Graphics</span>=<span class="string">"Microsoft.Xna.Framework.Content.Pipeline.Graphics"</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">Asset</span> <span class="attr">Type</span>=<span class="string">"Graphics:FontDescription"</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!--</span></span><br><span class="line"><span class="comment">    Modify this string to change the font that will be imported. Redistributable sample</span></span><br><span class="line"><span class="comment">    fonts are available at http://go.microsoft.com/fwlink/?LinkId=104778&amp;clcid=0x409.</span></span><br><span class="line"><span class="comment">    --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">FontName</span>&gt;</span>Arial<span class="tag">&lt;/<span class="name">FontName</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!--</span></span><br><span class="line"><span class="comment">    Size is a float value, measured in points. Modify this value to change</span></span><br><span class="line"><span class="comment">    the size of the font.</span></span><br><span class="line"><span class="comment">    --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Size</span>&gt;</span>14<span class="tag">&lt;/<span class="name">Size</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!--</span></span><br><span class="line"><span class="comment">    Spacing is a float value, measured in pixels. Modify this value to change</span></span><br><span class="line"><span class="comment">    the amount of spacing in between characters.</span></span><br><span class="line"><span class="comment">    --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Spacing</span>&gt;</span>0<span class="tag">&lt;/<span class="name">Spacing</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!--</span></span><br><span class="line"><span class="comment">    UseKerning controls the layout of the font. If this value is true, kerning information</span></span><br><span class="line"><span class="comment">    will be used when placing characters.</span></span><br><span class="line"><span class="comment">    --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">UseKerning</span>&gt;</span>true<span class="tag">&lt;/<span class="name">UseKerning</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!--</span></span><br><span class="line"><span class="comment">    Style controls the style of the font. Valid entries are "Regular", "Bold", "Italic",</span></span><br><span class="line"><span class="comment">    and "Bold, Italic", and are case sensitive.</span></span><br><span class="line"><span class="comment">    --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Style</span>&gt;</span><span class="undefined">Bold</span><span class="tag">&lt;/<span class="name">Style</span>&gt;</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment">&lt;!--</span></span><br><span class="line"><span class="comment">    CharacterRegions control what letters are available in the font. Every</span></span><br><span class="line"><span class="comment">    character from Start to End will be built and made available for drawing. The</span></span><br><span class="line"><span class="comment">    default range is from 32, (ASCII space), to 126, ('~'), covering the basic Latin</span></span><br><span class="line"><span class="comment">    character set. The characters are ordered according to the Unicode standard.</span></span><br><span class="line"><span class="comment">    See the documentation for more information.</span></span><br><span class="line"><span class="comment">    --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">CharacterRegions</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">CharacterRegion</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">Start</span>&gt;</span>&amp;#32;<span class="tag">&lt;/<span class="name">Start</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">End</span>&gt;</span>&amp;#126;<span class="tag">&lt;/<span class="name">End</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">CharacterRegion</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">CharacterRegions</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">Asset</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">XnaContent</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>为什么叫SpriteFont呢? 因为Font是以Sprite的方式被绘制的.<strong>MonoGame笔记(二)SpriteBatch</strong>中提到了DrawString方法的实现<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">DrawString</span>(<span class="params">SpriteFont spriteFont, <span class="keyword">string</span> text, Vector2 position, Color color</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (spriteFont == <span class="literal">null</span> )</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> ArgumentException(<span class="string">"spriteFont"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    Vector2 p = position;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">foreach</span> (<span class="keyword">char</span> c <span class="keyword">in</span> text)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span> (c == <span class="string">'\n'</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            p.Y += spriteFont.LineSpacing;</span><br><span class="line">            p.X = position.X;</span><br><span class="line">            <span class="keyword">continue</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (spriteFont.characterData.ContainsKey(c) == <span class="literal">false</span>) </span><br><span class="line">            <span class="keyword">continue</span>;</span><br><span class="line">        GlyphData g = spriteFont.characterData[c];</span><br><span class="line">        </span><br><span class="line">        SpriteBatchItem item = _batcher.CreateBatchItem();</span><br><span class="line">        </span><br><span class="line">        item.Depth = <span class="number">0.0f</span>;</span><br><span class="line">        item.TextureID = (<span class="keyword">int</span>) spriteFont._texture.ID;</span><br><span class="line"></span><br><span class="line">        Vector2 texCoordTL = spriteFont._texture.Image.GetTextureCoord ( g.Glyph.X, g.Glyph.Y );</span><br><span class="line">        Vector2 texCoordBR = spriteFont._texture.Image.GetTextureCoord ( g.Glyph.X+g.Glyph.Width, g.Glyph.Y+g.Glyph.Height );</span><br><span class="line"></span><br><span class="line">        item.Set</span><br><span class="line">            (</span><br><span class="line">                p.X,</span><br><span class="line">                p.Y+g.Cropping.Y,</span><br><span class="line">                g.Glyph.Width,</span><br><span class="line">                g.Glyph.Height,</span><br><span class="line">                color,</span><br><span class="line">                texCoordTL,</span><br><span class="line">                texCoordBR</span><br><span class="line">                );</span><br><span class="line">                </span><br><span class="line">        p.X += (g.Kerning.Y + g.Kerning.Z + spriteFont.Spacing);</span><br><span class="line">    &#125;			</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>也可以使用中文字体<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">XnaContent</span> <span class="attr">xmlns:Graphics</span>=<span class="string">"Microsoft.Xna.Framework.Content.Pipeline.Graphics"</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">Asset</span> <span class="attr">Type</span>=<span class="string">"Graphics:FontDescription"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">FontName</span>&gt;</span>华文行楷<span class="tag">&lt;/<span class="name">FontName</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Size</span>&gt;</span>30<span class="tag">&lt;/<span class="name">Size</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Spacing</span>&gt;</span>0<span class="tag">&lt;/<span class="name">Spacing</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">UseKerning</span>&gt;</span>true<span class="tag">&lt;/<span class="name">UseKerning</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Style</span>&gt;</span><span class="undefined">Regular</span><span class="tag">&lt;/<span class="name">Style</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">CharacterRegions</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">CharacterRegion</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">Start</span>&gt;</span>&amp;#19968;<span class="tag">&lt;/<span class="name">Start</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">End</span>&gt;</span>&amp;#40869;<span class="tag">&lt;/<span class="name">End</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">CharacterRegion</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">CharacterRegions</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">Asset</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">XnaContent</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>不过上述方式包含的汉字太多(2万多个), 一般只需要包含游戏中用到的汉字即可, 具体做法, 参考<a href="http://blog.csdn.net/jianxin160/article/details/6313518" target="_blank" rel="noopener">http://blog.csdn.net/jianxin160/article/details/6313518</a></p>
+<p>但这些系统自带的字体中规中矩, 游戏中很多效果往往要用到图片字<br><img src="/img/monogame-bitmapfont.png" alt=""><br>这张图片必须包含一个alpha通道, 洋红色的地方不透明, 字体黑色背景透明.</p>
+<p>添加该资源文件是的属性面板设置, 使用FontTextureProcessor<br><img src="/img/monogame-bitmapfont2.png" alt=""></p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line">public class FontTextureProcessor : ContentProcessor&lt;Texture2DContent, SpriteFontContent&gt;</span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">private</span> List&lt;Glyph&gt; <span class="title">ExtractGlyphs</span>(<span class="params">PixelBitmapContent&lt;Color&gt; bitmap</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">var</span> glyphs = <span class="keyword">new</span> List&lt;Glyph&gt;(); </span><br><span class="line">        <span class="keyword">var</span> regions = <span class="keyword">new</span> List&lt;Rectangle&gt;();</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> y = <span class="number">0</span>; y &lt; bitmap.Height; y++)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> x = <span class="number">0</span>; x &lt; bitmap.Width; x++)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">if</span> (bitmap.GetPixel(x, y) != transparentPixel)</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="comment">// if we don't have a region that has this pixel already</span></span><br><span class="line">                    <span class="keyword">var</span> re = regions.Find(r =&gt; &#123;</span><br><span class="line">                        <span class="keyword">return</span> r.Contains(x, y); </span><br><span class="line">                    &#125;);</span><br><span class="line">                    <span class="keyword">if</span> (re == Rectangle.Empty)</span><br><span class="line">                    &#123;</span><br><span class="line">                        <span class="comment">// we have found the top, left of a image. </span></span><br><span class="line">                        <span class="comment">// we now need to scan for the 'bounds'</span></span><br><span class="line">                        <span class="keyword">int</span> top = y;</span><br><span class="line">                        <span class="keyword">int</span> bottom = y;</span><br><span class="line">                        <span class="keyword">int</span> left = x;</span><br><span class="line">                        <span class="keyword">int</span> right = x;</span><br><span class="line">                        <span class="keyword">while</span> (bitmap.GetPixel(right, bottom) != transparentPixel)</span><br><span class="line">                            right++;</span><br><span class="line">                        <span class="keyword">while</span> (bitmap.GetPixel(left, bottom) != transparentPixel)</span><br><span class="line">                            bottom++;</span><br><span class="line">                        <span class="comment">// we got a glyph :)</span></span><br><span class="line">                        regions.Add(<span class="keyword">new</span> Rectangle(left, top, right - left, bottom - top));</span><br><span class="line">                        x = right;</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="keyword">else</span></span><br><span class="line">                    &#123;</span><br><span class="line">                        x += re.Width;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; regions.Count; i++)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">var</span> rect = regions[i];</span><br><span class="line">            <span class="keyword">var</span> newBitmap = <span class="keyword">new</span> PixelBitmapContent&lt;Color&gt;(rect.Width, rect.Height);</span><br><span class="line">            BitmapContent.Copy(bitmap, rect, newBitmap, <span class="keyword">new</span> Rectangle(<span class="number">0</span>, <span class="number">0</span>, rect.Width, rect.Height));</span><br><span class="line">            <span class="keyword">var</span> glyph = <span class="keyword">new</span> Glyph(GetCharacterForIndex (i), newBitmap);</span><br><span class="line">            glyph.CharacterWidths.B = glyph.Bitmap.Width;</span><br><span class="line">            glyphs.Add(glyph);</span><br><span class="line">            <span class="comment">//newbitmap.Save (GetCharacterForIndex(i)+".png", System.Drawing.Imaging.ImageFormat.Png);</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> glyphs ;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>ExtractGlyphs被Process调用, 返回一个SpriteFontContent. 如此, 仍就可以使用上面的SpriteFont类, Content Pipeline消除了*.spritefont和bitmapfont之间的差异.</p>
+<p>详细可以参考<a href="https://blogs.msdn.microsoft.com/shawnhar/2007/04/26/bitmap-fonts-in-xna/" target="_blank" rel="noopener">https://blogs.msdn.microsoft.com/shawnhar/2007/04/26/bitmap-fonts-in-xna/</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/编程/" rel="tag"># 编程</a>
+          
+            <a href="/tags/MonoGame/" rel="tag"># MonoGame</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/12/21/MonoGame笔记(X1)Camera2D/" rel="next" title="MonoGame笔记(X1)Camera2D">
+                <i class="fa fa-chevron-left"></i> MonoGame笔记(X1)Camera2D
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/12/22/MonoGame笔记(X3)SpriteBatch Test/" rel="prev" title="MonoGame笔记(X3)SpriteBatch Test">
+                MonoGame笔记(X3)SpriteBatch Test <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">zmapleaf</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">66</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zmapleaf</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

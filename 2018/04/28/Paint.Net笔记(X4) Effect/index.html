@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Pattern&Practice,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="上一篇讲菜单项中的Action 与 HistoryFunction. 两者之间的区别, 暂时还不甚了然. 先放一放, 这一篇整理一下Paint.Net中的Effect Effect是以Plugin的方式提供的, 可以使用单独的dll, 放在特定的目录下. 程序启动时, 会自动加载.但Paint.Net并不是插件结构. 和SharpDevelop不同, SharpDevelop中界面的UI也是以Pl">
+<meta name="keywords" content="Pattern&amp;Practice">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Paint.Net笔记(X4) Effect">
+<meta property="og:url" content="http://yoursite.com/2018/04/28/Paint.Net笔记(X4) Effect/index.html">
+<meta property="og:site_name" content="远">
+<meta property="og:description" content="上一篇讲菜单项中的Action 与 HistoryFunction. 两者之间的区别, 暂时还不甚了然. 先放一放, 这一篇整理一下Paint.Net中的Effect Effect是以Plugin的方式提供的, 可以使用单独的dll, 放在特定的目录下. 程序启动时, 会自动加载.但Paint.Net并不是插件结构. 和SharpDevelop不同, SharpDevelop中界面的UI也是以Pl">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://yoursite.com/img/paintdotnet-effect.png">
+<meta property="og:updated_time" content="2018-05-13T07:51:23.985Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Paint.Net笔记(X4) Effect">
+<meta name="twitter:description" content="上一篇讲菜单项中的Action 与 HistoryFunction. 两者之间的区别, 暂时还不甚了然. 先放一放, 这一篇整理一下Paint.Net中的Effect Effect是以Plugin的方式提供的, 可以使用单独的dll, 放在特定的目录下. 程序启动时, 会自动加载.但Paint.Net并不是插件结构. 和SharpDevelop不同, SharpDevelop中界面的UI也是以Pl">
+<meta name="twitter:image" content="http://yoursite.com/img/paintdotnet-effect.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/04/28/Paint.Net笔记(X4) Effect/">
+
+
+
+
+
+  <title>Paint.Net笔记(X4) Effect | 远</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">远</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/28/Paint.Net笔记(X4) Effect/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zmapleaf">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="远">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Paint.Net笔记(X4) Effect</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-28T17:43:51+08:00">
+                2018-04-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/编程/" itemprop="url" rel="index">
+                    <span itemprop="name">编程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>上一篇讲菜单项中的Action 与 HistoryFunction. 两者之间的区别, 暂时还不甚了然. 先放一放, 这一篇整理一下Paint.Net中的Effect</p>
+<p>Effect是以Plugin的方式提供的, 可以使用单独的dll, 放在特定的目录下. 程序启动时, 会自动加载.但Paint.Net并不是插件结构. 和SharpDevelop不同, SharpDevelop中界面的UI也是以Plugin的方式提供的.</p>
+<p>Effect滤镜的主要逻辑在EffectMenuBase.cs中<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">EffectMenuItem_Click</span>(<span class="params"><span class="keyword">object</span> sender, EventArgs e</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">if</span> (AppWorkspace.ActiveDocumentWorkspace == <span class="literal">null</span>)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">return</span>; </span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	PdnMenuItem pmi = (PdnMenuItem)sender;</span><br><span class="line">	Type effectType = (Type)pmi.Tag;</span><br><span class="line"></span><br><span class="line">	RunEffect(effectType);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">RunEffect</span>(<span class="params">Type effectType</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">bool</span> oldDirtyValue = AppWorkspace.ActiveDocumentWorkspace.Document.Dirty;</span><br><span class="line">	<span class="keyword">bool</span> resetDirtyValue = <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">	AppWorkspace.Update(); <span class="comment">// make sure the window is done 'closing'</span></span><br><span class="line">	AppWorkspace.Widgets.StatusBarProgress.ResetProgressStatusBar();</span><br><span class="line">	DocumentWorkspace activeDW = AppWorkspace.ActiveDocumentWorkspace;</span><br><span class="line"></span><br><span class="line">	PdnRegion selectedRegion; <span class="comment">//选择区域，滤镜是应用于整幅图像，还是一个选择区域。下图就是只应用于一个选择区域</span></span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (activeDW.Selection.IsEmpty)</span><br><span class="line">	&#123;</span><br><span class="line">		selectedRegion = <span class="keyword">new</span> PdnRegion(activeDW.Document.Bounds);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">else</span></span><br><span class="line">	&#123;</span><br><span class="line">		selectedRegion = activeDW.Selection.CreateRegion();</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure></p>
+<p><img src="/img/paintdotnet-effect.png" alt=""></p>
+<p>这里Effect通过EffectFlags.Configurable分为2类（有没有参数配置，可以调整参数）</p>
+<p>第一类（没有参数配置）：<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (!(effect.CheckForEffectFlags(EffectFlags.Configurable)))</span><br><span class="line">&#123;</span><br><span class="line">	Surface copy = activeDW.BorrowScratchSurface(<span class="keyword">this</span>.GetType() + <span class="string">".RunEffect() using scratch surface for non-configurable rendering"</span>);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">try</span></span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">using</span> (<span class="keyword">new</span> WaitCursorChanger(AppWorkspace))</span><br><span class="line">		&#123;</span><br><span class="line">			copy.CopySurface(layer.Surface);</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		EffectEnvironmentParameters eep = <span class="keyword">new</span> EffectEnvironmentParameters(</span><br><span class="line">			AppWorkspace.AppEnvironment.PrimaryColor,</span><br><span class="line">			AppWorkspace.AppEnvironment.SecondaryColor,</span><br><span class="line">			AppWorkspace.AppEnvironment.PenInfo.Width,</span><br><span class="line">			selectedRegion,</span><br><span class="line">			copy);</span><br><span class="line"></span><br><span class="line">		effect.EnvironmentParameters = eep;</span><br><span class="line"></span><br><span class="line">		DoEffect(effect, <span class="literal">null</span>, selectedRegion, selectedRegion, copy, <span class="keyword">out</span> exception);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">finally</span></span><br><span class="line">	&#123;</span><br><span class="line">		activeDW.ReturnScratchSurface(copy);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>第二类（有参数配置）:有参数配置，就需要一个调整参数的对话框，例如上图中的高斯模糊. 先是创建一个EffectConfigDialog<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">using</span> (EffectConfigDialog configDialog = effect.CreateConfigDialog())</span><br><span class="line">&#123;</span><br><span class="line">	configDialog.Opacity = <span class="number">0.9</span>;</span><br><span class="line">	configDialog.Effect = effect;</span><br><span class="line">	configDialog.EffectSourceSurface = originalSurface;</span><br><span class="line">	configDialog.Selection = selectedRegion;</span><br><span class="line"></span><br><span class="line">	BackgroundEffectRenderer ber = <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">	EventHandler eh =</span><br><span class="line">		<span class="keyword">delegate</span>(<span class="keyword">object</span> sender, EventArgs e)</span><br><span class="line">		&#123;</span><br><span class="line">			EffectConfigDialog ecf = (EffectConfigDialog)sender;</span><br><span class="line"></span><br><span class="line">			<span class="keyword">if</span> (ber != <span class="literal">null</span>)</span><br><span class="line">			&#123;</span><br><span class="line">				AppWorkspace.Widgets.StatusBarProgress.ResetProgressStatusBarAsync();</span><br><span class="line"></span><br><span class="line">				<span class="keyword">try</span></span><br><span class="line">				&#123;</span><br><span class="line">					ber.Start();</span><br><span class="line">				&#125;</span><br><span class="line"></span><br><span class="line">				<span class="keyword">catch</span> (Exception ex)</span><br><span class="line">				&#123;</span><br><span class="line">					exception = ex;</span><br><span class="line">					ecf.Close();</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;;</span><br><span class="line"></span><br><span class="line">	configDialog.EffectTokenChanged += eh;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>如何创建EffectConfigDialog应该是Paint.Net中最有技巧性的东西了，真是大开眼界</p>
+<p>翻看了不少代码，大致明白了是怎么回事。因为Effect在Paint.Net中是以plugin的形式存在，假如Effect有参数可以调整，那么在什么地方去调整参数呢？想像一下，我们需要有一个参数的Dialog。在没有源码的情况下，如何创建这个Dialog。以高斯模糊为例，只要该Effect提供参数，由Paint.Net帮你创建EffectConfigDialog </p>
+<p>Paint.Net在框架中提供了一种参数与Control的一一对应，然后根据参数列表，创建一个一个的Control，然后用一个Panel将这些Control添加进来。再提供一个参数变更引发的事件。<br>这些参数用一个叫做EffectConfigToken的类封装起来(具体是PropertyCollection)</p>
+<p>以高斯模糊为例<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">sealed</span> <span class="keyword">class</span> <span class="title">GaussianBlurEffect</span></span><br><span class="line">    : <span class="title">InternalPropertyBasedEffect</span></span><br><span class="line"></span><br><span class="line"><span class="title">public</span> <span class="title">abstract</span> <span class="title">class</span> <span class="title">InternalPropertyBasedEffect</span></span><br><span class="line">    : <span class="title">PropertyBasedEffect</span></span><br><span class="line"></span><br><span class="line"><span class="title">public</span> <span class="title">abstract</span> <span class="title">class</span> <span class="title">PropertyBasedEffect</span></span><br><span class="line">    : Effect&lt;PropertyBasedEffectConfigToken&gt;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">sealed</span> <span class="keyword">class</span> <span class="title">PropertyBasedEffectConfigToken</span></span><br><span class="line">    : <span class="title">EffectConfigToken</span></span><br></pre></td></tr></table></figure></p>
+<p>其中<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">internal</span> <span class="keyword">sealed</span> <span class="keyword">class</span> <span class="title">PropertyBasedEffectConfigDialog</span></span><br><span class="line">    : EffectConfigDialog&lt;PropertyBasedEffect, PropertyBasedEffectConfigToken&gt;</span><br></pre></td></tr></table></figure></p>
+<p>AmountEffectConfigDialog.cs<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">amountUpDown_ValueChanged</span>(<span class="params"><span class="keyword">object</span> sender, System.EventArgs e</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (amountTrackBar.Value != (<span class="keyword">int</span>)amountUpDown.Value)</span><br><span class="line">    &#123;</span><br><span class="line">        amountTrackBar.Value = (<span class="keyword">int</span>)amountUpDown.Value;</span><br><span class="line">        FinishTokenUpdate();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">FinishTokenUpdate</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    InitTokenFromDialog();</span><br><span class="line">    OnEffectTokenChanged();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">OnEffectTokenChanged</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (EffectTokenChanged != <span class="literal">null</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        EffectTokenChanged(<span class="keyword">this</span>, EventArgs.Empty);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>扫描有多少个Effect，这部分是以插件的形式出现的，加载后出现在菜单项中<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">static</span> EffectsCollection <span class="title">GatherEffects</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    List&lt;Assembly&gt; assemblies = <span class="keyword">new</span> List&lt;Assembly&gt;();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// PaintDotNet.Effects.dll</span></span><br><span class="line">    assemblies.Add(Assembly.GetAssembly(<span class="keyword">typeof</span>(Effect)));</span><br><span class="line"></span><br><span class="line">    <span class="comment">// TARGETDIR\Effects\*.dll</span></span><br><span class="line">    <span class="keyword">string</span> homeDir = PdnInfo.GetApplicationDir();</span><br><span class="line">    <span class="keyword">string</span> effectsDir = Path.Combine(homeDir, InvariantStrings.EffectsSubDir);</span><br><span class="line">    <span class="keyword">bool</span> dirExists;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">try</span></span><br><span class="line">    &#123;</span><br><span class="line">        dirExists = Directory.Exists(effectsDir);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">catch</span></span><br><span class="line">    &#123;</span><br><span class="line">        dirExists = <span class="literal">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (dirExists)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">string</span> fileSpec = <span class="string">"*"</span> + InvariantStrings.DllExtension;</span><br><span class="line">        <span class="keyword">string</span>[] filePaths = Directory.GetFiles(effectsDir, fileSpec);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">foreach</span> (<span class="keyword">string</span> filePath <span class="keyword">in</span> filePaths)</span><br><span class="line">        &#123;</span><br><span class="line">            Assembly pluginAssembly = <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">try</span></span><br><span class="line">            &#123;</span><br><span class="line">                pluginAssembly = Assembly.LoadFrom(filePath);</span><br><span class="line">                assemblies.Add(pluginAssembly);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">catch</span> (Exception ex)</span><br><span class="line">            &#123;</span><br><span class="line">                Tracing.Ping(<span class="string">"Exception while loading "</span> + filePath + <span class="string">": "</span> + ex.ToString());</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    EffectsCollection ec = <span class="keyword">new</span> EffectsCollection(assemblies);</span><br><span class="line">    <span class="keyword">return</span> ec;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Pattern-Practice/" rel="tag"># Pattern&Practice</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/04/28/Paint.Net笔记(X3) Action & HistoryFunction/" rel="next" title="Paint.Net笔记(X3) Action 与 HistoryFunction">
+                <i class="fa fa-chevron-left"></i> Paint.Net笔记(X3) Action 与 HistoryFunction
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/05/04/WCF笔记(X1) 基本概念/" rel="prev" title="WCF笔记(X1) 基本概念">
+                WCF笔记(X1) 基本概念 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">zmapleaf</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">66</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zmapleaf</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

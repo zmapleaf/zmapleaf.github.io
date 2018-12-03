@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="编程,MonoGame,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="SpriteBatch.Begin的Matrix参数12345spriteBatch.Begin(SpriteBlendMode.AlphaBlend, SpriteSortMode.FrontToBack,SaveStateMode.None,        Matrix.CreateTranslation(new Vector3(10, 10, 0)));spriteBatch.Draw(pi">
+<meta name="keywords" content="编程,MonoGame">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MonoGame笔记(X3)SpriteBatch Test">
+<meta property="og:url" content="http://yoursite.com/2017/12/22/MonoGame笔记(X3)SpriteBatch Test/index.html">
+<meta property="og:site_name" content="远">
+<meta property="og:description" content="SpriteBatch.Begin的Matrix参数12345spriteBatch.Begin(SpriteBlendMode.AlphaBlend, SpriteSortMode.FrontToBack,SaveStateMode.None,        Matrix.CreateTranslation(new Vector3(10, 10, 0)));spriteBatch.Draw(pi">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://yoursite.com/img/monogame-spritebatch-test1.jpeg">
+<meta property="og:image" content="http://yoursite.com/img/monogame-spritebatch-test2.jpeg">
+<meta property="og:image" content="http://yoursite.com/img/monogame-spritebatch-test3.jpeg">
+<meta property="og:image" content="http://yoursite.com/img/monogame-spritebatch-test4.jpeg">
+<meta property="og:image" content="http://yoursite.com/img/monogame-spritebatch-test4.jpeg">
+<meta property="og:updated_time" content="2017-12-22T01:01:27.660Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="MonoGame笔记(X3)SpriteBatch Test">
+<meta name="twitter:description" content="SpriteBatch.Begin的Matrix参数12345spriteBatch.Begin(SpriteBlendMode.AlphaBlend, SpriteSortMode.FrontToBack,SaveStateMode.None,        Matrix.CreateTranslation(new Vector3(10, 10, 0)));spriteBatch.Draw(pi">
+<meta name="twitter:image" content="http://yoursite.com/img/monogame-spritebatch-test1.jpeg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/12/22/MonoGame笔记(X3)SpriteBatch Test/">
+
+
+
+
+
+  <title>MonoGame笔记(X3)SpriteBatch Test | 远</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">远</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/22/MonoGame笔记(X3)SpriteBatch Test/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zmapleaf">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="远">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">MonoGame笔记(X3)SpriteBatch Test</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-12-22T08:38:37+08:00">
+                2017-12-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/编程/" itemprop="url" rel="index">
+                    <span itemprop="name">编程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h4 id="SpriteBatch-Begin的Matrix参数"><a href="#SpriteBatch-Begin的Matrix参数" class="headerlink" title="SpriteBatch.Begin的Matrix参数"></a>SpriteBatch.Begin的Matrix参数</h4><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">spriteBatch.Begin(SpriteBlendMode.AlphaBlend, SpriteSortMode.FrontToBack,SaveStateMode.None,        Matrix.CreateTranslation(<span class="keyword">new</span> Vector3(<span class="number">10</span>, <span class="number">10</span>, <span class="number">0</span>)));</span><br><span class="line"></span><br><span class="line">spriteBatch.Draw(pic1, <span class="keyword">new</span> Vector2(<span class="number">0</span>, <span class="number">0</span>),  <span class="literal">null</span>, Color.White, <span class="number">0.0f</span>, Vector2.Zero, <span class="number">1.0f</span>, SpriteEffects.None, <span class="number">1.0f</span>);</span><br><span class="line"></span><br><span class="line">spriteBatch.End();</span><br></pre></td></tr></table></figure>
+<p>原本是将图片绘制在左上角的，但由于Matrix.CreateTranslation(new Vector3(10, 10, 0)，结果如下<br><img src="/img/monogame-spritebatch-test1.jpeg" alt=""></p>
+<h4 id="SpriteBatch-Draw的origin参数"><a href="#SpriteBatch-Draw的origin参数" class="headerlink" title="SpriteBatch.Draw的origin参数"></a>SpriteBatch.Draw的origin参数</h4><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">spriteBatch.Draw(pic1, <span class="keyword">new</span> Vector2(GraphicsDevice.Viewport.Width / <span class="number">2</span>, GraphicsDevice.Viewport.Height / <span class="number">2</span>), <span class="literal">null</span>, Color.White, <span class="number">0.0f</span>, Vector2.Zero, <span class="number">1.0f</span>, SpriteEffects.None, <span class="number">0</span>); </span><br><span class="line"></span><br><span class="line">spriteBatch.Draw(pic1, <span class="keyword">new</span> Vector2(GraphicsDevice.Viewport.Width / <span class="number">2</span>, GraphicsDevice.Viewport.Height / <span class="number">2</span>), <span class="literal">null</span>, Color.White, <span class="number">0.0f</span>, <span class="keyword">new</span> Vector2(<span class="number">100</span>, <span class="number">100</span>), <span class="number">1.0f</span>, SpriteEffects.None, <span class="number">0</span>);</span><br></pre></td></tr></table></figure>
+<p>两者的区别在于origin参数不同，一个是Vector2(0,0)，一个是Vector2(100,100)，结果如下<br><img src="/img/monogame-spritebatch-test2.jpeg" alt=""></p>
+<p>从图中看出origin为(100,100)，其实是从屏幕中心向左上偏移(100,100)。所以也可以通过改变origin移动图片。在卷轴类地图中用到这种技术。下面在此基础上又添加了scale值，而且可以通过方向键改变origin</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">float</span> scale1 = <span class="number">0.5f</span>; </span><br><span class="line"><span class="keyword">float</span> scale2 = <span class="number">1.0f</span>; </span><br><span class="line">origin1 = Vector2.Zero; </span><br><span class="line">origin2 = Vector2.Zero; </span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Update</span>(<span class="params">GameTime gameTime</span>) </span></span><br><span class="line"><span class="function"></span>&#123; </span><br><span class="line">    <span class="comment">// Allows the game to exit </span></span><br><span class="line">    <span class="keyword">if</span> (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed) </span><br><span class="line">        <span class="keyword">this</span>.Exit(); </span><br><span class="line">    <span class="keyword">if</span> (Keyboard.GetState().IsKeyDown(Keys.Left)) </span><br><span class="line">    &#123; </span><br><span class="line">        origin1 += <span class="keyword">new</span> Vector2(<span class="number">5</span>, <span class="number">0</span>) / scale1; </span><br><span class="line">        origin2 += <span class="keyword">new</span> Vector2(<span class="number">5</span>, <span class="number">0</span>) / scale2; </span><br><span class="line">    &#125; </span><br><span class="line">    <span class="keyword">if</span> (Keyboard.GetState().IsKeyDown(Keys.Right)) </span><br><span class="line">    &#123; </span><br><span class="line">        origin1 -= <span class="keyword">new</span> Vector2(<span class="number">5</span>, <span class="number">0</span>) / scale1; </span><br><span class="line">        origin2 -= <span class="keyword">new</span> Vector2(<span class="number">5</span>, <span class="number">0</span>) / scale2; </span><br><span class="line"> </span><br><span class="line">    &#125; </span><br><span class="line">    <span class="keyword">if</span> (Keyboard.GetState().IsKeyDown(Keys.Up)) </span><br><span class="line">    &#123; </span><br><span class="line">        origin1 += <span class="keyword">new</span> Vector2(<span class="number">0</span>, <span class="number">5</span>) / scale1; </span><br><span class="line">        origin2 += <span class="keyword">new</span> Vector2(<span class="number">0</span>, <span class="number">5</span>) / scale2; </span><br><span class="line"> </span><br><span class="line">    &#125; </span><br><span class="line">    <span class="keyword">if</span> (Keyboard.GetState().IsKeyDown(Keys.Down)) </span><br><span class="line">    &#123; </span><br><span class="line">        origin1 -= <span class="keyword">new</span> Vector2(<span class="number">0</span>, <span class="number">5</span>) / scale1; </span><br><span class="line">        origin2 -= <span class="keyword">new</span> Vector2(<span class="number">0</span>, <span class="number">5</span>) / scale2; </span><br><span class="line"> </span><br><span class="line">    &#125; </span><br><span class="line">    <span class="comment">// <span class="doctag">TODO:</span> Add your update logic here </span></span><br><span class="line"> </span><br><span class="line">    <span class="keyword">base</span>.Update(gameTime); </span><br><span class="line">&#125; </span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Draw</span>(<span class="params">GameTime gameTime</span>) </span></span><br><span class="line"><span class="function"></span>&#123; </span><br><span class="line">    GraphicsDevice.Clear(Color.CornflowerBlue); </span><br><span class="line"> </span><br><span class="line">    <span class="comment">// <span class="doctag">TODO:</span> Add your drawing code here </span></span><br><span class="line">    spriteBatch.Begin(SpriteBlendMode.AlphaBlend, SpriteSortMode.FrontToBack, SaveStateMode.None); </span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line">    spriteBatch.Draw(pic1, <span class="keyword">new</span> Vector2(GraphicsDevice.Viewport.Width / <span class="number">2</span>, GraphicsDevice.Viewport.Height / <span class="number">2</span> - <span class="number">50</span>),  </span><br><span class="line">        <span class="literal">null</span>, Color.White, <span class="number">0.0f</span>, origin1, scale1, SpriteEffects.None, <span class="number">0</span>); </span><br><span class="line"> </span><br><span class="line">    spriteBatch.Draw(pic1, <span class="keyword">new</span> Vector2(GraphicsDevice.Viewport.Width / <span class="number">2</span>, GraphicsDevice.Viewport.Height / <span class="number">2</span>), </span><br><span class="line">        <span class="literal">null</span>, Color.White, <span class="number">0.0f</span>, origin2, scale2, SpriteEffects.None, <span class="number">0</span>); </span><br><span class="line"> </span><br><span class="line">    spriteBatch.End(); </span><br><span class="line">    <span class="keyword">base</span>.Draw(gameTime); </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>注意在Update方法中，origin1和origin2增量不同，这是因为scale除了会影响图片的尺寸，也会使origin按比例改变。<br>比如origin1 += new Vector2(100,100)， origin2 += new Vector2(100,100)，由于scale1为0.5，其实origin2改变的距离只有(50,50)，通过除以各自的比例，可以让两者移动的距离相同<br><img src="/img/monogame-spritebatch-test3.jpeg" alt=""></p>
+<h4 id="SpriteBatch-Draw的layerDepth"><a href="#SpriteBatch-Draw的layerDepth" class="headerlink" title="SpriteBatch.Draw的layerDepth"></a>SpriteBatch.Draw的layerDepth</h4><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">spriteBatch.Begin(SpriteBlendMode.AlphaBlend, SpriteSortMode.FrontToBack, SaveStateMode.None);</span><br><span class="line"></span><br><span class="line">spriteBatch.Draw(pic1, <span class="keyword">new</span> Vector2(<span class="number">0</span>, <span class="number">0</span>), <span class="literal">null</span>, Color.White, <span class="number">0.0f</span>, Vector2.Zero, <span class="number">1.0f</span>, SpriteEffects.None, <span class="number">0.5f</span>); </span><br><span class="line"></span><br><span class="line">spriteBatch.Draw(pic2, <span class="keyword">new</span> Vector2(<span class="number">0</span>, <span class="number">0</span>), <span class="literal">null</span>, Color.White, <span class="number">0.0f</span>, Vector2.Zero, <span class="number">0.25f</span>, SpriteEffects.None, <span class="number">1.0f</span>); </span><br><span class="line"></span><br><span class="line">spriteBatch.End();</span><br></pre></td></tr></table></figure>
+<p>SpriteSortMode为FrontToBack的情况下，是pic1先画，pic2后画，因为pic2图片尺寸大于pic1，所以pic2会完全覆盖pic1.结果如下<img src="/img/monogame-spritebatch-test4.jpeg" alt=""></p>
+<p>如果改成<br>spriteBatch.Draw(pic1, new Vector2(0, 0),   null, Color.White, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 1.0f); 则变成<br><img src="/img/monogame-spritebatch-test4.jpeg" alt=""><br>虽然pic1和pic2的layerDepth是相等的，但从结果上来看是pic2先画，pic1后画。即使把SpriteSortMode改为BackToFront，结果不变。所以当两者的层深相等时，可以想象成后进先出的情况</p>
+<h4 id="SpriteBatch-Winform实现"><a href="#SpriteBatch-Winform实现" class="headerlink" title="SpriteBatch Winform实现"></a>SpriteBatch Winform实现</h4><p>将texture的一部分(sRect)，以origin为中心缩放和旋转（或翻转flip)，然会绘制在画布的location位置。这里的重点是matrix的复合变换</p>
+<p>SpriteBatch的Draw有一个color参数<br>ColorMatrix用于color tint</p>
+<p>先绘制在temp上，对temp进行了color tint</p>
+<p>xna中旋转是弧度，而gdi+中旋转是角度。</p>
+<p>这里要注意的是以origin为中心，这里我将origin设置为sRect的中心，得到下面的points</p>
+<p>这一步可以分成2步：<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//1</span></span><br><span class="line">Point[] points = <span class="keyword">new</span> Point[] &#123;    </span><br><span class="line">    <span class="keyword">new</span> Point(<span class="number">0</span>, <span class="number">0</span>), </span><br><span class="line">    <span class="keyword">new</span> Point(temp.Width, <span class="number">0</span>),</span><br><span class="line">    <span class="keyword">new</span> Point(<span class="number">0</span>, temp.Height)</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//2  </span></span><br><span class="line">matrix.Translate（-temp.with/<span class="number">2</span>, -temp.height/<span class="number">2</span>);<span class="comment">//移回原点（0,0）</span></span><br><span class="line"></span><br><span class="line">变成：</span><br><span class="line">Point[] points = <span class="keyword">new</span> Point[] &#123;</span><br><span class="line">    <span class="keyword">new</span> Point(-temp.Width/<span class="number">2</span>, -temp.Height/<span class="number">2</span>), <span class="keyword">new</span> Point(temp.Width/<span class="number">2</span>, -temp.Height/<span class="number">2</span>),</span><br><span class="line">    <span class="keyword">new</span> Point(-temp.Width/<span class="number">2</span>, temp.Height/<span class="number">2</span>)</span><br><span class="line">&#125;;  <span class="comment">//这三个点构成一个以原点（0,0）为中心的矩形</span></span><br></pre></td></tr></table></figure>
+<p>以origin为中心缩放和旋转，变成以原点为缩放和旋转，然后translate，再将变换应用到points上.</p>
+<p><strong>旋转缩放最好以原点（0,0）来进行</strong><br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line">     <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">DrawWithTransformation</span>(<span class="params">Bitmap texture, Vector2 location, Rectangle sRect,<span class="comment">/* Color color,*/</span> <span class="keyword">float</span> rotation, Vector2 origin, Vector2 scale, <span class="keyword">bool</span> flip, Graphics g</span>)</span></span><br><span class="line"><span class="function"></span>     &#123;</span><br><span class="line">         <span class="comment">//着色</span></span><br><span class="line">         Bitmap temp = <span class="keyword">new</span> Bitmap(sRect.Width, sRect.Height);</span><br><span class="line">         Graphics tempGraphics = Graphics.FromImage(temp);</span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line">         <span class="comment">/*float[][] colorMatrixElements = &#123;</span></span><br><span class="line"><span class="comment">new float[] &#123;2,  0,  0,  0, 0&#125;,        // red scaling factor of 2</span></span><br><span class="line"><span class="comment">new float[] &#123;0,  1,  0,  0, 0&#125;,        // green scaling factor of 1</span></span><br><span class="line"><span class="comment">new float[] &#123;0,  0,  1,  0, 0&#125;,        // blue scaling factor of 1</span></span><br><span class="line"><span class="comment">new float[] &#123;0,  0,  0,  1, 0&#125;,        // alpha scaling factor of 1</span></span><br><span class="line"><span class="comment">new float[] &#123;.2f, .2f, .2f, 0, 1&#125;&#125;;    // three translations of 0.2*/</span></span><br><span class="line"> </span><br><span class="line">         <span class="keyword">float</span>[][] colorMatrixElements =</span><br><span class="line">         &#123;</span><br><span class="line">                 <span class="keyword">new</span> <span class="keyword">float</span>[] &#123;<span class="number">1</span>,  <span class="number">0</span>,  <span class="number">0</span>,  <span class="number">0</span>, <span class="number">0</span>&#125;,        <span class="comment">// red scaling factor of 2</span></span><br><span class="line">                 <span class="keyword">new</span> <span class="keyword">float</span>[] &#123;<span class="number">0</span>,  <span class="number">1</span>,  <span class="number">0</span>,  <span class="number">0</span>, <span class="number">0</span>&#125;,        <span class="comment">// green scaling factor of 1</span></span><br><span class="line">                 <span class="keyword">new</span> <span class="keyword">float</span>[] &#123;<span class="number">0</span>,  <span class="number">0</span>,  <span class="number">1</span>,  <span class="number">0</span>, <span class="number">0</span>&#125;,        <span class="comment">// blue scaling factor of 1</span></span><br><span class="line">                 <span class="keyword">new</span> <span class="keyword">float</span>[] &#123;<span class="number">0</span>,  <span class="number">0</span>,  <span class="number">0</span>,  <span class="number">1</span>, <span class="number">0</span>&#125;,        <span class="comment">// alpha scaling factor of 1</span></span><br><span class="line">                 <span class="keyword">new</span> <span class="keyword">float</span>[] &#123;<span class="number">0f</span>, <span class="number">0f</span>, <span class="number">0f</span>, <span class="number">0</span>, <span class="number">1</span>&#125;&#125;;    <span class="comment">// three translations of 0.2*/</span></span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line">         <span class="comment">//float[][] cm = &#123;1.0f, 0.0f, 0.0f, 0.0f, 0.0f&#125;,</span></span><br><span class="line">         <span class="comment">//    cm[1]new float[]&#123;0.0f, 1.0f, 0.0f, 0.0f, 0.0f&#125;,</span></span><br><span class="line">         <span class="comment">//    cm[2]new float[]&#123;-0.0f, 0.0f, 1.0f, 0.0f, 0.0f&#125;,</span></span><br><span class="line">         <span class="comment">//    cm[3]new float[]&#123;0.0f, 0.0f, 0.0f, 1.0f, 0.0f&#125;,</span></span><br><span class="line">         <span class="comment">//    cm[4]new float[]&#123;0.75f, 0.0f, 0.0f, 0.0f, 1.0f&#125;&#125;;</span></span><br><span class="line"> </span><br><span class="line">         ColorMatrix colorMatrix = <span class="keyword">new</span> ColorMatrix(colorMatrixElements);</span><br><span class="line">         ImageAttributes imageAttributes = <span class="keyword">new</span> ImageAttributes();</span><br><span class="line">         imageAttributes.SetColorMatrix(</span><br><span class="line">                             colorMatrix,</span><br><span class="line">                             ColorMatrixFlag.Default,</span><br><span class="line">                             ColorAdjustType.Bitmap);</span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line">         Rectangle tempRec = <span class="keyword">new</span> Rectangle(<span class="number">0</span>, <span class="number">0</span>, temp.Width, temp.Height);</span><br><span class="line">         tempGraphics.DrawImage(texture, tempRec, sRect.X, sRect.Y, sRect.Width, sRect.Height,</span><br><span class="line">             GraphicsUnit.Pixel, imageAttributes);</span><br><span class="line"> </span><br><span class="line">         Matrix matrix = <span class="keyword">new</span> Matrix();</span><br><span class="line">         matrix.Rotate(rotation * <span class="number">180</span> / <span class="number">3.1415926f</span>);</span><br><span class="line">         <span class="comment">//matrix.RotateAt(rotation*180/3.1415926f, new PointF((float)sRect.Width / 2f, 32f));</span></span><br><span class="line">         matrix.Scale((<span class="keyword">float</span>)scale.X, (<span class="keyword">float</span>)scale.Y, MatrixOrder.Append);</span><br><span class="line">         matrix.Translate((<span class="keyword">float</span>)location.X, (<span class="keyword">float</span>)location.Y, MatrixOrder.Append);</span><br><span class="line"> </span><br><span class="line">         <span class="keyword">if</span> (!flip) matrix.Scale(<span class="number">-1</span>, <span class="number">1</span>);</span><br><span class="line">         <span class="comment">//Point[] points = new Point[]&#123;new Point(0, 0), new Point(temp.Width, 0),</span></span><br><span class="line">             <span class="comment">//                                new Point(0, temp.Height)&#125;;</span></span><br><span class="line"> </span><br><span class="line">         Point[] points = <span class="keyword">new</span> Point[]</span><br><span class="line">         &#123;</span><br><span class="line">             <span class="keyword">new</span> Point(-temp.Width/<span class="number">2</span>, -temp.Height/<span class="number">2</span>), <span class="keyword">new</span> Point(temp.Width/<span class="number">2</span>, -temp.Height/<span class="number">2</span>),</span><br><span class="line">             <span class="keyword">new</span> Point(-temp.Width/<span class="number">2</span>, temp.Height/<span class="number">2</span>)</span><br><span class="line">         &#125;;  </span><br><span class="line"> </span><br><span class="line">         matrix.TransformPoints(points);</span><br><span class="line">         g.DrawImage(temp, points, tempRec, GraphicsUnit.Pixel);<span class="comment">//图像的旋转和拉伸通常是通过在DrawImage中指定destPoints参数来实现，destPoints包含对新的坐标系定义的点的数据</span></span><br><span class="line">     &#125;</span><br></pre></td></tr></table></figure></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/编程/" rel="tag"># 编程</a>
+          
+            <a href="/tags/MonoGame/" rel="tag"># MonoGame</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/12/22/MonoGame笔记(X2)SpriteFont/" rel="next" title="MonoGame笔记(X2)SpriteFont">
+                <i class="fa fa-chevron-left"></i> MonoGame笔记(X2)SpriteFont
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/12/25/MonoGame笔记(X4)Game State Management(一)/" rel="prev" title="MonoGame笔记(X4)Game State Management (一)">
+                MonoGame笔记(X4)Game State Management (一) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">zmapleaf</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">66</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#SpriteBatch-Begin的Matrix参数"><span class="nav-number">1.</span> <span class="nav-text">SpriteBatch.Begin的Matrix参数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#SpriteBatch-Draw的origin参数"><span class="nav-number">2.</span> <span class="nav-text">SpriteBatch.Draw的origin参数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#SpriteBatch-Draw的layerDepth"><span class="nav-number">3.</span> <span class="nav-text">SpriteBatch.Draw的layerDepth</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#SpriteBatch-Winform实现"><span class="nav-number">4.</span> <span class="nav-text">SpriteBatch Winform实现</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zmapleaf</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

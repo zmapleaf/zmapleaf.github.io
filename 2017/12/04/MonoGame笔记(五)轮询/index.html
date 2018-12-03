@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="编程,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="笔记三和笔记四讲到MonoGame中的event driven input并不是真正意义的event driven, 只是在轮询的基础上采用了一种C# event的方式去封装. 然而Windows系统的确是事件驱动的. 深入浅出MFC第一章Win32基本程序概念提到  所有的GUI系统，包括UNIX的X Window 以及OS/2 的Presentation Manager，都像Windows那样">
+<meta name="keywords" content="编程">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MonoGame笔记(五)轮询">
+<meta property="og:url" content="http://yoursite.com/2017/12/04/MonoGame笔记(五)轮询/index.html">
+<meta property="og:site_name" content="远">
+<meta property="og:description" content="笔记三和笔记四讲到MonoGame中的event driven input并不是真正意义的event driven, 只是在轮询的基础上采用了一种C# event的方式去封装. 然而Windows系统的确是事件驱动的. 深入浅出MFC第一章Win32基本程序概念提到  所有的GUI系统，包括UNIX的X Window 以及OS/2 的Presentation Manager，都像Windows那样">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://yoursite.com/img/monogame-windowsgameclassic-loop.png">
+<meta property="og:updated_time" content="2017-12-04T07:02:25.057Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="MonoGame笔记(五)轮询">
+<meta name="twitter:description" content="笔记三和笔记四讲到MonoGame中的event driven input并不是真正意义的event driven, 只是在轮询的基础上采用了一种C# event的方式去封装. 然而Windows系统的确是事件驱动的. 深入浅出MFC第一章Win32基本程序概念提到  所有的GUI系统，包括UNIX的X Window 以及OS/2 的Presentation Manager，都像Windows那样">
+<meta name="twitter:image" content="http://yoursite.com/img/monogame-windowsgameclassic-loop.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/12/04/MonoGame笔记(五)轮询/">
+
+
+
+
+
+  <title>MonoGame笔记(五)轮询 | 远</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">远</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/04/MonoGame笔记(五)轮询/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zmapleaf">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="远">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">MonoGame笔记(五)轮询</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-12-04T13:18:37+08:00">
+                2017-12-04
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/编程/" itemprop="url" rel="index">
+                    <span itemprop="name">编程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>笔记三和笔记四讲到MonoGame中的event driven input并不是真正意义的event driven, 只是在轮询的基础上采用了一种C# event的方式去封装. 然而Windows系统的确是事件驱动的. <strong>深入浅出MFC第一章Win32基本程序概念</strong>提到</p>
+<blockquote>
+<p>所有的GUI系统，包括UNIX的X Window 以及OS/2 的Presentation Manager，都像Windows那样，是以消息为基础的事件驱动系统。</p>
+</blockquote>
+<blockquote>
+<p>以消息为基础, 以事件驱动之</p>
+</blockquote>
+<p>以鼠标和键盘为例, 由Windows系统捕捉到之后, 将该输入封装成消息(message)放入系统队列(system queue)中, 之后在主事件循环(main event loop)中获取它(PeekMessage), 再派发(dispatch)给窗口处理函数(WndProc)<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">WndProc(hwnd, msg, wParam, lParam)</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">switch</span> (msg) &#123;</span><br><span class="line">    <span class="keyword">case</span> WM_CREATE: ...</span><br><span class="line">    <span class="keyword">case</span> WM_COMMAND: ...</span><br><span class="line">    <span class="keyword">case</span> WM_LBUTTONDOWN: ...</span><br><span class="line">    <span class="keyword">case</span> WM_KEYDOWN: ...</span><br><span class="line">    <span class="keyword">case</span> WM_PAINT: ...</span><br><span class="line">    <span class="keyword">case</span> WM_CLOSE: ...</span><br><span class="line">    <span class="keyword">case</span> WM_DESTROY: ...</span><br><span class="line">    <span class="keyword">default</span>: <span class="keyword">return</span> DefWindowProc(...);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">return</span>(<span class="number">0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>WM_LBUTTONDOWN和WM_KEYDOWN分支就是对鼠标和键盘的输入处理. 而XNA是在每一帧Update时去检测鼠标和键盘的输入状态, 即每一帧轮询输入设备的状态. 为何XNA是这样处理的, 二者之间有什么差异, XNA和上面提到GUI有什么区别?</p>
+<p>这些问题的答案存在于MonoGame的<strong>主事件循环</strong>中.笔记一中提到WinFormsGameWindow的RunLoop<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">internal</span> <span class="keyword">void</span> <span class="title">RunLoop</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// https://bugzilla.novell.com/show_bug.cgi?id=487896</span></span><br><span class="line">    <span class="comment">// Since there's existing bug from implementation with mono WinForms since 09'</span></span><br><span class="line">    <span class="comment">// Application.Idle is not working as intended</span></span><br><span class="line">    <span class="comment">// So we're just going to emulate Application.Run just like Microsoft implementation</span></span><br><span class="line">    _form.Show();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">var</span> nativeMsg = <span class="keyword">new</span> NativeMessage();</span><br><span class="line">    <span class="keyword">while</span> (_form != <span class="literal">null</span> &amp;&amp; _form.IsDisposed == <span class="literal">false</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span> (PeekMessage(<span class="keyword">out</span> nativeMsg, IntPtr.Zero, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>))</span><br><span class="line">        &#123;</span><br><span class="line">            Application.DoEvents();</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (nativeMsg.msg == WM_QUIT)</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">continue</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        UpdateWindows();</span><br><span class="line">        Game.Tick();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// We need to remove the WM_QUIT message in the message </span></span><br><span class="line">    <span class="comment">// pump as it will keep us from restarting on this </span></span><br><span class="line">    <span class="comment">// same thread.</span></span><br><span class="line">    <span class="comment">//</span></span><br><span class="line">    <span class="comment">// This is critical for some NUnit runners which</span></span><br><span class="line">    <span class="comment">// typically will run all the tests on the same</span></span><br><span class="line">    <span class="comment">// process/thread.</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">var</span> msg = <span class="keyword">new</span> NativeMessage();</span><br><span class="line">    <span class="keyword">do</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span> (msg.msg == WM_QUIT)</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">        Thread.Sleep(<span class="number">100</span>);</span><br><span class="line">    &#125; </span><br><span class="line">    <span class="keyword">while</span> (PeekMessage(<span class="keyword">out</span> msg, IntPtr.Zero, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>从上面的代码中可以看到, 当PeekMessage为false, 表示没有消息, 系统处于空闲状态(Idle)时, 才会执行Game.Tick方法. 即Game的逻辑和渲染是在Idle时执行的.</p>
+<p>这是MonoGame的处理方式, 可能其他的framework不是这样处理的.那可以看看它的原生版XNA的处理方式</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//Game.cs </span></span><br><span class="line"><span class="comment">//host为GameHost</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">this</span>.host.Idle += <span class="keyword">new</span> EventHandler&lt;EventArgs&gt;(<span class="keyword">this</span>.HostIdle);</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">HostIdle</span>(<span class="params"><span class="keyword">object</span> sender, EventArgs e</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">this</span>.Tick();<span class="comment">//重头戏</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Game调用host的Run方法, host的具体实现为WindowsGameHost, 它的Run方法如下<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//WindowsGameHost.cs</span></span><br><span class="line"><span class="function"><span class="keyword">internal</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Run</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.doneRun)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> InvalidOperationException(Resources.NoMultipleRuns);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">try</span></span><br><span class="line">    &#123;</span><br><span class="line">        Application.Idle += <span class="keyword">new</span> EventHandler(<span class="keyword">this</span>.ApplicationIdle);</span><br><span class="line">        Application.Run(<span class="keyword">this</span>.gameWindow.Form);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">finally</span></span><br><span class="line">    &#123;</span><br><span class="line">        Application.Idle -= <span class="keyword">new</span> EventHandler(<span class="keyword">this</span>.ApplicationIdle);</span><br><span class="line">        <span class="keyword">this</span>.doneRun = <span class="literal">true</span>;</span><br><span class="line">        <span class="keyword">base</span>.OnExiting();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>注册了Winform的Application的Idle事件, 当系统空闲时, 调用ApplicationIdle方法.<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">ApplicationIdle</span>(<span class="params"><span class="keyword">object</span> sender, EventArgs e</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    NativeMethods.Message message;</span><br><span class="line">    <span class="keyword">while</span> (!NativeMethods.PeekMessage(<span class="keyword">out</span> message, IntPtr.Zero, <span class="number">0u</span>, <span class="number">0u</span>, <span class="number">0u</span>))</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">this</span>.exitRequested)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">this</span>.gameWindow.Close();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">this</span>.RunOneFrame();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>再看RunOneFrame方法<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">internal</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">RunOneFrame</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">this</span>.gameWindow.Tick();</span><br><span class="line">    <span class="keyword">base</span>.OnIdle();</span><br><span class="line">    <span class="keyword">if</span> (GamerServicesDispatcher.IsInitialized)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">this</span>.gameWindow.IsGuideVisible = Guide.IsVisible;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>内部调用base.OnIdle. 而GameHost的Idle事件注册了Game的HostIdle, 而后者又调用了Tick方法.</p>
+<p>其实从HostIdle顾名思义可以得出结论<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">HostIdle</span>(<span class="params"><span class="keyword">object</span> sender, EventArgs e</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">this</span>.Tick();<span class="comment">//重头戏</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>Game是在Host空闲的时候才调用Tick方法. Host顾名思义就是Game寄宿的载体.可以是Windows的Winform, 也可以Android的View, 等等等等.</p>
+<p>或许还会有疑问, 那只是MonoGame(XNA)的做法, 其他game framework并不一定如此吧.</p>
+<p>于是查了一本经典老书: Windows游戏编程大师技巧<br>第二章产生一个实时事件循环<br><img src="/img/monogame-windowsgameclassic-loop.png" alt=""></p>
+<p>代码基于Win32平台, 没有framework封装, 已经接近底层了.</p>
+<p>或许还有一丝存疑, 那是该书对Idle的运用, 将Game logic放在那里, 不一定都是这样吧. 那看一下非游戏编程的书是怎么描述Idle的运用的.</p>
+<p><strong>深入浅出MFC第一章Win32基本程序概念</strong>专门有一节是<em>空闲时间的处理: OnIdle</em></p>
+<blockquote>
+<p>所谓空闲时间（idle time），是指「系统中没有任何消息等待处理」的时间。举个例子，没有任何程序使用定时器（timer，它会定时送来WM_TIMER），使用者也没有碰触键盘和鼠标或任何外围，那么，系统就处于所谓的空闲时间。空闲时间常常发生。不要认为你移动鼠标时产生一大堆的WM_MOUSEMOVE，事实上夹杂在每一个WM_MOUSEMOVE 之间就可能存在许多空闲时间。毕竟，计算机速度超乎想像。背景工作最适宜在空闲时间完成。传统的SDK 程序如果要处理空闲时间，可以以下列循环取代WinMain 中传统的消息循环：</p>
+</blockquote>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">while</span> (TRUE) &#123;</span><br><span class="line">    <span class="keyword">if</span> (PeekMessage(&amp;msg, NULL, <span class="number">0</span>, <span class="number">0</span>, PM_REMOVE) &#123;</span><br><span class="line">        <span class="keyword">if</span> (msg.message == WM_QUIT)</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        TranslateMessage(&amp;msg);</span><br><span class="line">        DispatchMessage(&amp;msg);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        OnIdle();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>第６章的HelloMFC 将示范如何在MFC 程序中处理所谓的idle time</p>
+</blockquote>
+<p>那有一个疑问: 游戏是背景工作吗? 要解答这样疑问看一篇笔记.</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/编程/" rel="tag"># 编程</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/12/03/MonoGame笔记(四)XNA Simple GUI/" rel="next" title="MonoGame笔记(四)XNA Simple GUI">
+                <i class="fa fa-chevron-left"></i> MonoGame笔记(四)XNA Simple GUI
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/12/04/MonoGame笔记(六)Game与GUI的差异/" rel="prev" title="MonoGame笔记(六)Game与GUI的差异">
+                MonoGame笔记(六)Game与GUI的差异 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">zmapleaf</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">66</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zmapleaf</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

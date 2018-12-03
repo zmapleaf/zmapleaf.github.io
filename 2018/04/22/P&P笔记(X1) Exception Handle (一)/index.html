@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Pattern&Practice,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="这一篇主要整理Exception的机制. 什么是Exception以及Exception Handle回答这个问题, 下面这段讲Exception与Assert区别的文字, 从另一个角度解释了什么是异常. 有醍醐灌顶, 正本清源的感觉. Exception与Assert的区别链接https://docs.microsoft.com/en-us/cpp/cpp/errors-and-exceptio">
+<meta name="keywords" content="Pattern&amp;Practice">
+<meta property="og:type" content="article">
+<meta property="og:title" content="P&amp;P笔记(X1) Exception Handle (一)">
+<meta property="og:url" content="http://yoursite.com/2018/04/22/P&P笔记(X1) Exception Handle (一)/index.html">
+<meta property="og:site_name" content="远">
+<meta property="og:description" content="这一篇主要整理Exception的机制. 什么是Exception以及Exception Handle回答这个问题, 下面这段讲Exception与Assert区别的文字, 从另一个角度解释了什么是异常. 有醍醐灌顶, 正本清源的感觉. Exception与Assert的区别链接https://docs.microsoft.com/en-us/cpp/cpp/errors-and-exceptio">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-05-08T03:22:15.988Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="P&amp;P笔记(X1) Exception Handle (一)">
+<meta name="twitter:description" content="这一篇主要整理Exception的机制. 什么是Exception以及Exception Handle回答这个问题, 下面这段讲Exception与Assert区别的文字, 从另一个角度解释了什么是异常. 有醍醐灌顶, 正本清源的感觉. Exception与Assert的区别链接https://docs.microsoft.com/en-us/cpp/cpp/errors-and-exceptio">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/04/22/P&P笔记(X1) Exception Handle (一)/">
+
+
+
+
+
+  <title>P&P笔记(X1) Exception Handle (一) | 远</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">远</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/22/P&P笔记(X1) Exception Handle (一)/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zmapleaf">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="远">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">P&P笔记(X1) Exception Handle (一)</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-22T13:19:37+08:00">
+                2018-04-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/编程/" itemprop="url" rel="index">
+                    <span itemprop="name">编程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>这一篇主要整理Exception的机制.</p>
+<h2 id="什么是Exception以及Exception-Handle"><a href="#什么是Exception以及Exception-Handle" class="headerlink" title="什么是Exception以及Exception Handle"></a>什么是Exception以及Exception Handle</h2><p>回答这个问题, 下面这段讲Exception与Assert区别的文字, 从另一个角度解释了什么是异常. 有醍醐灌顶, 正本清源的感觉.</p>
+<h3 id="Exception与Assert的区别"><a href="#Exception与Assert的区别" class="headerlink" title="Exception与Assert的区别"></a>Exception与Assert的区别</h3><p>链接<a href="https://docs.microsoft.com/en-us/cpp/cpp/errors-and-exception-handling-modern-cpp" target="_blank" rel="noopener">https://docs.microsoft.com/en-us/cpp/cpp/errors-and-exception-handling-modern-cpp</a> </p>
+<blockquote>
+<p>Exceptions and asserts are two distinct mechanisms for detecting run-time errors in a program. Use asserts to test for conditions during development that should never be true if all your code is correct. There is no point in handling such an error by using an exception <strong>because the error indicates that something in the code has to be fixed(是代码本身出了问题)</strong>, and doesn’t represent a condition that the program has to recover from at run time. An assert stops execution at the statement so that you can inspect the program state in the debugger; an exception continues execution from the first appropriate catch handler. <strong>Use exceptions to check error conditions that might occur at run time even if your code is correct</strong>, for example, “file not found” or “out of memory.” You might want to recover from these conditions, even if the recovery just outputs a message to a log and ends the program. <strong>Always check arguments to public functions by using exceptions</strong>. Even if your function is error-free, you might not have complete control over arguments that a user might pass to it.</p>
+</blockquote>
+<p>再看C# in a nutshell中怎么说</p>
+<blockquote>
+<p>An assertion is something that, if violated, indicates a bug in the current method’s code.<br>Throwing an exception based on argument validation indicates a bug in the caller’s code.</p>
+</blockquote>
+<p>例如一个复杂的算法内部在进行下一个计算时, 上一个计算得到的值必须符合某个范围. 如果在范围外, 则表示该算法的计算步骤有误, 这种情况下, 使用的是断言. 断言判断的是程序本身的逻辑问题.异常, 就像链接中所说的那样, 程序本身没有问题. 是运行时的问题, 例如输入, 网络异常, 读写异常等等. 有些异常可以恢复, 例如FileNotFoundException; 有些异常不能恢复, 例如StackOverflowException. 异常处理的做法是, 对于可恢复的异常, 根据程序上下文, 恢复程序的正常执行; 对于那些不可恢复的异常, 则记录日志, 再次抛出异常, 终止程序执行. </p>
+<h2 id="throw还是不throw"><a href="#throw还是不throw" class="headerlink" title="throw还是不throw"></a>throw还是不throw</h2><p>对于函数设计而言, 什么情况下需要抛出异常, 什么情况下不抛出异常, 可以用if来替代.</p>
+<p>一种说法是尽量少throw, 例如</p>
+<p><em>Best Practices - Exception Handling in C# .NET</em><br><a href="https://www.c-sharpcorner.com/UploadFile/84c85b/best-practices-exception-handling-in-C-Sharp-net/" target="_blank" rel="noopener">https://www.c-sharpcorner.com/UploadFile/84c85b/best-practices-exception-handling-in-C-Sharp-net/</a><br>中提到2点</p>
+<ol>
+<li>Do Not Throw Exceptions to Control Application Flow</li>
+<li>Use Validation Code to Reduce Unnecessary Exceptions</li>
+</ol>
+<p>像除以0这种, 用if判断即可, 不要throw exception.</p>
+<p>另一种说法是<strong>Always check arguments to public functions by using exceptions</strong><br>看List<t>的源码发现很多throw exception<br><a href="https://referencesource.microsoft.com/#mscorlib/system/collections/generic/list.cs,cf7f4095e4de7646" target="_blank" rel="noopener">https://referencesource.microsoft.com/#mscorlib/system/collections/generic/list.cs,cf7f4095e4de7646</a></t></p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"> <span class="function"><span class="keyword">public</span> <span class="title">List</span>(<span class="params"><span class="keyword">int</span> capacity</span>)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (capacity &lt; <span class="number">0</span>) ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.capacity, ExceptionResource.ArgumentOutOfRange_NeedNonNegNum);</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">List</span>(<span class="params">IEnumerable&lt;T&gt; collection</span>)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (collection == <span class="literal">null</span>)</span><br><span class="line">        ThrowHelper.ThrowArgumentNullException(ExceptionArgument.collection);</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> List&lt;T&gt; <span class="title">FindAll</span>(<span class="params">Predicate&lt;T&gt; match</span>)</span> &#123; </span><br><span class="line">    <span class="keyword">if</span>( match == <span class="literal">null</span>) &#123;</span><br><span class="line">        ThrowHelper.ThrowArgumentNullException(ExceptionArgument.match);</span><br><span class="line">    &#125;</span><br><span class="line">    Contract.EndContractBlock();</span><br><span class="line"></span><br><span class="line">    List&lt;T&gt; list = <span class="keyword">new</span> List&lt;T&gt;(); </span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span> ; i &lt; _size; i++) &#123;</span><br><span class="line">        <span class="keyword">if</span>(match(_items[i])) &#123;</span><br><span class="line">            list.Add(_items[i]);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> list;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>该如何选择?</p>
+<p>其实仔细看一下上述List<t>的方法, 可以发现一些线索.像构造方法这种, 如果输入参数有误, 是没有办法通过if来规避的, 只能抛出异常; 再看FindAll方法, API的设计是需要返回一个列表. 假如match为null时不抛出异常, 那么是return null还是return new list<t>()呢? return new List<t>的话, 即使match不是null, 也有可能返回. 即所有的item都不匹配. return null的话, 从API的设计角度, 是不恰当的. 调用者调用List的FindAll方法, 不应该返回null. 当不知道返回什么时, throw exception是一个更好的选择, throw new exception可以当做返回值, 编译器不会报错. 而且List<t>属于底层库. 它没有程序上下文, 也不需要去recover. 直接像上层抛出异常即可.</t></t></t></t></p>
+<p>再例如:<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> List&lt;People&gt; <span class="title">GetAllCustomersByAge</span>(<span class="params"><span class="keyword">int</span> age</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (age &lt; <span class="number">18</span> || age &gt; <span class="number">150</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> ArgumentOutOfRangeException(<span class="string">"Age must be between 18 and 150."</span>, <span class="keyword">nameof</span>(age));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>虽然这是上层逻辑, 但该方法内部缺少恢复的程序上下文, 抛出异常是合适的.</p>
+<p>现在再来讨论可以不抛出异常的情况.<br><a href="https://github.com/dotnet/training-tutorials/blob/master/content/csharp/getting-started/exceptions.md" target="_blank" rel="noopener">https://github.com/dotnet/training-tutorials/blob/master/content/csharp/getting-started/exceptions.md</a><br>该链接中有这样一段文字和示例:</p>
+<p>When to Avoid Throwing and Catching</p>
+<blockquote>
+<p>It is important that you only throw exceptions when it’s appropriate, when your code is in an unintended(没预料到的) situation. If the situation seems likely(预料到的), but requires taking a certain action, just handle it using normal application flow control elements like if statements.</p>
+</blockquote>
+<blockquote>
+<p>A rule of thumb for determining if you need to throw an exception is if you encounter a situation in a method that <strong>doesn’t allow you to return a valid result. In that case, an exception may be the best solution, or you may need to reconsider what your method is returning.</strong> The following two examples demonstrate two ways to deal with a method failing to perform its intended task:</p>
+</blockquote>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">SetMemberBirthday</span>(<span class="params"><span class="keyword">int</span> memberId, DateTime birthday</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Member member = _memberList.SingleOrDefault(m =&gt; m.Id == memberId);</span><br><span class="line">    <span class="keyword">if</span> (member == <span class="literal">null</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> MemberNotFoundException(id);</span><br><span class="line">    &#125;</span><br><span class="line">    member.Birthday = birthday;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>没有找到member是一种<strong>预料之中</strong>的情况, 这种情况下, 可以更改API的设计, 来避免抛出异常</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">bool</span> <span class="title">SetMemberBirthday</span>(<span class="params"><span class="keyword">int</span> memberId, DateTime birthday</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Member member = _memberList.SingleOrDefault(m =&gt; m.Id == memberId);</span><br><span class="line">    <span class="keyword">if</span> (member == <span class="literal">null</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        Logger.LogWarning(<span class="string">$"SetMemberBirthday Error: Member <span class="subst">&#123;memberId&#125;</span> not found. Birthday not set <span class="subst">&#123;birthday&#125;</span>."</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>; <span class="comment">// false tells the caller that the operation failed.</span></span><br><span class="line">    &#125;</span><br><span class="line">    member.Birthday = birthday;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>通过以上的描述, 可以体会下面的结论:</p>
+<ol>
+<li>异常用在unintended situation中. 什么样算是unintended, 这需要程序员自己界定. 这是一个难点.</li>
+<li>如果是intended situation, 可以通过更改API的接口设计(返回值)来避免抛出异常. </li>
+<li>像List的FindAll方法, 它的接口意图是明确的. 它的返回值没法更改. 这种不知道返回什么的情况下, 用<br>throw exception是最合适的选择.</li>
+</ol>
+<p>上面提到的是API的设计, 更上一层, 在类的设计层面去避免异常. 下面摘自Best practices for exceptions<br><a href="https://docs.microsoft.com/en-us/dotnet/standard/exceptions/best-practices-for-exceptions" target="_blank" rel="noopener">https://docs.microsoft.com/en-us/dotnet/standard/exceptions/best-practices-for-exceptions</a></p>
+<p>Handle common conditions without throwing exceptions</p>
+<blockquote>
+<p>For conditions that are likely to occur but might trigger an exception, consider handling them in a way that will avoid the exception. For example, if you try to close a connection that is already closed, you’ll get an InvalidOperationException. You can avoid that by using an if statement to check the connection state before trying to close it.</p>
+</blockquote>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (conn.State != ConnectionState.Closed)</span><br><span class="line">&#123;</span><br><span class="line">    conn.Close();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>conn类提供了State属性, 用来判断; 如果没有改属性, 则需要捕获异常<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span></span><br><span class="line">&#123;</span><br><span class="line">    conn.Close();</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">catch</span> (InvalidOperationException ex)</span><br><span class="line">&#123;</span><br><span class="line">    Console.WriteLine(ex.GetType().FullName);</span><br><span class="line">    Console.WriteLine(ex.Message);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>The method to choose depends on how often you expect the event to occur.</p>
+<ul>
+<li><p>Use exception handling if the event doesn’t occur very often, that is, if the event is truly exceptional and indicates an error (such as an unexpected end-of-file). When you use exception handling, less code is executed in normal conditions.</p>
+</li>
+<li><p>Check for error conditions in code if the event happens routinely and could be considered part of normal execution. When you check for common error conditions, less code is executed because you avoid exceptions.</p>
+</li>
+</ul>
+<blockquote>
+<p><strong>Design classes so that exceptions can be avoided</strong>. A class can provide methods or properties that enable you to avoid making a call that would trigger an exception. For example, a FileStream class provides methods that help determine whether the end of the file has been reached. These can be used to avoid the exception that is thrown if you read past the end of the file. </p>
+</blockquote>
+<h2 id="swallow还是rethrow"><a href="#swallow还是rethrow" class="headerlink" title="swallow还是rethrow"></a>swallow还是rethrow</h2><p>对于下层调用抛出的异常, 是吞掉呢? 还是向上propagate. 这个主要看当前这一层, 有没有足够的程序上下文, 来进行恢复. 如果没有那样的能力, 只能rethrow exception. 下面这段文字摘自MSDN, 讲的非常明了.</p>
+<p><a href="https://docs.microsoft.com/en-us/cpp/cpp/how-to-design-for-exception-safety" target="_blank" rel="noopener">https://docs.microsoft.com/en-us/cpp/cpp/how-to-design-for-exception-safety</a></p>
+<blockquote>
+<p>Basic Techniques<br>A robust exception-handling policy requires careful thought and should be part of the design process. In general, most exceptions are detected and thrown at <strong>the lower layers</strong> of a software module, but typically these layers do not have enough context to handle the error or expose a message to end users. In <strong>the middle layers</strong>, functions can catch and rethrow an exception when they have to inspect the exception object, or they have additional useful information to provide for the upper layer that ultimately catches the exception. A function should catch and “swallow” an exception only if it is able to completely recover from it. In many cases, the correct behavior in the middle layers is to let an exception propagate up the call stack. Even at <strong>the highest layer</strong>, it might be appropriate to let an unhandled exception terminate a program if the exception leaves the program in a state in which its correctness cannot be guaranteed.<br>No matter how a function handles an exception, to help guarantee that it is “exception-safe,” it must be designed according to the following basic rules.</p>
+</blockquote>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Pattern-Practice/" rel="tag"># Pattern&Practice</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/01/08/DesignPattern笔记(三)Iterator/" rel="next" title="DesignPattern笔记(三)Iterator">
+                <i class="fa fa-chevron-left"></i> DesignPattern笔记(三)Iterator
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/04/22/P&P笔记(X1) Exception Handle (二)/" rel="prev" title="P&P笔记(X1) Exception Handle (二)">
+                P&P笔记(X1) Exception Handle (二) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">zmapleaf</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">66</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#什么是Exception以及Exception-Handle"><span class="nav-number">1.</span> <span class="nav-text">什么是Exception以及Exception Handle</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Exception与Assert的区别"><span class="nav-number">1.1.</span> <span class="nav-text">Exception与Assert的区别</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#throw还是不throw"><span class="nav-number">2.</span> <span class="nav-text">throw还是不throw</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#swallow还是rethrow"><span class="nav-number">3.</span> <span class="nav-text">swallow还是rethrow</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zmapleaf</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="编程,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="上一篇笔记中TimerComponent, FrameRateCounter分别继承于GameComponent, DrawableGameComponent.关于GameComponent和DrawableGameComponent, 官方的介绍如下:  Game components provide a modular way of adding functionality to a game">
+<meta name="keywords" content="编程">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MonoGame笔记(十)GameComponent">
+<meta property="og:url" content="http://yoursite.com/2017/12/17/MonoGame笔记(十)GameComponent/index.html">
+<meta property="og:site_name" content="远">
+<meta property="og:description" content="上一篇笔记中TimerComponent, FrameRateCounter分别继承于GameComponent, DrawableGameComponent.关于GameComponent和DrawableGameComponent, 官方的介绍如下:  Game components provide a modular way of adding functionality to a game">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://yoursite.com/img/monogame-gamecomponents.png">
+<meta property="og:updated_time" content="2017-12-17T10:29:00.953Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="MonoGame笔记(十)GameComponent">
+<meta name="twitter:description" content="上一篇笔记中TimerComponent, FrameRateCounter分别继承于GameComponent, DrawableGameComponent.关于GameComponent和DrawableGameComponent, 官方的介绍如下:  Game components provide a modular way of adding functionality to a game">
+<meta name="twitter:image" content="http://yoursite.com/img/monogame-gamecomponents.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/12/17/MonoGame笔记(十)GameComponent/">
+
+
+
+
+
+  <title>MonoGame笔记(十)GameComponent | 远</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">远</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/17/MonoGame笔记(十)GameComponent/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zmapleaf">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="远">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">MonoGame笔记(十)GameComponent</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-12-17T17:22:37+08:00">
+                2017-12-17
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/编程/" itemprop="url" rel="index">
+                    <span itemprop="name">编程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>上一篇笔记中TimerComponent, FrameRateCounter分别继承于GameComponent, DrawableGameComponent.关于GameComponent和DrawableGameComponent, 官方的介绍如下:</p>
+<blockquote>
+<p>Game components provide a modular way of adding functionality to a game. You create a game component by deriving the new component either from the <strong>GameComponent</strong> class, or, if the component loads and draws graphics content, from the <strong>DrawableGameComponent</strong> class. You then add game logic and rendering code to the game component by overriding <strong>GameComponent.Update</strong>,<strong>DrawableGameComponent.Draw</strong> and <strong>GameComponent.Initialize</strong>. A game component is registered with a game by passing the component to <strong>Game.Components.Add</strong>. A registered component will have its draw, update, and initialize methods called from the <strong>Game.Initialize</strong>, <strong>Game.Update</strong>, and <strong>Game.Draw</strong> methods.<br><a href="https://msdn.microsoft.com/en-us/library/bb203873.aspx" target="_blank" rel="noopener">https://msdn.microsoft.com/en-us/library/bb203873.aspx</a></p>
+</blockquote>
+<p>游戏组件提供了一种模块化的开发方式, 使得程序结构更加清晰. 除了上面提到的TimerComponent, FrameRateCounter, 包括像Input, SpriteManager, ScreenManager等等都可以用游戏组件的方式来提供.</p>
+<p>Learn XNA 4.0中介绍的SpriteManager<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line">public class SpriteManager : Microsoft.Xna.Framework.DrawableGameComponent</span><br><span class="line">&#123;</span><br><span class="line">    SpriteBatch spriteBatch;</span><br><span class="line">    UserControlledSprite player;</span><br><span class="line">    List&lt;Sprite&gt; spriteList = <span class="keyword">new</span> List&lt;Sprite&gt;( );</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">LoadContent</span>(<span class="params"> </span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        spriteBatch = <span class="keyword">new</span> SpriteBatch(Game.GraphicsDevice);</span><br><span class="line"></span><br><span class="line">        player = <span class="keyword">new</span> UserControlledSprite(</span><br><span class="line">        Game.Content.Load&lt;Texture2D&gt;(<span class="string">@"Images/threerings"</span>),</span><br><span class="line">        Vector2.Zero, <span class="keyword">new</span> Point(<span class="number">75</span>, <span class="number">75</span>), <span class="number">10</span>, <span class="keyword">new</span> Point(<span class="number">0</span>, <span class="number">0</span>),</span><br><span class="line">        <span class="keyword">new</span> Point(<span class="number">6</span>, <span class="number">8</span>), <span class="keyword">new</span> Vector2(<span class="number">6</span>, <span class="number">6</span>));</span><br><span class="line"></span><br><span class="line">        spriteList.Add(<span class="keyword">new</span> AutomatedSprite(</span><br><span class="line">        Game.Content.Load&lt;Texture2D&gt;(<span class="string">@"Images/skullball"</span>),</span><br><span class="line">        <span class="keyword">new</span> Vector2(<span class="number">150</span>, <span class="number">150</span>), <span class="keyword">new</span> Point(<span class="number">75</span>, <span class="number">75</span>), <span class="number">10</span>, <span class="keyword">new</span> Point(<span class="number">0</span>, <span class="number">0</span>),</span><br><span class="line">        <span class="keyword">new</span> Point(<span class="number">6</span>, <span class="number">8</span>), Vector2.Zero));</span><br><span class="line"></span><br><span class="line">        spriteList.Add(<span class="keyword">new</span> AutomatedSprite(</span><br><span class="line">        Game.Content.Load&lt;Texture2D&gt;(<span class="string">@"Images/skullball"</span>),</span><br><span class="line">        <span class="keyword">new</span> Vector2(<span class="number">300</span>, <span class="number">150</span>), <span class="keyword">new</span> Point(<span class="number">75</span>, <span class="number">75</span>), <span class="number">10</span>, <span class="keyword">new</span> Point(<span class="number">0</span>, <span class="number">0</span>),</span><br><span class="line">        <span class="keyword">new</span> Point(<span class="number">6</span>, <span class="number">8</span>), Vector2.Zero));</span><br><span class="line"></span><br><span class="line">        <span class="keyword">base</span>.LoadContent( );</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Update</span>(<span class="params">GameTime gameTime</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">// Update player</span></span><br><span class="line">        player.Update(gameTime, Game.Window.ClientBounds);</span><br><span class="line">        <span class="comment">// Update all sprites</span></span><br><span class="line">        <span class="keyword">foreach</span> (Sprite s <span class="keyword">in</span> spriteList)</span><br><span class="line">        &#123;</span><br><span class="line">            s.Update(gameTime, Game.Window.ClientBounds);</span><br><span class="line">            <span class="comment">// Check for collisions and exit game if there is one</span></span><br><span class="line">            <span class="keyword">if</span> (s.collisionRect.Intersects(player.collisionRect))</span><br><span class="line">                Game.Exit();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">base</span>.Update(gameTime);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Draw</span>(<span class="params">GameTime gameTime</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        spriteBatch.Begin(SpriteBlendMode.AlphaBlend,</span><br><span class="line">        SpriteSortMode.FrontToBack, SaveStateMode.None);</span><br><span class="line">        <span class="comment">// Draw the player</span></span><br><span class="line">        player.Draw(gameTime, spriteBatch);</span><br><span class="line">        <span class="comment">// Draw all sprites</span></span><br><span class="line">        <span class="keyword">foreach</span> (Sprite s <span class="keyword">in</span> spriteList)</span><br><span class="line">            s.Draw(gameTime, spriteBatch);</span><br><span class="line">        spriteBatch.End( );</span><br><span class="line">        <span class="keyword">base</span>.Draw(gameTime);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//使用方式</span></span><br><span class="line">spriteManger = <span class="keyword">new</span> SpriteManager(<span class="keyword">this</span>);</span><br><span class="line">Components.Add(spriteManger);</span><br></pre></td></tr></table></figure></p>
+<p>注意<strong>Sprite</strong>自身不是GameComponent或者DrawableGameComponent, 虽然也有Update和Draw方法</p>
+<p>RolePlayingGameStarterKit中使用的ScreenManager, 做法和SpriteManager一样, 也是继承DrawableGameComponent. 各种GameScreen, 就类似Sprite, 通过ScreenManager的draw方法进行绘制. GameScreen自己有draw方法, 用的是ScreenManager的spriteBatch. </p>
+<p>除了上面介绍的游戏系统可以作为组件, 下面的这种方式也可以提供一种思路<br><a href="http://blogs.microsoft.co.il/pavely/2010/11/06/xna-2d-game-tutorial-part-4/" target="_blank" rel="noopener">http://blogs.microsoft.co.il/pavely/2010/11/06/xna-2d-game-tutorial-part-4/</a><br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//星空, 游戏背景</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">StarfieldComponent</span> : <span class="title">DrawableGameComponent</span> &#123;</span><br><span class="line">    Star[] _stars = <span class="keyword">new</span> Star[<span class="number">128</span>];</span><br><span class="line">    Random _rnd = <span class="keyword">new</span> Random();</span><br><span class="line">    Texture2D _starTexture;</span><br><span class="line">    SpriteBatch _batch;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">StarfieldComponent</span>(<span class="params">Game game</span>)</span></span><br><span class="line"><span class="function">        : <span class="title">base</span>(<span class="params">game</span>)</span> &#123;</span><br><span class="line">        <span class="comment">// <span class="doctag">TODO:</span> Construct any child components here</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Initialize</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; _stars.Length; i++) &#123;</span><br><span class="line">            Star star = <span class="keyword">new</span> Star();</span><br><span class="line">            star.Color = <span class="keyword">new</span> Color(_rnd.Next(<span class="number">256</span>), _rnd.Next(<span class="number">256</span>), _rnd.Next(<span class="number">256</span>), <span class="number">128</span>);</span><br><span class="line">            star.Position = <span class="keyword">new</span> Vector2(_rnd.Next(Game.Window.ClientBounds.Width), _rnd.Next(Game.Window.ClientBounds.Height));</span><br><span class="line">            star.Speed = (<span class="keyword">float</span>)_rnd.NextDouble() * <span class="number">5</span> + <span class="number">2</span>;</span><br><span class="line">            _stars[i] = star;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">base</span>.Initialize();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">LoadContent</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">        _starTexture = Game.Content.Load&lt;Texture2D&gt;(<span class="string">"Images/star"</span>);</span><br><span class="line">        _batch = <span class="keyword">new</span> SpriteBatch(Game.GraphicsDevice);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">base</span>.LoadContent();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Update</span>(<span class="params">GameTime gameTime</span>)</span> &#123;</span><br><span class="line">        <span class="keyword">int</span> height = Game.Window.ClientBounds.Height;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; _stars.Length; i++) &#123;</span><br><span class="line">            <span class="keyword">var</span> star = _stars[i];</span><br><span class="line">            <span class="keyword">if</span>((star.Position.Y += star.Speed) &gt; height) &#123;</span><br><span class="line">                <span class="comment">// "generate" a new star</span></span><br><span class="line">                star.Position = <span class="keyword">new</span> Vector2(_rnd.Next(Game.Window.ClientBounds.Width), -_rnd.Next(<span class="number">20</span>));</span><br><span class="line">                star.Speed = (<span class="keyword">float</span>)_rnd.NextDouble() * <span class="number">5</span> + <span class="number">2</span>;</span><br><span class="line">                star.Color = <span class="keyword">new</span> Color(_rnd.Next(<span class="number">256</span>), _rnd.Next(<span class="number">256</span>), _rnd.Next(<span class="number">256</span>), <span class="number">128</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">base</span>.Update(gameTime);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Draw</span>(<span class="params">GameTime gameTime</span>)</span> &#123;</span><br><span class="line">        _batch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied);</span><br><span class="line">        <span class="keyword">foreach</span>(<span class="keyword">var</span> star <span class="keyword">in</span> _stars)</span><br><span class="line">            _batch.Draw(_starTexture, star.Position, <span class="literal">null</span>, star.Color, <span class="number">0</span>, Vector2.Zero, <span class="number">1.0f</span>, SpriteEffects.None, <span class="number">1.0f</span>);</span><br><span class="line">        _batch.End();</span><br><span class="line">        <span class="keyword">base</span>.Draw(gameTime);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>GameComponent和DrawableGameComponent的类图如下:<br><img src="/img/monogame-gamecomponents.png" alt=""><br>值得一提的是IUpdateable中有一个UpdateOrder, IDrawable中有一个DrawOrder, 这两个Order对于组件来说是不可或缺的. 例如寻路组件, 碰撞组件, 网络组件等之间会有一个先后顺序, 绘制的时候则有特效层, UI层, 场景中又细分为前景层, 中间层, 背景层.</p>
+<p>GameComponent其实是一种设计模式(<a href="http://gameprogrammingpatterns.com/component.html)" target="_blank" rel="noopener">http://gameprogrammingpatterns.com/component.html)</a>, Unity3D中则更进一步, 每一个物体都是GameObject, 通过”挂”上各种GameComponent, 在游戏中运行. 另外还有一种ECS(Entity-Component-System 实体组件系统, 参考守望先锋), 则比Unity3D更加彻底(Entity就是Unity3D中的GameObject), 关于ECS还有待进一步学习.</p>
+<p><a href="http://gameprogrammingpatterns.com/component.html" target="_blank" rel="noopener">http://gameprogrammingpatterns.com/component.html</a> 最后提到了Unity3D和XNA中运用Component模式的区别: 二者之间的level不一样, XNA的level是在Game级别, 而Unity3D是在Entity级别.</p>
+<blockquote>
+<p>The Unity framework’s core GameObject class is designed entirely around components.</p>
+</blockquote>
+<blockquote>
+<p>Microsoft’s XNA game framework comes with a core Game class. It owns a collection of GameComponent objects. Where our example uses components at the individual game entity level, XNA implements the pattern at the level of the main game object itself, but the purpose is the same.</p>
+</blockquote>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/编程/" rel="tag"># 编程</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/12/08/MonoGame笔记(九)其他几个时间相关程序设计/" rel="next" title="MonoGame笔记(九)其他几个时间相关程序设计">
+                <i class="fa fa-chevron-left"></i> MonoGame笔记(九)其他几个时间相关程序设计
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/12/17/MonoGame笔记(十一)GameServices/" rel="prev" title="MonoGame笔记(十一)GameService">
+                MonoGame笔记(十一)GameService <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">zmapleaf</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">66</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zmapleaf</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Pattern&Practice,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="源码版本：paint.net 3.36 (https://github.com/rivy/OpenPDN), 后续的版本貌似不提供源码了重要的几个工程目录：Base: 基础数据结构, 和项目无关，例如Pair，Tuple，Set，EventArgs等Core：和项目相关的数据结构，例如RendreArgs，Surface，Histogram，HsvColorData：项目文件类型，例如PdnFil">
+<meta name="keywords" content="Pattern&amp;Practice">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Paint.Net笔记(X1) 基本结构">
+<meta property="og:url" content="http://yoursite.com/2018/04/28/Paint.Net笔记(X1) 基本结构/index.html">
+<meta property="og:site_name" content="远">
+<meta property="og:description" content="源码版本：paint.net 3.36 (https://github.com/rivy/OpenPDN), 后续的版本貌似不提供源码了重要的几个工程目录：Base: 基础数据结构, 和项目无关，例如Pair，Tuple，Set，EventArgs等Core：和项目相关的数据结构，例如RendreArgs，Surface，Histogram，HsvColorData：项目文件类型，例如PdnFil">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://yoursite.com/img/paintdotnet-1.png">
+<meta property="og:updated_time" content="2018-05-13T07:51:30.489Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Paint.Net笔记(X1) 基本结构">
+<meta name="twitter:description" content="源码版本：paint.net 3.36 (https://github.com/rivy/OpenPDN), 后续的版本貌似不提供源码了重要的几个工程目录：Base: 基础数据结构, 和项目无关，例如Pair，Tuple，Set，EventArgs等Core：和项目相关的数据结构，例如RendreArgs，Surface，Histogram，HsvColorData：项目文件类型，例如PdnFil">
+<meta name="twitter:image" content="http://yoursite.com/img/paintdotnet-1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/04/28/Paint.Net笔记(X1) 基本结构/">
+
+
+
+
+
+  <title>Paint.Net笔记(X1) 基本结构 | 远</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">远</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/28/Paint.Net笔记(X1) 基本结构/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zmapleaf">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="远">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Paint.Net笔记(X1) 基本结构</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-28T15:17:51+08:00">
+                2018-04-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/编程/" itemprop="url" rel="index">
+                    <span itemprop="name">编程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>源码版本：paint.net 3.36 (<a href="https://github.com/rivy/OpenPDN)" target="_blank" rel="noopener">https://github.com/rivy/OpenPDN)</a>, 后续的版本貌似不提供源码了<br>重要的几个工程目录：<br>Base: 基础数据结构, 和项目无关，例如Pair，Tuple，Set，EventArgs等<br>Core：和项目相关的数据结构，例如RendreArgs，Surface，Histogram，HsvColor<br>Data：项目文件类型，例如PdnFileType，JpegFileType等<br><strong>paintdotnet</strong>：主入口，主逻辑<br>Effect：滤镜<br>SystemLayer：和系统相关, 例如ThreadBackground, Memory等，不是图层的Layer<br>Resource：cursor，icon，image等 </p>
+<p>启动入口：Startup类<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">StartPart2</span><br><span class="line">&#123;                 </span><br><span class="line">	Application.Run(<span class="keyword">this</span>.mainForm); </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">internal</span> <span class="keyword">sealed</span> <span class="keyword">class</span> <span class="title">MainForm</span>: <span class="title">PdnBaseForm</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">private</span> AppWorkspace appWorkspace;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">InitializeComponent</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>	&#123;</span><br><span class="line">		<span class="keyword">this</span>.components = <span class="keyword">new</span> System.ComponentModel.Container();</span><br><span class="line">		<span class="keyword">this</span>.defaultButton = <span class="keyword">new</span> System.Windows.Forms.Button();</span><br><span class="line">		<span class="comment">// 构造</span></span><br><span class="line">		<span class="keyword">this</span>.appWorkspace = <span class="keyword">new</span> PaintDotNet.AppWorkspace();</span><br><span class="line">		<span class="keyword">this</span>.floaterOpacityTimer = <span class="keyword">new</span> System.Windows.Forms.Timer(<span class="keyword">this</span>.components);</span><br><span class="line">		<span class="keyword">this</span>.deferredInitializationTimer = <span class="keyword">new</span> System.Windows.Forms.Timer(<span class="keyword">this</span>.components);</span><br><span class="line">		<span class="keyword">this</span>.SuspendLayout();</span><br><span class="line">		<span class="comment">// </span></span><br><span class="line">		<span class="comment">// appWorkspace</span></span><br><span class="line">		<span class="comment">// </span></span><br><span class="line">		<span class="keyword">this</span>.appWorkspace.Dock = System.Windows.Forms.DockStyle.Fill;</span><br><span class="line">		<span class="keyword">this</span>.appWorkspace.Location = <span class="keyword">new</span> System.Drawing.Point(<span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line">		<span class="keyword">this</span>.appWorkspace.Name = <span class="string">"appWorkspace"</span>;</span><br><span class="line">		<span class="keyword">this</span>.appWorkspace.Size = <span class="keyword">new</span> System.Drawing.Size(<span class="number">752</span>, <span class="number">648</span>);</span><br><span class="line">		<span class="keyword">this</span>.appWorkspace.TabIndex = <span class="number">2</span>;</span><br><span class="line">		<span class="keyword">this</span>.appWorkspace.ActiveDocumentWorkspaceChanging += <span class="keyword">new</span> EventHandler(AppWorkspace_ActiveDocumentWorkspaceChanging);</span><br><span class="line">		<span class="keyword">this</span>.appWorkspace.ActiveDocumentWorkspaceChanged += <span class="keyword">new</span> EventHandler(AppWorkspace_ActiveDocumentWorkspaceChanged);</span><br><span class="line">		<span class="comment">//...</span></span><br><span class="line"></span><br><span class="line">		<span class="keyword">this</span>.AutoScaleDimensions = <span class="keyword">new</span> SizeF(<span class="number">96F</span>, <span class="number">96F</span>);</span><br><span class="line">		<span class="keyword">this</span>.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;</span><br><span class="line">		<span class="keyword">this</span>.ClientSize = <span class="keyword">new</span> System.Drawing.Size(<span class="number">950</span>, <span class="number">738</span>);</span><br><span class="line"></span><br><span class="line">		<span class="comment">// 添加appWorkspace</span></span><br><span class="line">		<span class="keyword">this</span>.Controls.Add(<span class="keyword">this</span>.appWorkspace);</span><br><span class="line">		<span class="keyword">this</span>.Controls.Add(<span class="keyword">this</span>.defaultButton);</span><br><span class="line">		<span class="comment">//...</span></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>AppWorkspace非常关键, 代码如下<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">internal</span> <span class="keyword">class</span> <span class="title">AppWorkspace</span>: <span class="title">UserControl</span>, <span class="title">ISnapObstacleHost</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">private</span> AppEnvironment appEnvironment; </span><br><span class="line">	<span class="keyword">private</span> DocumentWorkspace activeDocumentWorkspace;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// if a new workspace is added, and this workspace is not dirty, then it will be removed. </span></span><br><span class="line">	<span class="comment">// This keeps track of the last workspace added via CreateBlankDocumentInNewWorkspace (if </span></span><br><span class="line">	<span class="comment">// true was passed for its 2nd parameter)</span></span><br><span class="line">	<span class="keyword">private</span> DocumentWorkspace initialWorkspace; </span><br><span class="line"></span><br><span class="line">	<span class="keyword">private</span> List&lt;DocumentWorkspace&gt; documentWorkspaces = <span class="keyword">new</span> List&lt;DocumentWorkspace&gt;();</span><br><span class="line">	<span class="keyword">private</span> WorkspaceWidgets widgets;</span><br><span class="line"></span><br><span class="line">	<span class="comment">//状态栏, 工具条, 悬浮窗</span></span><br><span class="line">	<span class="keyword">private</span> Panel workspacePanel;</span><br><span class="line">	<span class="keyword">private</span> PdnToolBar toolBar;</span><br><span class="line">	<span class="keyword">private</span> PdnStatusBar statusBar;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">private</span> ToolsForm mainToolBarForm;</span><br><span class="line">	<span class="keyword">private</span> LayerForm layerForm;</span><br><span class="line">	<span class="keyword">private</span> HistoryForm historyForm;</span><br><span class="line">	<span class="keyword">private</span> ColorsForm colorsForm;</span><br><span class="line"></span><br><span class="line">	<span class="comment">//...</span></span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="title">AppWorkspace</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>	&#123;</span><br><span class="line">		SuspendLayout();</span><br><span class="line"></span><br><span class="line">		<span class="comment">// initialize!</span></span><br><span class="line">		InitializeComponent();</span><br><span class="line">		InitializeFloatingForms();</span><br><span class="line"></span><br><span class="line">		<span class="keyword">this</span>.mainToolBarForm.ToolsControl.SetTools(DocumentWorkspace.ToolInfos);</span><br><span class="line">		<span class="keyword">this</span>.mainToolBarForm.ToolsControl.ToolClicked += <span class="keyword">new</span> ToolClickedEventHandler(<span class="keyword">this</span>.MainToolBar_ToolClicked);</span><br><span class="line"></span><br><span class="line">		<span class="keyword">this</span>.toolBar.ToolChooserStrip.SetTools(DocumentWorkspace.ToolInfos);</span><br><span class="line">		<span class="keyword">this</span>.toolBar.ToolChooserStrip.ToolClicked += <span class="keyword">new</span> ToolClickedEventHandler(<span class="keyword">this</span>.MainToolBar_ToolClicked);</span><br><span class="line"></span><br><span class="line">		<span class="keyword">this</span>.toolBar.AppWorkspace = <span class="keyword">this</span>;</span><br><span class="line"></span><br><span class="line">		<span class="comment">// init the Widgets container</span></span><br><span class="line">		<span class="keyword">this</span>.widgets = <span class="keyword">new</span> WorkspaceWidgets(<span class="keyword">this</span>);</span><br><span class="line">		<span class="keyword">this</span>.widgets.ViewConfigStrip = <span class="keyword">this</span>.toolBar.ViewConfigStrip;</span><br><span class="line">		<span class="keyword">this</span>.widgets.CommonActionsStrip = <span class="keyword">this</span>.toolBar.CommonActionsStrip;</span><br><span class="line">		<span class="keyword">this</span>.widgets.ToolConfigStrip = <span class="keyword">this</span>.toolBar.ToolConfigStrip;</span><br><span class="line">		<span class="keyword">this</span>.widgets.ToolsForm = <span class="keyword">this</span>.mainToolBarForm;</span><br><span class="line">		<span class="keyword">this</span>.widgets.LayerForm = <span class="keyword">this</span>.layerForm;</span><br><span class="line">		<span class="keyword">this</span>.widgets.HistoryForm = <span class="keyword">this</span>.historyForm;</span><br><span class="line">		<span class="keyword">this</span>.widgets.ColorsForm = <span class="keyword">this</span>.colorsForm;</span><br><span class="line">		<span class="keyword">this</span>.widgets.StatusBarProgress = <span class="keyword">this</span>.statusBar;</span><br><span class="line">		<span class="keyword">this</span>.widgets.DocumentStrip = <span class="keyword">this</span>.toolBar.DocumentStrip;</span><br><span class="line"></span><br><span class="line">		<span class="comment">// Load our settings and initialize the AppEnvironment</span></span><br><span class="line">		LoadSettings();</span><br><span class="line"></span><br><span class="line">		<span class="comment">// hook into Environment *Changed events</span></span><br><span class="line">		AppEnvironment.PrimaryColorChanged += PrimaryColorChangedHandler;</span><br><span class="line">		AppEnvironment.SecondaryColorChanged += SecondaryColorChangedHandler;</span><br><span class="line">		AppEnvironment.ShapeDrawTypeChanged += ShapeDrawTypeChangedHandler;</span><br><span class="line">		AppEnvironment.GradientInfoChanged += GradientInfoChangedHandler;</span><br><span class="line">		AppEnvironment.ToleranceChanged += OnEnvironmentToleranceChanged;</span><br><span class="line">		AppEnvironment.AlphaBlendingChanged += AlphaBlendingChangedHandler;</span><br><span class="line">		AppEnvironment.FontInfo = <span class="keyword">this</span>.toolBar.ToolConfigStrip.FontInfo;</span><br><span class="line">		AppEnvironment.TextAlignment = <span class="keyword">this</span>.toolBar.ToolConfigStrip.FontAlignment;</span><br><span class="line">		AppEnvironment.AntiAliasingChanged += Environment_AntiAliasingChanged;</span><br><span class="line">		AppEnvironment.FontInfoChanged += Environment_FontInfoChanged;</span><br><span class="line">		AppEnvironment.FontSmoothingChanged += Environment_FontSmoothingChanged;</span><br><span class="line">		AppEnvironment.TextAlignmentChanged += Environment_TextAlignmentChanged;</span><br><span class="line">		AppEnvironment.PenInfoChanged += Environment_PenInfoChanged;</span><br><span class="line">		AppEnvironment.BrushInfoChanged += Environment_BrushInfoChanged;</span><br><span class="line">		AppEnvironment.ColorPickerClickBehaviorChanged += Environment_ColorPickerClickBehaviorChanged;</span><br><span class="line">		AppEnvironment.ResamplingAlgorithmChanged += Environment_ResamplingAlgorithmChanged;</span><br><span class="line">		AppEnvironment.SelectionCombineModeChanged += Environment_SelectionCombineModeChanged;</span><br><span class="line">		AppEnvironment.FloodModeChanged += Environment_FloodModeChanged;</span><br><span class="line">		AppEnvironment.SelectionDrawModeInfoChanged += Environment_SelectionDrawModeInfoChanged;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">this</span>.toolBar.DocumentStrip.RelinquishFocus += RelinquishFocusHandler;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">this</span>.toolBar.ToolConfigStrip.ToleranceChanged += OnToolBarToleranceChanged;</span><br><span class="line">		<span class="keyword">this</span>.toolBar.ToolConfigStrip.FontAlignmentChanged += ToolConfigStrip_TextAlignmentChanged;</span><br><span class="line">		<span class="keyword">this</span>.toolBar.ToolConfigStrip.FontInfoChanged += ToolConfigStrip_FontTextChanged;</span><br><span class="line">		<span class="keyword">this</span>.toolBar.ToolConfigStrip.FontSmoothingChanged += ToolConfigStrip_FontSmoothingChanged;</span><br><span class="line">		<span class="keyword">this</span>.toolBar.ToolConfigStrip.RelinquishFocus += RelinquishFocusHandler2;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">this</span>.toolBar.CommonActionsStrip.RelinquishFocus += OnToolStripRelinquishFocus;</span><br><span class="line">		<span class="keyword">this</span>.toolBar.CommonActionsStrip.MouseWheel += OnToolStripMouseWheel;</span><br><span class="line">		<span class="keyword">this</span>.toolBar.CommonActionsStrip.ButtonClick += CommonActionsStrip_ButtonClick;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">this</span>.toolBar.ViewConfigStrip.DrawGridChanged += ViewConfigStrip_DrawGridChanged;</span><br><span class="line">		<span class="keyword">this</span>.toolBar.ViewConfigStrip.RulersEnabledChanged += ViewConfigStrip_RulersEnabledChanged;</span><br><span class="line">		<span class="keyword">this</span>.toolBar.ViewConfigStrip.ZoomBasisChanged += ViewConfigStrip_ZoomBasisChanged;</span><br><span class="line">		<span class="keyword">this</span>.toolBar.ViewConfigStrip.ZoomScaleChanged += ViewConfigStrip_ZoomScaleChanged;</span><br><span class="line">		<span class="keyword">this</span>.toolBar.ViewConfigStrip.ZoomIn += ViewConfigStrip_ZoomIn;</span><br><span class="line">		<span class="keyword">this</span>.toolBar.ViewConfigStrip.ZoomOut += ViewConfigStrip_ZoomOut;</span><br><span class="line">		<span class="keyword">this</span>.toolBar.ViewConfigStrip.UnitsChanged += ViewConfigStrip_UnitsChanged;</span><br><span class="line">		<span class="keyword">this</span>.toolBar.ViewConfigStrip.RelinquishFocus += OnToolStripRelinquishFocus;</span><br><span class="line">		<span class="keyword">this</span>.toolBar.ViewConfigStrip.MouseWheel += OnToolStripMouseWheel;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">this</span>.toolBar.ToolConfigStrip.BrushInfoChanged += DrawConfigStrip_BrushChanged;</span><br><span class="line">		<span class="keyword">this</span>.toolBar.ToolConfigStrip.ShapeDrawTypeChanged += DrawConfigStrip_ShapeDrawTypeChanged;</span><br><span class="line">		<span class="keyword">this</span>.toolBar.ToolConfigStrip.PenInfoChanged += DrawConfigStrip_PenChanged;</span><br><span class="line">		<span class="keyword">this</span>.toolBar.ToolConfigStrip.GradientInfoChanged += ToolConfigStrip_GradientInfoChanged;</span><br><span class="line">		<span class="keyword">this</span>.toolBar.ToolConfigStrip.AlphaBlendingChanged += OnDrawConfigStripAlphaBlendingChanged;</span><br><span class="line">		<span class="keyword">this</span>.toolBar.ToolConfigStrip.AntiAliasingChanged += DrawConfigStrip_AntiAliasingChanged;</span><br><span class="line">		<span class="keyword">this</span>.toolBar.ToolConfigStrip.RelinquishFocus += OnToolStripRelinquishFocus;</span><br><span class="line">		<span class="keyword">this</span>.toolBar.ToolConfigStrip.ColorPickerClickBehaviorChanged += ToolConfigStrip_ColorPickerClickBehaviorChanged;</span><br><span class="line">		<span class="keyword">this</span>.toolBar.ToolConfigStrip.ResamplingAlgorithmChanged += ToolConfigStrip_ResamplingAlgorithmChanged;</span><br><span class="line">		<span class="keyword">this</span>.toolBar.ToolConfigStrip.SelectionCombineModeChanged += ToolConfigStrip_SelectionCombineModeChanged;</span><br><span class="line">		<span class="keyword">this</span>.toolBar.ToolConfigStrip.FloodModeChanged += ToolConfigStrip_FloodModeChanged;</span><br><span class="line">		<span class="keyword">this</span>.toolBar.ToolConfigStrip.SelectionDrawModeInfoChanged += ToolConfigStrip_SelectionDrawModeInfoChanged;</span><br><span class="line">		<span class="keyword">this</span>.toolBar.ToolConfigStrip.SelectionDrawModeUnitsChanging += ToolConfigStrip_SelectionDrawModeUnitsChanging;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">this</span>.toolBar.ToolConfigStrip.MouseWheel += OnToolStripMouseWheel;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">this</span>.toolBar.DocumentStrip.RelinquishFocus += OnToolStripRelinquishFocus;</span><br><span class="line">		<span class="keyword">this</span>.toolBar.DocumentStrip.DocumentClicked += DocumentStrip_DocumentTabClicked;</span><br><span class="line">		<span class="keyword">this</span>.toolBar.DocumentStrip.DocumentListChanged += DocumentStrip_DocumentListChanged;</span><br><span class="line"></span><br><span class="line">		<span class="comment">// Synchronize</span></span><br><span class="line">		AppEnvironment.PerformAllChanged();</span><br><span class="line"></span><br><span class="line">		<span class="keyword">this</span>.globalToolTypeChoice = <span class="keyword">this</span>.defaultToolTypeChoice;</span><br><span class="line">		<span class="keyword">this</span>.toolBar.ToolConfigStrip.ToolBarConfigItems = ToolBarConfigItems.None;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">this</span>.layerForm.LayerControl.AppWorkspace = <span class="keyword">this</span>;</span><br><span class="line"></span><br><span class="line">		ResumeLayout();</span><br><span class="line">		PerformLayout();</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">InitializeFloatingForms</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>	&#123;</span><br><span class="line">		<span class="comment">// MainToolBarForm</span></span><br><span class="line">		mainToolBarForm = <span class="keyword">new</span> ToolsForm();</span><br><span class="line">		mainToolBarForm.RelinquishFocus += RelinquishFocusHandler;</span><br><span class="line">		mainToolBarForm.ProcessCmdKeyEvent += OnToolFormProcessCmdKeyEvent;</span><br><span class="line"></span><br><span class="line">		<span class="comment">// LayerForm</span></span><br><span class="line">		layerForm = <span class="keyword">new</span> LayerForm();</span><br><span class="line">		layerForm.LayerControl.AppWorkspace = <span class="keyword">this</span>;</span><br><span class="line">		layerForm.LayerControl.ClickedOnLayer += LayerControl_ClickedOnLayer;</span><br><span class="line">		layerForm.NewLayerButtonClick += LayerForm_NewLayerButtonClicked;</span><br><span class="line">		layerForm.DeleteLayerButtonClick += LayerForm_DeleteLayerButtonClicked;</span><br><span class="line">		layerForm.DuplicateLayerButtonClick += LayerForm_DuplicateLayerButtonClick;</span><br><span class="line">		layerForm.MergeLayerDownClick += <span class="keyword">new</span> EventHandler(LayerForm_MergeLayerDownClick);</span><br><span class="line">		layerForm.MoveLayerUpButtonClick += LayerForm_MoveLayerUpButtonClicked;</span><br><span class="line">		layerForm.MoveLayerDownButtonClick += LayerForm_MoveLayerDownButtonClicked;</span><br><span class="line">		layerForm.PropertiesButtonClick += LayerForm_PropertiesButtonClick;</span><br><span class="line">		layerForm.RelinquishFocus += RelinquishFocusHandler;</span><br><span class="line">		layerForm.ProcessCmdKeyEvent += OnToolFormProcessCmdKeyEvent;</span><br><span class="line">		</span><br><span class="line">		<span class="comment">// HistoryForm</span></span><br><span class="line">		historyForm = <span class="keyword">new</span> HistoryForm();</span><br><span class="line">		historyForm.RewindButtonClicked += HistoryForm_RewindButtonClicked;</span><br><span class="line">		historyForm.UndoButtonClicked += HistoryForm_UndoButtonClicked;</span><br><span class="line">		historyForm.RedoButtonClicked += HistoryForm_RedoButtonClicked;</span><br><span class="line">		historyForm.FastForwardButtonClicked += HistoryForm_FastForwardButtonClicked;</span><br><span class="line">		historyForm.RelinquishFocus += RelinquishFocusHandler;</span><br><span class="line">		historyForm.ProcessCmdKeyEvent += OnToolFormProcessCmdKeyEvent;</span><br><span class="line"></span><br><span class="line">		<span class="comment">// ColorsForm</span></span><br><span class="line">		colorsForm = <span class="keyword">new</span> ColorsForm();</span><br><span class="line">		colorsForm.PaletteCollection = <span class="keyword">new</span> PaletteCollection();</span><br><span class="line">		colorsForm.WhichUserColor = WhichUserColor.Primary;</span><br><span class="line">		colorsForm.UserPrimaryColorChanged += ColorsForm_UserPrimaryColorChanged;</span><br><span class="line">		colorsForm.UserSecondaryColorChanged += ColorsForm_UserSecondaryColorChanged;</span><br><span class="line">		colorsForm.RelinquishFocus += RelinquishFocusHandler;</span><br><span class="line">		colorsForm.ProcessCmdKeyEvent += OnToolFormProcessCmdKeyEvent;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>下图是Paint.Net的UI界面<br><img src="/img/paintdotnet-1.png" alt=""></p>
+<p>是个悬浮窗分别是ToolsForm, LayerForm, HistoryForm, ColorsForm. 中间图像所在区域可以理解为DocumentWorkspace. 由于可以打开多张图像, 所以存在一个DocumentWorkspace列表. 当前正在处理的是activeDocumentWorkspace. 另外还有一个WorkspaceWidgets, 代码中将layerForm, historyForm, colorsForm, mainToolBarForm都赋值给了它</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Pattern-Practice/" rel="tag"># Pattern&Practice</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/04/28/Paint.Net笔记(X2) ToolForm/" rel="next" title="Paint.Net笔记(X2) ToolForm">
+                <i class="fa fa-chevron-left"></i> Paint.Net笔记(X2) ToolForm
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/04/28/Paint.Net笔记(X3) Action & HistoryFunction/" rel="prev" title="Paint.Net笔记(X3) Action 与 HistoryFunction">
+                Paint.Net笔记(X3) Action 与 HistoryFunction <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">zmapleaf</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">66</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zmapleaf</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

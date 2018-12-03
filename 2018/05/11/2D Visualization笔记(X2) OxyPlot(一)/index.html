@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="可视化,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="OxyPlot is a cross-platform plotting library for .NET(http://www.oxyplot.org/).有简单的文档(http://docs.oxyplot.org/en/latest/common-tasks/refresh-plot.html). 这里以OxyPlot.WPF为例. 用词 Plot:Also called a graph o">
+<meta name="keywords" content="可视化">
+<meta property="og:type" content="article">
+<meta property="og:title" content="2D Visualization笔记(X2) OxyPlot(一)">
+<meta property="og:url" content="http://yoursite.com/2018/05/11/2D Visualization笔记(X2) OxyPlot(一)/index.html">
+<meta property="og:site_name" content="远">
+<meta property="og:description" content="OxyPlot is a cross-platform plotting library for .NET(http://www.oxyplot.org/).有简单的文档(http://docs.oxyplot.org/en/latest/common-tasks/refresh-plot.html). 这里以OxyPlot.WPF为例. 用词 Plot:Also called a graph o">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://yoursite.com/img/oxyplot.png">
+<meta property="og:image" content="http://yoursite.com/img/oxyplot-2.png">
+<meta property="og:updated_time" content="2018-05-13T03:31:58.181Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="2D Visualization笔记(X2) OxyPlot(一)">
+<meta name="twitter:description" content="OxyPlot is a cross-platform plotting library for .NET(http://www.oxyplot.org/).有简单的文档(http://docs.oxyplot.org/en/latest/common-tasks/refresh-plot.html). 这里以OxyPlot.WPF为例. 用词 Plot:Also called a graph o">
+<meta name="twitter:image" content="http://yoursite.com/img/oxyplot.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/05/11/2D Visualization笔记(X2) OxyPlot(一)/">
+
+
+
+
+
+  <title>2D Visualization笔记(X2) OxyPlot(一) | 远</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">远</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/05/11/2D Visualization笔记(X2) OxyPlot(一)/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zmapleaf">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="远">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">2D Visualization笔记(X2) OxyPlot(一)</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-05-11T14:34:51+08:00">
+                2018-05-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/编程/" itemprop="url" rel="index">
+                    <span itemprop="name">编程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>OxyPlot is a cross-platform plotting library for .NET(<a href="http://www.oxyplot.org/)" target="_blank" rel="noopener">http://www.oxyplot.org/)</a>.<br><img src="/img/oxyplot.png" alt=""><br>有简单的文档(<a href="http://docs.oxyplot.org/en/latest/common-tasks/refresh-plot.html)" target="_blank" rel="noopener">http://docs.oxyplot.org/en/latest/common-tasks/refresh-plot.html)</a>. 这里以OxyPlot.WPF为例.</p>
+<p>用词</p>
+<p><strong>Plot</strong>:<br>Also called a graph or chart</p>
+<p><strong>Plot model</strong>:<br>A model represents the contents of a plot</p>
+<p><strong>Plot controller</strong>:<br>Handles user input</p>
+<p><strong>Plot view</strong>:<br>The custom control that displays the plot model and communicates with the plot controller</p>
+<p><strong>Plot element</strong>: An element of the plot model that can be displayed (e.g. a series, annotation or axis)</p>
+<p><strong>Axis</strong>:<br>A plot element that displays an axis</p>
+<p><strong>Series</strong>:<br>A plot element that displays data</p>
+<p><strong>Annotation</strong>:<br>Displays content that is not a series. Annotations are not included in the legend and not used by the tracker</p>
+<p><strong>Plot area</strong>:<br>The area where the series are displayed</p>
+<p><strong>Legend</strong>:<br>Displays the titles and symbol of the series.</p>
+<p><strong>Tracker</strong>:<br>When the user hovers or clicks on a series, the tracker shows the actual values at that point</p>
+<hr>
+<p>OxyPlot分为OxyPlot(Portable)和OxyPlot.Wpf两部分. OxyPlot(Portable)暴露IPlotView接口, OxyPlot.Wpf中的PlotBase继承Control, 同时实现IPlotView. 其他和平台无关的类, 都位于OxyPlot(Portable)中, 例如PlotModel和IPlotModel, IPlotController和PlotController.</p>
+<p>先看入门样例(<a href="http://docs.oxyplot.org/en/latest/getting-started/hello-wpf.html)" target="_blank" rel="noopener">http://docs.oxyplot.org/en/latest/getting-started/hello-wpf.html)</a>:</p>
+<h4 id="创建ViewModel"><a href="#创建ViewModel" class="headerlink" title="创建ViewModel"></a>创建ViewModel</h4><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">namespace</span> <span class="title">WpfApplication1</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">using</span> System;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">using</span> OxyPlot;</span><br><span class="line">    <span class="keyword">using</span> OxyPlot.Series;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">class</span> <span class="title">MainViewModel</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">MainViewModel</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            <span class="keyword">this</span>.MyModel = <span class="keyword">new</span> PlotModel &#123; Title = <span class="string">"Example 1"</span> &#125;;</span><br><span class="line">            <span class="keyword">this</span>.MyModel.Series.Add(<span class="keyword">new</span> FunctionSeries(Math.Cos, <span class="number">0</span>, <span class="number">10</span>, <span class="number">0.1</span>, <span class="string">"cos(x)"</span>));</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">public</span> PlotModel MyModel &#123; <span class="keyword">get</span>; <span class="keyword">private</span> <span class="keyword">set</span>; &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="创建View"><a href="#创建View" class="headerlink" title="创建View"></a>创建View</h4><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&lt;Window x:Class=<span class="string">"WpfApplication1.MainWindow"</span></span><br><span class="line">        xmlns=<span class="string">"http://schemas.microsoft.com/winfx/2006/xaml/presentation"</span></span><br><span class="line">        xmlns:x=<span class="string">"http://schemas.microsoft.com/winfx/2006/xaml"</span> xmlns:oxy=<span class="string">"http://oxyplot.org/wpf"</span></span><br><span class="line">        xmlns:local=<span class="string">"clr-namespace:WpfApplication1"</span></span><br><span class="line">        Title=<span class="string">"Example 1 (WPF)"</span> Height=<span class="string">"350"</span> Width=<span class="string">"525"</span>&gt;</span><br><span class="line">    &lt;Window.DataContext&gt;</span><br><span class="line">        &lt;local:MainViewModel/&gt;</span><br><span class="line">    &lt;/Window.DataContext&gt;</span><br><span class="line">    &lt;Grid&gt;</span><br><span class="line">        &lt;oxy:PlotView Model=<span class="string">"&#123;Binding MyModel&#125;"</span>/&gt;</span><br><span class="line">    &lt;/Grid&gt;</span><br><span class="line">&lt;/Window&gt;</span><br></pre></td></tr></table></figure>
+<p>运行得到下图<img src="/img/oxyplot-2.png" alt=""><br>先看PlotView的部分代码<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> Identifies the <span class="doctag">&lt;see cref="Model"/&gt;</span> dependency property.</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">readonly</span> DependencyProperty ModelProperty =</span><br><span class="line">    DependencyProperty.Register(<span class="string">"Model"</span>, <span class="keyword">typeof</span>(PlotModel), <span class="keyword">typeof</span>(PlotView), <span class="keyword">new</span> PropertyMetadata(<span class="literal">null</span>, ModelChanged));</span><br><span class="line"></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> Called when the model is changed.</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;param name="d"&gt;</span>The sender.<span class="doctag">&lt;/param&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;param name="e"&gt;</span>The <span class="doctag">&lt;see cref="System.Windows.DependencyPropertyChangedEventArgs" /&gt;</span> instance containing the event data.<span class="doctag">&lt;/param&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">ModelChanged</span>(<span class="params">DependencyObject d, DependencyPropertyChangedEventArgs e</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    ((PlotView)d).OnModelChanged();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> Called when the model is changed.</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">OnModelChanged</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">lock</span> (<span class="keyword">this</span>.modelLock)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">this</span>.currentModel != <span class="literal">null</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            ((IPlotModel)<span class="keyword">this</span>.currentModel).AttachPlotView(<span class="literal">null</span>);</span><br><span class="line">            <span class="keyword">this</span>.currentModel = <span class="literal">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">this</span>.Model != <span class="literal">null</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            ((IPlotModel)<span class="keyword">this</span>.Model).AttachPlotView(<span class="keyword">this</span>);</span><br><span class="line">            <span class="keyword">this</span>.currentModel = <span class="keyword">this</span>.Model;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">this</span>.InvalidatePlot();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>当面Model的值发生变化时, 会调用ModelChanged方法, 进而调用this.InvalidatePlot方法绘图. 这里另外一个地方也很重要: AttachPlotView(this). 将PlotView关联到PlotModel中.</p>
+<p>InvalidatePlot方法是在父类PlotBase中定义的, 这个方法至关重要.<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> Invalidate the PlotView (not blocking the UI thread)</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;param name="updateData"&gt;</span>The update Data.<span class="doctag">&lt;/param&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">InvalidatePlot</span>(<span class="params"><span class="keyword">bool</span> updateData = <span class="literal">true</span></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.ActualWidth &lt;= <span class="number">0</span> || <span class="keyword">this</span>.ActualHeight &lt;= <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">this</span>.UpdateModel(updateData);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (Interlocked.CompareExchange(<span class="keyword">ref</span> <span class="keyword">this</span>.isPlotInvalidated, <span class="number">1</span>, <span class="number">0</span>) == <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// Invalidate the arrange state for the element.</span></span><br><span class="line">        <span class="comment">// After the invalidation, the element will have its layout updated,</span></span><br><span class="line">        <span class="comment">// which will occur asynchronously unless subsequently forced by UpdateLayout.</span></span><br><span class="line">        <span class="keyword">this</span>.BeginInvoke(<span class="keyword">this</span>.InvalidateArrange);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> Updates the model.</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;param name="updateData"&gt;</span>The update Data.<span class="doctag">&lt;/param&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">UpdateModel</span>(<span class="params"><span class="keyword">bool</span> updateData = <span class="literal">true</span></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.ActualModel != <span class="literal">null</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        ((IPlotModel)<span class="keyword">this</span>.ActualModel).Update(updateData);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>第一步更新PlotModel, 第二步异步调用InvalidateArrange进行绘制. InvalidateArrange是Control的方法, 最终调用的ArrangeOverride方法<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> Provides the behavior for the Arrange pass of Silverlight layout. Classes can override this method to define their own Arrange pass behavior.</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;param name="finalSize"&gt;</span>The final area within the parent that this object should use to arrange itself and its children.<span class="doctag">&lt;/param&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;returns&gt;</span>The actual size that is used after the element is arranged in layout.<span class="doctag">&lt;/returns&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">override</span> Size <span class="title">ArrangeOverride</span>(<span class="params">Size finalSize</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.ActualWidth &gt; <span class="number">0</span> &amp;&amp; <span class="keyword">this</span>.ActualHeight &gt; <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span> (Interlocked.CompareExchange(<span class="keyword">ref</span> <span class="keyword">this</span>.isPlotInvalidated, <span class="number">0</span>, <span class="number">1</span>) == <span class="number">1</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">this</span>.UpdateVisuals();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">base</span>.ArrangeOverride(finalSize);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> Updates the visuals.</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">UpdateVisuals</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.canvas == <span class="literal">null</span> || <span class="keyword">this</span>.renderContext == <span class="literal">null</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (!<span class="keyword">this</span>.isVisibleToUserCache)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Clear the canvas</span></span><br><span class="line">    <span class="keyword">this</span>.canvas.Children.Clear();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.ActualModel != <span class="literal">null</span> &amp;&amp; <span class="keyword">this</span>.ActualModel.Background.IsVisible())</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">this</span>.canvas.Background = <span class="keyword">this</span>.ActualModel.Background.ToBrush();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">this</span>.canvas.Background = <span class="literal">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.ActualModel != <span class="literal">null</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">this</span>.DisconnectCanvasWhileUpdating)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="comment">// <span class="doctag">TODO:</span> profile... not sure if this makes any difference</span></span><br><span class="line">            <span class="keyword">int</span> idx = <span class="keyword">this</span>.grid.Children.IndexOf(<span class="keyword">this</span>.canvas);</span><br><span class="line">            <span class="keyword">if</span> (idx != <span class="number">-1</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">this</span>.grid.Children.RemoveAt(idx);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            ((IPlotModel)<span class="keyword">this</span>.ActualModel).Render(<span class="keyword">this</span>.renderContext, <span class="keyword">this</span>.canvas.ActualWidth, <span class="keyword">this</span>.canvas.ActualHeight);</span><br><span class="line"></span><br><span class="line">            <span class="comment">// reinsert the canvas again</span></span><br><span class="line">            <span class="keyword">if</span> (idx != <span class="number">-1</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">this</span>.grid.Children.Insert(idx, <span class="keyword">this</span>.canvas);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">        &#123;</span><br><span class="line">            ((IPlotModel)<span class="keyword">this</span>.ActualModel).Render(<span class="keyword">this</span>.renderContext, <span class="keyword">this</span>.canvas.ActualWidth, <span class="keyword">this</span>.canvas.ActualHeight);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>在UpdateVisual方法中, 看到了Render方法. 该方法是在PlotModel中定义的. <strong>也就是说PlotView不关心具体的绘制逻辑, 它只提供绘图的纸和笔(RenderContext, 在WPF中,该RenderContext就是Canvas). 然后由PlotModel负责整个绘制逻辑. PlotModel由各种PlotElement组成, 各种PlotElement有自己的绘图逻辑. 于是PlotModel把从PlotView中拿到的纸和笔, 再交给具体的PlotElement, 由他们自己去绘制</strong>.</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br></pre></td><td class="code"><pre><span class="line">    <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line">    <span class="comment"><span class="doctag">///</span> Renders the plot with the specified rendering context.</span></span><br><span class="line">    <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line">    <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;param name="rc"&gt;</span>The rendering context.<span class="doctag">&lt;/param&gt;</span></span></span><br><span class="line">    <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;param name="width"&gt;</span>The width.<span class="doctag">&lt;/param&gt;</span></span></span><br><span class="line">    <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;param name="height"&gt;</span>The height.<span class="doctag">&lt;/param&gt;</span></span></span><br><span class="line">    <span class="keyword">void</span> IPlotModel.Render(IRenderContext rc, <span class="keyword">double</span> width, <span class="keyword">double</span> height)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">this</span>.RenderOverride(rc, width, height);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line">    <span class="comment"><span class="doctag">///</span> Renders the plot with the specified rendering context.</span></span><br><span class="line">    <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line">    <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;param name="rc"&gt;</span>The rendering context.<span class="doctag">&lt;/param&gt;</span></span></span><br><span class="line">    <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;param name="width"&gt;</span>The width.<span class="doctag">&lt;/param&gt;</span></span></span><br><span class="line">    <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;param name="height"&gt;</span>The height.<span class="doctag">&lt;/param&gt;</span></span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">RenderOverride</span>(<span class="params">IRenderContext rc, <span class="keyword">double</span> width, <span class="keyword">double</span> height</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">//...</span></span><br><span class="line">        <span class="keyword">this</span>.RenderBackgrounds(rc);</span><br><span class="line">        <span class="keyword">this</span>.RenderAnnotations(rc, AnnotationLayer.BelowAxes);</span><br><span class="line">        <span class="keyword">this</span>.RenderAxes(rc, AxisLayer.BelowSeries);</span><br><span class="line">        <span class="keyword">this</span>.RenderAnnotations(rc, AnnotationLayer.BelowSeries);</span><br><span class="line">        <span class="keyword">this</span>.RenderSeries(rc);</span><br><span class="line">        <span class="keyword">this</span>.RenderAnnotations(rc, AnnotationLayer.AboveSeries);</span><br><span class="line">        <span class="keyword">this</span>.RenderTitle(rc);</span><br><span class="line">        <span class="keyword">this</span>.RenderBox(rc);</span><br><span class="line">        <span class="keyword">this</span>.RenderAxes(rc, AxisLayer.AboveSeries);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">this</span>.IsLegendVisible)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">this</span>.RenderLegends(rc, <span class="keyword">this</span>.LegendArea);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//...</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line">    <span class="comment"><span class="doctag">///</span> Renders the series.</span></span><br><span class="line">    <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line">    <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;param name="rc"&gt;</span>The render context.<span class="doctag">&lt;/param&gt;</span></span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">RenderSeries</span>(<span class="params">IRenderContext rc</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">foreach</span> (<span class="keyword">var</span> s <span class="keyword">in</span> <span class="keyword">this</span>.Series.Where(s =&gt; s.IsVisible))</span><br><span class="line">        &#123;</span><br><span class="line">            rc.SetToolTip(s.ToolTip);</span><br><span class="line">            s.Render(rc);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        rc.SetToolTip(<span class="literal">null</span>);</span><br><span class="line">    &#125;</span><br><span class="line">``` </span><br><span class="line">以LineSeries为例</span><br><span class="line">```CSharp</span><br><span class="line">    <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line">    <span class="comment"><span class="doctag">///</span> Renders the series on the specified rendering context.</span></span><br><span class="line">    <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line">    <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;param name="rc"&gt;</span>The rendering context.<span class="doctag">&lt;/param&gt;</span></span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Render</span>(<span class="params">IRenderContext rc</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">var</span> actualPoints = <span class="keyword">this</span>.ActualPoints;</span><br><span class="line">        <span class="keyword">if</span> (actualPoints == <span class="literal">null</span> || actualPoints.Count == <span class="number">0</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">this</span>.VerifyAxes();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">var</span> clippingRect = <span class="keyword">this</span>.GetClippingRect();</span><br><span class="line">        rc.SetClip(clippingRect);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">this</span>.RenderPoints(rc, clippingRect, actualPoints);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">this</span>.LabelFormatString != <span class="literal">null</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="comment">// render point labels (not optimized for performance)</span></span><br><span class="line">            <span class="keyword">this</span>.RenderPointLabels(rc, clippingRect);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        rc.ResetClip();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">this</span>.LineLegendPosition != LineLegendPosition.None &amp;&amp; !<span class="keyword">string</span>.IsNullOrEmpty(<span class="keyword">this</span>.Title))</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="comment">// renders a legend on the line</span></span><br><span class="line">            <span class="keyword">this</span>.RenderLegendOnLine(rc);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/可视化/" rel="tag"># 可视化</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/05/07/WCF笔记(X5) 并发管理 /" rel="next" title="WCF笔记(X5) 并发管理">
+                <i class="fa fa-chevron-left"></i> WCF笔记(X5) 并发管理
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/05/11/2D Visualization笔记(X2) OxyPlot(二)/" rel="prev" title="2D Visualization笔记(X2) OxyPlot(二)">
+                2D Visualization笔记(X2) OxyPlot(二) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">zmapleaf</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">66</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#创建ViewModel"><span class="nav-number">1.</span> <span class="nav-text">创建ViewModel</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#创建View"><span class="nav-number">2.</span> <span class="nav-text">创建View</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zmapleaf</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

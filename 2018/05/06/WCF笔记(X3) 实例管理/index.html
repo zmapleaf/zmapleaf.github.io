@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="WCF,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="前面提到了Client通过Proxy或者Channel将服务调用转发给Service Instance(服务实例). 接下来的一个问题是, 假如有多个Client同时调用服务, Client与Service Instance之间是多对多的关系, 还是多对一的关系, 亦或其他关系?回答这个问题之前, 先看WCF中服务寄宿的结构  Each service host instance has zero">
+<meta name="keywords" content="WCF">
+<meta property="og:type" content="article">
+<meta property="og:title" content="WCF笔记(X3) 实例管理">
+<meta property="og:url" content="http://yoursite.com/2018/05/06/WCF笔记(X3) 实例管理/index.html">
+<meta property="og:site_name" content="远">
+<meta property="og:description" content="前面提到了Client通过Proxy或者Channel将服务调用转发给Service Instance(服务实例). 接下来的一个问题是, 假如有多个Client同时调用服务, Client与Service Instance之间是多对多的关系, 还是多对一的关系, 亦或其他关系?回答这个问题之前, 先看WCF中服务寄宿的结构  Each service host instance has zero">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://yoursite.com/img/wcf-host-arch.png">
+<meta property="og:image" content="http://yoursite.com/img/wcf-percall.png">
+<meta property="og:updated_time" content="2018-05-13T08:16:50.408Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="WCF笔记(X3) 实例管理">
+<meta name="twitter:description" content="前面提到了Client通过Proxy或者Channel将服务调用转发给Service Instance(服务实例). 接下来的一个问题是, 假如有多个Client同时调用服务, Client与Service Instance之间是多对多的关系, 还是多对一的关系, 亦或其他关系?回答这个问题之前, 先看WCF中服务寄宿的结构  Each service host instance has zero">
+<meta name="twitter:image" content="http://yoursite.com/img/wcf-host-arch.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/05/06/WCF笔记(X3) 实例管理/">
+
+
+
+
+
+  <title>WCF笔记(X3) 实例管理 | 远</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">远</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/05/06/WCF笔记(X3) 实例管理/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zmapleaf">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="远">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">WCF笔记(X3) 实例管理</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-05-06T16:41:51+08:00">
+                2018-05-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/编程/" itemprop="url" rel="index">
+                    <span itemprop="name">编程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>前面提到了Client通过Proxy或者Channel将服务调用转发给Service Instance(服务实例). 接下来的一个问题是, 假如有多个Client同时调用服务, Client与Service Instance之间是多对多的关系, 还是多对一的关系, 亦或其他关系?<br>回答这个问题之前, 先看WCF中服务寄宿的结构<br><img src="/img/wcf-host-arch.png" alt=""></p>
+<blockquote>
+<p>Each service host instance has zero or more contexts. The context is the innermost execution scope of the service instance.A context is associated with zero or one service instance, meaning it could also be<br>empty (i.e., not associated with any service instance). It is the combined work of the service host and the context that exposes a native CLR type as a service. After the message is passed through the channels, the host maps that message to a new or existing context (and the object instance inside) and lets it process the call.</p>
+</blockquote>
+<p>WCF支持以下三种实例上下文模式<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">enum</span> InstanceContextMode</span><br><span class="line">&#123;</span><br><span class="line">	PerCall,<span class="comment">//单调</span></span><br><span class="line">	PerSession, <span class="comment">//会话, 默认</span></span><br><span class="line">	Single <span class="comment">//单例</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>The enum is correctly called <strong>InstanceContextMode</strong> rather than <strong>InstanceMode</strong> because it actually controls the instantiation mode of the context hosting the instance, rather than that of the instance itself. By default, however, the instance and its context are treated as a single unit, so the enum does control the life of the instance as well</p>
+<h4 id="PerCall模式"><a href="#PerCall模式" class="headerlink" title="PerCall模式"></a>PerCall模式</h4><p>PerCall字面上就是每一次服务调用. 不管服务调用是否来自相同的客户端, host这边总是创建一个全新的实例上下文来处理每一个请求.</p>
+<p><img src="/img/wcf-percall.png" alt=""></p>
+<ol>
+<li>The client calls the proxy and the proxy forwards the call to the service.</li>
+<li>WCF creates a new context with a new service instance and calls the method on<br>it.</li>
+<li>When the method call returns, if the object implements IDisposable, WCF calls<br>IDisposable.Dispose() on it. WCF then destroys the context.</li>
+<li>The client calls the proxy and the proxy forwards the call to the service.</li>
+<li>WCF creates an object and calls the method on it.</li>
+</ol>
+<h4 id="PerCall模式的好处"><a href="#PerCall模式的好处" class="headerlink" title="PerCall模式的好处"></a>PerCall模式的好处</h4><blockquote>
+<p>In the classic client/server programming model, using languages such as C++ or C#, every client gets its own dedicated server object. The fundamental problem with this approach is that it doesn’t scale well. Imagine an application that has to serve many clients. Typically, these clients create the objects they need when the client application starts and dispose of them when the client application shuts down. What impedes<br>scalability with the client/server model is that the client applications can hold onto objects for long periods of time, while actually using them for only a fraction of that time. Those objects may hold expensive or scarce resources, such as database connections, communication ports, or files. If you allocate an object for each client, you will tie up such crucial and/or limited resources for long periods, and you will eventually run out of resources.</p>
+</blockquote>
+<blockquote>
+<p>A better activation model is to allocate an object for a client only while a call is in progress from the client to the service. That way, you have to create and maintain in memory only as many objects as there are concurrent calls, not as many objects as there are outstanding clients. My personal experience indicates that in a typical Enterprise system, especially one that involves users, at most 1% of all clients make concurrent calls (in a high-load Enterprise system, that figure rises to 3%). Thus, if your system can concurrently sustain 100 expensive service instances, it can still typically serve as many as 10,000 outstanding clients. This is precisely the benefit the per-call instance activation mode offers</p>
+</blockquote>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span>/ Service Code <span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span></span></span><br><span class="line">[<span class="meta">ServiceContract</span>]</span><br><span class="line"><span class="keyword">interface</span> <span class="title">IMyContract</span></span><br><span class="line">&#123;</span><br><span class="line">    [<span class="meta">OperationContract</span>]</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">MyMethod</span>(<span class="params"></span>)</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">[<span class="meta">ServiceBehavior(InstanceContextMode = InstanceContextMode.PerCall)</span>]</span><br><span class="line"><span class="keyword">class</span> <span class="title">MyService</span> : <span class="title">IMyContract</span>,<span class="title">IDisposable</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">int</span> m_Counter = <span class="number">0</span>;</span><br><span class="line">    MyService()</span><br><span class="line">    &#123;</span><br><span class="line">        Trace.WriteLine(<span class="string">"MyService.MyService()"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">MyMethod</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_Counter++;</span><br><span class="line">        Trace.WriteLine(<span class="string">"Counter = "</span> + m_Counter);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Dispose</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        Trace.WriteLine(<span class="string">"MyService.Dispose()"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment"><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span>/ Client Code <span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span></span></span><br><span class="line">MyContractClient proxy = <span class="keyword">new</span> MyContractClient();</span><br><span class="line">proxy.MyMethod();</span><br><span class="line">proxy.MyMethod();</span><br><span class="line">proxy.Close();</span><br><span class="line"><span class="comment">//Possible output</span></span><br><span class="line">MyService.MyService()</span><br><span class="line">Counter = <span class="number">1</span></span><br><span class="line">MyService.Dispose()</span><br><span class="line">MyService.MyService()</span><br><span class="line">Counter = <span class="number">1</span></span><br><span class="line">MyService.Dispose()</span><br></pre></td></tr></table></figure>
+<h4 id="PerSesssion模式"><a href="#PerSesssion模式" class="headerlink" title="PerSesssion模式"></a>PerSesssion模式</h4><p>All bindings support configuring the contract on the endpoint with Session<br>Mode.Allowed. When the SessionMode property is configured with this value, transport sessions are allowed, but not enforced. The exact resulting behavior is a product of the service configuration and the binding used. </p>
+<p>If the service is configured for percall activation, it still behaves as per-call service,<br>Whenthe service is configured for per-session activation, it will behave as a per-session service only if the binding used maintains a transport-level session. For example, the BasicHttpBinding can never have a transport-level session, due to the connectionless nature of the HTTP protocol. The WSHttpBinding without Message security and without reliable messaging will also not maintain a transport-level session. In both of these cases, although the service is configured with InstanceContextMode.PerSession and the contract with SessionMode.Allowed, the service will behave as a percall service.</p>
+<p>However, if you use the WSHttpBinding with Message security (its default configuration) or with reliable messaging, or if you use the NetTcpBinding or the NetNamedPipeBinding, the service will behave as a per-session service.</p>
+<p>When designing a sessionful contract, I recommend explicitly using SessionMode.Required and not relying on the default of SessionMode.Allowed<br>SessionMode.NotAllowed disallows the use of a transport-level session, which precludes(排除) an application-level session. Regardless of the service configuration, when this value is used, the service will always behave as a per-call service.</p>
+<p>WCF can maintain a logical session between a client and a particular service instance. When the client creates a new proxy to a service configured as a sessionful service, the client gets a new dedicated(专用的) service instance that is independent of all other instances of the same service.<br>That instance will typically remain in service until the client no longer needs it. This activation mode (sometimes also referred to as the privatesession mode) is very much like the classic client/server model: each private session uniquely binds a proxy and its set of client- and service-side channels to a particular service instance, or more specifically, to its context. It follows that a transport session is required for the private-session instantiation mode, as discussed later in this section.<br>Because the service instance remains in memory throughout the session, it can maintain state in memory, and the programming model is very much like that of the classic client/server model. Consequently, it suffers from the same scalability and transaction issues as the classic client/server model. A service configured for private sessions cannot typically support more than a few dozen (or perhaps up to one or two hundred) outstanding clients, due to the cost associated with each such dedicated service instance.<br>The client session is per service endpoint per proxy. If the client creates another proxy to the same or a different endpoint, that second proxy will be associated with a new instance and session.</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span>/ Service Code <span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span></span></span><br><span class="line">[<span class="meta">ServiceContract(SessionMode = SessionMode.Required)</span>]</span><br><span class="line"><span class="keyword">interface</span> <span class="title">IMyContract</span></span><br><span class="line">&#123;</span><br><span class="line">    [<span class="meta">OperationContract</span>]</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">MyMethod</span>(<span class="params"></span>)</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">class</span> <span class="title">MyService</span> : <span class="title">IMyContract</span>,<span class="title">IDisposable</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">int</span> m_Counter = <span class="number">0</span>;</span><br><span class="line">    MyService()</span><br><span class="line">    &#123;</span><br><span class="line">        Trace.WriteLine(<span class="string">"MyService.MyService()"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">MyMethod</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_Counter++;</span><br><span class="line">        Trace.WriteLine(<span class="string">"Counter = "</span> + m_Counter);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Dispose</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        Trace.WriteLine(<span class="string">"MyService.Dispose()"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment"><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span>/ Client Code <span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span></span></span><br><span class="line">MyContractClient proxy = <span class="keyword">new</span> MyContractClient();</span><br><span class="line">proxy.MyMethod();</span><br><span class="line">proxy.MyMethod();</span><br><span class="line">proxy.Close();</span><br><span class="line"><span class="comment">//Output</span></span><br><span class="line">MyService.MyService()</span><br><span class="line">Counter = <span class="number">1</span></span><br><span class="line">Counter = <span class="number">2</span></span><br><span class="line">MyService.Dispose()</span><br></pre></td></tr></table></figure>
+<p>Every session has a unique ID that both the client and the service can obtain. The session ID is largely in the form of a GUID, and it can be used for logging and diagnostics. The service can access the session ID via the operation call context, which is a set of properties (including the session ID) that are used for callbacks, message headers, transaction management, security, host access, and access to the object represent‐<br>ing the execution context itself. </p>
+<h4 id="Single模式"><a href="#Single模式" class="headerlink" title="Single模式"></a>Single模式</h4><p>The singleton service is the ultimate shareable service. When you configure a service as a singleton, all clients are independently connected to the same single well-known instance context and implicitly to the same instance inside, regardless of which endpoint of the service they connect to. The singleton is created exactly once, when the host is created, and lives forever: it is disposed of only when the host shuts down.</p>
+<p>If the contract the client consumes has a session, during the call the singleton will have the same session ID as the client (binding permitting), but closing the client proxy will terminate only the transport session, not the singleton context and the instance inside</p>
+<p>If the singleton service supports contracts without a session, those contracts will not be per-call: they too will be connected to the same instance. By its very nature, the singleton is shared, and each client should simply create its own proxy or proxies to it.</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span>/ Service Code <span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span></span></span><br><span class="line">[<span class="meta">ServiceContract(SessionMode = SessionMode.Required)</span>]</span><br><span class="line"><span class="keyword">interface</span> <span class="title">IMyContract</span></span><br><span class="line">&#123;</span><br><span class="line">    [<span class="meta">OperationContract</span>]</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">MyMethod</span>(<span class="params"></span>)</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">[<span class="meta">ServiceContract(SessionMode = SessionMode.NotAllowed)</span>]</span><br><span class="line"><span class="keyword">interface</span> <span class="title">IMyOtherContract</span></span><br><span class="line">&#123;</span><br><span class="line">    [<span class="meta">OperationContract</span>]</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">MyOtherMethod</span>(<span class="params"></span>)</span>;</span><br><span class="line">&#125;</span><br><span class="line">[<span class="meta">ServiceBehavior(InstanceContextMode=InstanceContextMode.Single)</span>]</span><br><span class="line"><span class="keyword">class</span> <span class="title">MySingleton</span> : <span class="title">IMyContract</span>,<span class="title">IMyOtherContract</span>,<span class="title">IDisposable</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">int</span> m_Counter = <span class="number">0</span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">MySingleton</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        Trace.WriteLine(<span class="string">"MySingleton.MySingleton()"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">MyMethod</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_Counter++;</span><br><span class="line">        Trace.WriteLine(<span class="string">"Counter = "</span> + m_Counter);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">MyOtherMethod</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_Counter++;</span><br><span class="line">        Trace.WriteLine(<span class="string">"Counter = "</span> + m_Counter);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Dispose</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        Trace.WriteLine(<span class="string">"Singleton.Dispose()"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment"><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span>/ Client Code <span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span></span></span><br><span class="line">MyContractClient proxy1 = <span class="keyword">new</span> MyContractClient();</span><br><span class="line">proxy1.MyMethod();</span><br><span class="line">proxy1.Close();</span><br><span class="line">MyOtherContractClient proxy2 = <span class="keyword">new</span> MyOtherContractClient();</span><br><span class="line">proxy2.MyOtherMethod();</span><br><span class="line">proxy2.Close();</span><br><span class="line"><span class="comment">//Output</span></span><br><span class="line">MySingleton.MySingleton()</span><br><span class="line">Counter = <span class="number">1</span></span><br><span class="line">Counter = <span class="number">2</span></span><br></pre></td></tr></table></figure>
+<h4 id="PerCall-PerSession-Single之间怎么选择"><a href="#PerCall-PerSession-Single之间怎么选择" class="headerlink" title="PerCall, PerSession, Single之间怎么选择"></a>PerCall, PerSession, Single之间怎么选择</h4><ul>
+<li>Per-Call: 最通用; 适用于无状态</li>
+<li>Per-Session: 经典的C/S模式, 需要保存一些会话数据</li>
+<li>Singleton: 日志服务</li>
+</ul>
+<p>Per-Call与Per-Session的区别 (<a href="https://stackoverflow.com/questions/15104960/persession-vs-percall" target="_blank" rel="noopener">https://stackoverflow.com/questions/15104960/persession-vs-percall</a>)</p>
+<p>In my opinion, to take a decision consider these two points</p>
+<ol>
+<li>For going with InstanceContextMode.PerSession - If your users have some session values stored on the WCF service on the server.</li>
+<li>For going with InstanceContextMode.PerCall - If your users have nothing stored in session on the WCF service on the server i.e. WCF service requires No per user settings required to store in memory. Requires scalability.<br>Some points regarding When-And-Why,</li>
+</ol>
+<p>InstanceContextMode.PerCall</p>
+<ul>
+<li>If your service is stateless and scalable, i.e. benefits are similar to HTTP as it is also stateless.</li>
+<li>If service has light-weight initialization code (or none at all).</li>
+<li>If your service is single threaded.</li>
+<li>Example scenario: For any 1000 client requests in a given time period in a PerCall situation, there will only be 100 objects instantiated for 100 active calls. Secondly if server were to crash then in PerCall situation the only errors that would occur would be to the 100 actual requests that were in progress (assuming fast failover). The other 900 clients could be routed to another server on their next call.</li>
+</ul>
+<p>InstanceContextMode.PerSession</p>
+<ul>
+<li>If your service has to maintain some state between calls from the same client.</li>
+<li>If your service has light-weight initialization code (or none at all). Even though you are only getting a new instance for each client proxy, you still want to be careful about having expensive initialization code in a constructor.</li>
+<li>Example scenario: For any 1000 client requests in a given time period in a PerSessionsituation you may have 1000 objects instantiated on the server but only 100 are actually activein call at any moment. And thus instantiated PerSession objects could be a waste of resources and may impact the ability to serve requests under load. Secondly if server were to crash then in PerSession all 1000 clients who have a session on that server would lose their session and be unable to complete their work.</li>
+</ul>
+<p>Reference links:</p>
+<ol>
+<li>MSDN - WCF Instancing, Concurrency, and Throttling</li>
+<li>SO - Per-Call vs Per-Session</li>
+<li>MSDN - Using Sessions in WCF context</li>
+</ol>
+<p>Choosing a Singleton</p>
+<p>The singleton service is the sworn enemy of scalability. The reason has to do with singleton state synchronization, rather than the cost of that single instance. Having a singleton implies that the singleton has some valuable state that you wish to share across multiple clients. The problem is that if the singleton’s state is mutable and multiple clients connect to the singleton, they may all do so concurrently, and the incoming client calls will be on multiple worker threads. The singleton must therefore synchronize access to its state to avoid state corruption. This, in turn, means that only one client at a time can access the singleton. This constraint may degrade throughput, responsiveness, and availability to the point that the singleton is unusable in a decentsized system. For example, if an operation on a singleton takes one-tenth of a second, the singleton can service only 10 clients per second. If there are many more clients(say 20 or 100), the system’s performance will be inadequate.</p>
+<p>In general, you should use a singleton only if it maps well to a natural singleton in the application domain. <strong>A natural singleton is a resource that is, by its very nature, single and unique. Examples of natural singletons are a global logbook to which all services should log their activities</strong>, a single communication port, or a single mechanical motor. Avoid using a singleton if there is even the slightest chance that the business logic will allow more than one such service in the future (for example, adding another motor or a second communication port). The reason is clear: if your clients all depend on implicitly being connected to the well-known instance and more than one service instance is available, the clients will suddenly need to have a way to bind to the correct instance. This can have severe implications for the application’s programming model. Because of these limitations, <strong>I recommend that you avoid singletons in the general case and find ways to share the state of the singleton instead of the singleton instance itself.</strong> That said, there are cases when using a singleton is acceptable, as mentioned earlier.</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/WCF/" rel="tag"># WCF</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/05/06/WCF笔记(X2) 基本使用/" rel="next" title="WCF笔记(X2) 基本使用">
+                <i class="fa fa-chevron-left"></i> WCF笔记(X2) 基本使用
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/05/06/WCF笔记(X4) 双工通信/" rel="prev" title="WCF笔记(X4) 双工通信">
+                WCF笔记(X4) 双工通信 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">zmapleaf</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">66</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#PerCall模式"><span class="nav-number">1.</span> <span class="nav-text">PerCall模式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#PerCall模式的好处"><span class="nav-number">2.</span> <span class="nav-text">PerCall模式的好处</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#PerSesssion模式"><span class="nav-number">3.</span> <span class="nav-text">PerSesssion模式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Single模式"><span class="nav-number">4.</span> <span class="nav-text">Single模式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#PerCall-PerSession-Single之间怎么选择"><span class="nav-number">5.</span> <span class="nav-text">PerCall, PerSession, Single之间怎么选择</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zmapleaf</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

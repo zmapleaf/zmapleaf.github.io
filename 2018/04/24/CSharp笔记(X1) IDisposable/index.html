@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="CSharp,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="关于IDisposable, 官方有很多很好的资料, 例如Framework Design Guidelines中的Dispose Pattern一节(https://docs.microsoft.com/en-us/dotnet/standard/design-guidelines/dispose-pattern), 还有VS2015 Code Analysis for Managed Code">
+<meta name="keywords" content="CSharp">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CSharp笔记(X1) IDisposable">
+<meta property="og:url" content="http://yoursite.com/2018/04/24/CSharp笔记(X1) IDisposable/index.html">
+<meta property="og:site_name" content="远">
+<meta property="og:description" content="关于IDisposable, 官方有很多很好的资料, 例如Framework Design Guidelines中的Dispose Pattern一节(https://docs.microsoft.com/en-us/dotnet/standard/design-guidelines/dispose-pattern), 还有VS2015 Code Analysis for Managed Code">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://yoursite.com/img/csharp-idisposable.png">
+<meta property="og:updated_time" content="2018-05-08T03:23:13.763Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="CSharp笔记(X1) IDisposable">
+<meta name="twitter:description" content="关于IDisposable, 官方有很多很好的资料, 例如Framework Design Guidelines中的Dispose Pattern一节(https://docs.microsoft.com/en-us/dotnet/standard/design-guidelines/dispose-pattern), 还有VS2015 Code Analysis for Managed Code">
+<meta name="twitter:image" content="http://yoursite.com/img/csharp-idisposable.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/04/24/CSharp笔记(X1) IDisposable/">
+
+
+
+
+
+  <title>CSharp笔记(X1) IDisposable | 远</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">远</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/24/CSharp笔记(X1) IDisposable/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zmapleaf">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="远">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">CSharp笔记(X1) IDisposable</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-24T09:37:37+08:00">
+                2018-04-24
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/编程/" itemprop="url" rel="index">
+                    <span itemprop="name">编程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>关于IDisposable, 官方有很多很好的资料, 例如Framework Design Guidelines中的Dispose Pattern一节(<a href="https://docs.microsoft.com/en-us/dotnet/standard/design-guidelines/dispose-pattern)" target="_blank" rel="noopener">https://docs.microsoft.com/en-us/dotnet/standard/design-guidelines/dispose-pattern)</a>, 还有VS2015 Code Analysis for Managed Code Warnings中给出的使用示例CA1063: Implement IDisposable correctly(<a href="https://msdn.microsoft.com/en-us/library/ms244737.aspx)等等" target="_blank" rel="noopener">https://msdn.microsoft.com/en-us/library/ms244737.aspx)等等</a></p>
+<p>相关细节很多, 这里简要记录两点 1. IDisposable用来做什么. 2. IDisposable的一般用法</p>
+<h4 id="1-IDisposable用来做什么"><a href="#1-IDisposable用来做什么" class="headerlink" title="1.IDisposable用来做什么"></a>1.IDisposable用来做什么</h4><p>IDisposable提供了一种释放非托管资源的机制(Provides a mechanism for releasing unmanaged resources). 这里重点是两个1: 释放资源 2. 非托管资源</p>
+<p>资源有托管和非托管之分, 非托管的资源包括 a file, a database connection, a socket, a mutex, a bitmap, an icon 等等<br>托管的资源由garbage collection 自动回收, 非托管的资源则需要手动释放.非托管资源一般会用一个托管类包装(wrap), 例如类FileStream, SqlConnection, Socket, Mutex, Bitmap. 对于这些包含非托管资源的托管类, C#提供了IDisposable接口, 表明在该类实例结束使用时, 需要手动调用它的Dispose方法来释放非托管资源.</p>
+<p>手动意味着遗忘, 这里要引出C#中的析构方法(destructor 或者fnalizer). 析构方法会在实例被回收之前调用. 由于托管资源(内存)会被garbage collection自动回收,<br>一般不需要在类中定义析构方法. 如果托管类中包含非托管资源, 为了防止没有被手动释放, 可以将Dispose方法放在析构方法中. 于是在设计Dispose方法实现的时候, 需要考虑到这两种情况: 1. 手动释放 2. 由析构方法释放. 3. 如果已经手动释放过了, 要避免再被析构方法释放.<br>官方有标准实现, 具体见下面.</p>
+<h4 id="2-IDisposable的一般用法"><a href="#2-IDisposable的一般用法" class="headerlink" title="2.IDisposable的一般用法"></a>2.IDisposable的一般用法</h4><p>这里分为3点: a 怎样使用实现IDisposable接口的类, b. 怎样设计实现IDisposable的类 c. 要不要实现IDisposable接口</p>
+<p><strong>a.怎样使用实现IDisposable接口的类</strong><br>IDisposable和using搭配使用(标准用法)</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> (FileStream fs = <span class="keyword">new</span> FileStream (<span class="string">"myFile.txt"</span>, FileMode.Open))</span><br><span class="line">&#123;</span><br><span class="line"><span class="comment">// ... Write to the file ...</span></span><br><span class="line">&#125;</span><br><span class="line">等同于</span><br><span class="line">FileStream fs = <span class="keyword">new</span> FileStream (<span class="string">"myFile.txt"</span>, FileMode.Open);</span><br><span class="line"><span class="keyword">try</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="comment">// ... Write to the file ...</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">finally</span></span><br><span class="line">&#123;<span class="comment">//即使有异常, 也会执行</span></span><br><span class="line"><span class="keyword">if</span> (fs != <span class="literal">null</span>) ((IDisposable)fs).Dispose();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">不要嵌套使用<span class="keyword">using</span>(https:<span class="comment">//msdn.microsoft.com/en-us/library/ms182334.aspx)</span></span><br><span class="line"><span class="keyword">using</span> (Stream stream = <span class="keyword">new</span> FileStream(<span class="string">"file.txt"</span>, FileMode.OpenOrCreate))  </span><br><span class="line">&#123;  </span><br><span class="line">    <span class="keyword">using</span> (StreamWriter writer = <span class="keyword">new</span> StreamWriter(stream))  </span><br><span class="line">    &#123;  </span><br><span class="line">        <span class="comment">// Use the writer object...  </span></span><br><span class="line">    &#125;  </span><br><span class="line">&#125;  </span><br><span class="line">改为</span><br><span class="line">Stream stream = <span class="literal">null</span>;  </span><br><span class="line"><span class="keyword">try</span>  </span><br><span class="line">&#123;  </span><br><span class="line">    stream = <span class="keyword">new</span> FileStream(<span class="string">"file.txt"</span>, FileMode.OpenOrCreate);  </span><br><span class="line">    <span class="keyword">using</span> (StreamWriter writer = <span class="keyword">new</span> StreamWriter(stream))  </span><br><span class="line">    &#123;  </span><br><span class="line">        stream = <span class="literal">null</span>;  </span><br><span class="line">        <span class="comment">// Use the writer object...  </span></span><br><span class="line">    &#125;  </span><br><span class="line">&#125;  </span><br><span class="line"><span class="keyword">finally</span>  </span><br><span class="line">&#123;  </span><br><span class="line">    <span class="keyword">if</span>(stream != <span class="literal">null</span>)  </span><br><span class="line">        stream.Dispose();  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>b. 怎样实现IDisposable的Dispose方法</strong><br>流程图(C#图解教程):<br><img src="/img/csharp-idisposable.png" alt=""><br>官方标准实现(注释最为详尽)<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> System.ComponentModel;</span><br><span class="line"></span><br><span class="line"><span class="comment">// The following example demonstrates how to create</span></span><br><span class="line"><span class="comment">// a resource class that implements the IDisposable interface</span></span><br><span class="line"><span class="comment">// and the IDisposable.Dispose method.</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">DisposeExample</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// A base class that implements IDisposable.</span></span><br><span class="line">    <span class="comment">// By implementing IDisposable, you are announcing that</span></span><br><span class="line">    <span class="comment">// instances of this type allocate scarce resources.</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">class</span> <span class="title">MyResource</span>: <span class="title">IDisposable</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// Pointer to an external unmanaged resource.</span></span><br><span class="line">        <span class="keyword">private</span> IntPtr handle;</span><br><span class="line">        <span class="comment">// Other managed resource this class uses.</span></span><br><span class="line">        <span class="keyword">private</span> Component component = <span class="keyword">new</span> Component();</span><br><span class="line">        <span class="comment">// Track whether Dispose has been called.</span></span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">bool</span> disposed = <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// The class constructor.</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">MyResource</span>(<span class="params">IntPtr handle</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            <span class="keyword">this</span>.handle = handle;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Implement IDisposable.</span></span><br><span class="line">        <span class="comment">// Do not make this method virtual.</span></span><br><span class="line">        <span class="comment">// A derived class should not be able to override this method.</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Dispose</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            Dispose(<span class="literal">true</span>);</span><br><span class="line">            <span class="comment">// This object will be cleaned up by the Dispose method.</span></span><br><span class="line">            <span class="comment">// Therefore, you should call GC.SupressFinalize to</span></span><br><span class="line">            <span class="comment">// take this object off the finalization queue</span></span><br><span class="line">            <span class="comment">// and prevent finalization code for this object</span></span><br><span class="line">            <span class="comment">// from executing a second time.</span></span><br><span class="line">            GC.SuppressFinalize(<span class="keyword">this</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Dispose(bool disposing) executes in two distinct scenarios.</span></span><br><span class="line">        <span class="comment">// If disposing equals true, the method has been called directly</span></span><br><span class="line">        <span class="comment">// or indirectly by a user's code. Managed and unmanaged resources</span></span><br><span class="line">        <span class="comment">// can be disposed.</span></span><br><span class="line">        <span class="comment">// If disposing equals false, the method has been called by the</span></span><br><span class="line">        <span class="comment">// runtime from inside the finalizer and you should not reference</span></span><br><span class="line">        <span class="comment">// other objects. Only unmanaged resources can be disposed.</span></span><br><span class="line">        <span class="function"><span class="keyword">protected</span> <span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">Dispose</span>(<span class="params"><span class="keyword">bool</span> disposing</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            <span class="comment">// Check to see if Dispose has already been called.</span></span><br><span class="line">            <span class="keyword">if</span>(!<span class="keyword">this</span>.disposed)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="comment">// If disposing equals true, dispose all managed</span></span><br><span class="line">                <span class="comment">// and unmanaged resources.</span></span><br><span class="line">                <span class="keyword">if</span>(disposing)</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="comment">// Dispose managed resources.</span></span><br><span class="line">                    component.Dispose();</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                <span class="comment">// Call the appropriate methods to clean up</span></span><br><span class="line">                <span class="comment">// unmanaged resources here.</span></span><br><span class="line">                <span class="comment">// If disposing is false,</span></span><br><span class="line">                <span class="comment">// only the following code is executed.</span></span><br><span class="line">                CloseHandle(handle);</span><br><span class="line">                handle = IntPtr.Zero;</span><br><span class="line"></span><br><span class="line">                <span class="comment">// Note disposing has been done.</span></span><br><span class="line">                disposed = <span class="literal">true</span>;</span><br><span class="line"></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Use interop to call the method necessary</span></span><br><span class="line">        <span class="comment">// to clean up the unmanaged resource.</span></span><br><span class="line">        [<span class="meta">System.Runtime.InteropServices.DllImport(<span class="meta-string">"Kernel32"</span>)</span>]</span><br><span class="line">        <span class="function"><span class="keyword">private</span> <span class="keyword">extern</span> <span class="keyword">static</span> Boolean <span class="title">CloseHandle</span>(<span class="params">IntPtr handle</span>)</span>;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Use C# destructor syntax for finalization code.</span></span><br><span class="line">        <span class="comment">// This destructor will run only if the Dispose method</span></span><br><span class="line">        <span class="comment">// does not get called.</span></span><br><span class="line">        <span class="comment">// It gives your base class the opportunity to finalize.</span></span><br><span class="line">        <span class="comment">// Do not provide destructors in types derived from this class.</span></span><br><span class="line">        ~MyResource()</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="comment">// Do not re-create Dispose clean-up code here.</span></span><br><span class="line">            <span class="comment">// Calling Dispose(false) is optimal in terms of</span></span><br><span class="line">            <span class="comment">// readability and maintainability.</span></span><br><span class="line">            Dispose(<span class="literal">false</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Main</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">// Insert code here to create</span></span><br><span class="line">        <span class="comment">// and use the MyResource object.</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>另外可以再加一个字段:<br>public bool IsDisposed { get; private set; }<br>如果该类被Dispose后还被调用该类的其他方法, 则抛出异常</p>
+<p>区别Close和Dispose, Close方法不一定等同于Dispose. 可以再定义一个Close方法</p>
+<p><strong>c.要不要实现IDisposable接口</strong></p>
+<p>1) 假如该类包含了Socket, Bitmap, FileStream等实现了IDisposable接口的类, 那么该类也需要实现IDisposable接口<br>2) 假如该类的子类有可能用到非托管资源, 那么该类也实现IDisposable接口. 例如Stream类. 需要注意的是, 它的其中一个子类MemoryStream没有用到非托管资源, 但也实现了Dispose方法. 这是网上讨论的IDisposable接口污染问题. 详见<a href="https://www.zhihu.com/question/51592470" target="_blank" rel="noopener">https://www.zhihu.com/question/51592470</a></p>
+<p>另外: IDisposable最初是用来释放非托管资源的, 但现在也有其他的用法, 例如Reactive Extention中的用法 <a href="https://msdn.microsoft.com/en-us/library/dd782981(v=vs.110).aspx" target="_blank" rel="noopener">https://msdn.microsoft.com/en-us/library/dd782981(v=vs.110).aspx</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/CSharp/" rel="tag"># CSharp</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/04/24/WPF笔记(X1) Threading Model (一)/" rel="next" title="WPF笔记(X1) Threading Model (一)">
+                <i class="fa fa-chevron-left"></i> WPF笔记(X1) Threading Model (一)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/04/24/WPF笔记(X1) Threading Model (二)/" rel="prev" title="WPF笔记(X1) Threading Model (二)">
+                WPF笔记(X1) Threading Model (二) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">zmapleaf</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">66</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-IDisposable用来做什么"><span class="nav-number">1.</span> <span class="nav-text">1.IDisposable用来做什么</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-IDisposable的一般用法"><span class="nav-number">2.</span> <span class="nav-text">2.IDisposable的一般用法</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zmapleaf</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

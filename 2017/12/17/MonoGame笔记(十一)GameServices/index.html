@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="编程,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="http://gameprogrammingpatterns.com/component.html 中将Component模式归类于Decouple Pattern, 用来解耦. 那Component之间如何交互呢. MonoGame提供了GameService.官方的介绍如下:https://msdn.microsoft.com/en-us/library/bb203873.aspx Game">
+<meta name="keywords" content="编程">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MonoGame笔记(十一)GameService">
+<meta property="og:url" content="http://yoursite.com/2017/12/17/MonoGame笔记(十一)GameServices/index.html">
+<meta property="og:site_name" content="远">
+<meta property="og:description" content="http://gameprogrammingpatterns.com/component.html 中将Component模式归类于Decouple Pattern, 用来解耦. 那Component之间如何交互呢. MonoGame提供了GameService.官方的介绍如下:https://msdn.microsoft.com/en-us/library/bb203873.aspx Game">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://yoursite.com/img/monogame-servicelocator-1.png">
+<meta property="og:image" content="http://yoursite.com/img/monogame-servicelocator-2.png">
+<meta property="og:updated_time" content="2017-12-18T01:17:01.846Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="MonoGame笔记(十一)GameService">
+<meta name="twitter:description" content="http://gameprogrammingpatterns.com/component.html 中将Component模式归类于Decouple Pattern, 用来解耦. 那Component之间如何交互呢. MonoGame提供了GameService.官方的介绍如下:https://msdn.microsoft.com/en-us/library/bb203873.aspx Game">
+<meta name="twitter:image" content="http://yoursite.com/img/monogame-servicelocator-1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/12/17/MonoGame笔记(十一)GameServices/">
+
+
+
+
+
+  <title>MonoGame笔记(十一)GameService | 远</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">远</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/17/MonoGame笔记(十一)GameServices/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zmapleaf">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="远">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">MonoGame笔记(十一)GameService</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-12-17T18:54:37+08:00">
+                2017-12-17
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/编程/" itemprop="url" rel="index">
+                    <span itemprop="name">编程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><a href="http://gameprogrammingpatterns.com/component.html" target="_blank" rel="noopener">http://gameprogrammingpatterns.com/component.html</a> 中将Component模式归类于Decouple Pattern, 用来解耦. 那Component之间如何交互呢. MonoGame提供了GameService.<br>官方的介绍如下:<a href="https://msdn.microsoft.com/en-us/library/bb203873.aspx" target="_blank" rel="noopener">https://msdn.microsoft.com/en-us/library/bb203873.aspx</a></p>
+<h4 id="Game-services"><a href="#Game-services" class="headerlink" title="Game services"></a>Game services</h4><p>Game services are a mechanism for maintaining loose coupling between objects that need to interact with each other. Services work through a mediator—in this case, <strong>Game.Services</strong>. Service providers register with Game.Services, and service consumers request services from Game.Services. This arrangement allows an object that requires a service to request the service without knowing the name of the service provider.</p>
+<p>Game services are defined by an interface. <strong>A class specifies the services it provides by implementing interfaces and registering the services with Game.Services</strong>. A service is registered by calling Game.Services.AddService specifying the type of service being implemented and a reference to the object providing the service. For example, to register an object that provides a service represented by the interface IMyService, you would use the following code.<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Services.AddService( <span class="keyword">typeof</span>( IMyService ), myobject );</span><br></pre></td></tr></table></figure></p>
+<p>Once a service is registered, the object providing the service can be retrieved by <strong>Game.Services.GetService</strong> and specifying the desired service. For example, to retrieve IGraphicsDeviceService, you would use the following code.<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">IGraphicsDeviceService graphicsservice = (IGraphicsDeviceService)Services.GetService( <span class="keyword">typeof</span>(IGraphicsDeviceService) );</span><br></pre></td></tr></table></figure></p>
+<h4 id="Game-Components-Consuming-Game-Services"><a href="#Game-Components-Consuming-Game-Services" class="headerlink" title="Game Components Consuming Game Services"></a>Game Components Consuming Game Services</h4><p>The GameComponent class provides the Game property so a GameComponent can determine what Game it is attached to. With the Game property, a GameComponent can call Game.Services.GetService to find a provider of a particular service. For example, a GameComponent would find the IGraphicsDeviceService provider by using the following code.<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">IGraphicsDeviceService graphicsservice = (IGraphicsDeviceService)Game.Services.GetService( <span class="keyword">typeof</span>( IGraphicsDeviceService ) );</span><br></pre></td></tr></table></figure></p>
+<p>上面的介绍已经很清楚了, 可以追加一点的是, 提供Service的可以是GameComponent, 也可以不是GameComponent. </p>
+<p>对于Game services, 我看过解释得最好的是下面这个链接（非常棒）<a href="http://zacharysnow.net/2010/02/18/creating-and-consuming-services-in-your-xna-game.html" target="_blank" rel="noopener">http://zacharysnow.net/2010/02/18/creating-and-consuming-services-in-your-xna-game.html</a></p>
+<p>全文摘录如下:</p>
+<h4 id="Creating-and-consuming-services-in-your-XNA-Game"><a href="#Creating-and-consuming-services-in-your-XNA-Game" class="headerlink" title="Creating and consuming services in your XNA Game"></a>Creating and consuming services in your XNA Game</h4><p>February 18, 2010  .NET  0 Comments</p>
+<p>The <strong>GameServiceContainer</strong> implements the <strong>IServiceProvider</strong> interface and the MSDN documentation says about the IServiceProvider interface:<br><em>Defines a mechanism for retrieving a service object; that is, an object that provides custom support to other objects.</em></p>
+<p>This article will <strong>attemp</strong> to describe how can you use the GameServiceContainer in your XNA game, in both your GameComponent(s) and your game’s entity objects.&lt; !—more—&gt;The most obvious place to use the GameServiceContainer is in your GameComponent(s). But first, lets talk about <strong>Coupling</strong>(耦合). Let’s assume you have the following components:<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title">FooComponent</span> : <span class="title">GameComponent</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">FooComponent</span>(<span class="params">Game game</span>)</span></span><br><span class="line"><span class="function">        : <span class="title">base</span>(<span class="params">game</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">DoFoo</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">// Do something and return an int.</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title">BarComponent</span> : <span class="title">GameComponent</span></span><br><span class="line">&#123;</span><br><span class="line">    FooComponent foo;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">BarComponent</span>(<span class="params">Game game</span>)</span></span><br><span class="line"><span class="function">        : <span class="title">base</span>(<span class="params">game</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">this</span>.foo = <span class="keyword">new</span> FooComponent(game);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">DoBar</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">int</span> result = <span class="keyword">this</span>.foo.DoFoo();</span><br><span class="line">        <span class="comment">// Do something based on result.</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>There’s nothing wrong with the code, but BarComponent has a <strong>dependency</strong> on FooComponent(BarComponent直接依赖FooComponent). BarComponent directly interacts with FooComponent and therefore any change made to FooComponent indirectly affects BarComponent(任何对FooComponent的改动都会间接影响BarComponent). For instance, let’s assume the constructor for FooComponent needs to be modified. That means we now have to update not only the FooComponent class but as well the BarComponent class(例如修改了FooComponent的构造方法, 则BarComponent也需要做相应修改). Throw in a few more components with dependencies on FooComponent and you could start to get headache really fast. This design is <strong>highly coupled</strong>(高耦合).</p>
+<p>Let’s try a slight redesign:<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title">FooComponent</span> : <span class="title">GameComponent</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">FooComponent</span>(<span class="params">Game game</span>)</span></span><br><span class="line"><span class="function">        : <span class="title">base</span>(<span class="params">game</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">DoFoo</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">// Do something and return an int.</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title">BarComponent</span> : <span class="title">GameComponent</span></span><br><span class="line">&#123;</span><br><span class="line">    FooComponent foo;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">BarComponent</span>(<span class="params">Game game, FooComponent foo</span>)</span></span><br><span class="line"><span class="function">        : <span class="title">base</span>(<span class="params">game</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">this</span>.foo = foo;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">DoBar</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">int</span> result = <span class="keyword">this</span>.foo.DoFoo();</span><br><span class="line">        <span class="comment">// Do something based on result.</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>We’ve now eliminated the construction of the FooComponent from within the BarComponent. The design is better but still not that great. BarComponent is still directly relying on and communicating with FooComponent. We want to change BarComponent so that it has no direct dependency on a concrete implementation of FooComponent. 这也是一种依赖注入, 但还不彻底</p>
+<p>We’ll create an interface(面向接口编程):<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">interface</span> <span class="title">IFooService</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">DoFoo</span>(<span class="params"></span>)</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title">FooComponent</span> : <span class="title">GameComponent</span>, <span class="title">IFooService</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">FooComponent</span>(<span class="params">Game game</span>)</span></span><br><span class="line"><span class="function">        : <span class="title">base</span>(<span class="params">game</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">DoFoo</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">// Do something and return an int.</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title">BarComponent</span> : <span class="title">GameComponent</span></span><br><span class="line">&#123;</span><br><span class="line">    IFooService foo;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">BarComponent</span>(<span class="params">Game game, IFooService foo</span>)</span></span><br><span class="line"><span class="function">        : <span class="title">base</span>(<span class="params">game</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">this</span>.foo = foo;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">DoBar</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">int</span> result = <span class="keyword">this</span>.foo.DoFoo();</span><br><span class="line">        <span class="comment">// Do something based on result.</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>We can now change FooComponent as much as we want and BarComponent will be unaffected. BarComponent now communicates with FooComponent through the IFooService interface(接口隔离). This also allows us to have multiple implementations of DoFoo():<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title">SimpleFooComponent</span> : <span class="title">GameComponent</span>, <span class="title">IFooService</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">SimpleFooComponent</span>(<span class="params">Game game</span>)</span></span><br><span class="line"><span class="function">        : <span class="title">base</span>(<span class="params">game</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">DoFoo</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">5</span>; <span class="comment">// The class says “Simple”</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title">ComplexFooComponent</span> : <span class="title">GameComponent</span>, <span class="title">IFooService</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ComplexFooComponent</span>(<span class="params">Game game</span>)</span></span><br><span class="line"><span class="function">        : <span class="title">base</span>(<span class="params">game</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">DoFoo</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">int</span> result = <span class="number">0</span>;</span><br><span class="line">        <span class="comment">// Do some very complex calculationreturn result;</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>We can pass BarComponent an instance of SimpleFooComponent or ComplexFooComponent. Whatever the situation may call for.<br>Where does GameServiceContainer fit into all of this? You can use the GameServiceContainer to hold all your “Services”. Add whatever class will implement the IFooService and then from within your BarComponent you can query for it:<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title">BarComponent</span> : <span class="title">GameComponent</span></span><br><span class="line">&#123;</span><br><span class="line">    IFooService foo;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">BarComponent</span>(<span class="params">Game game</span>)</span></span><br><span class="line"><span class="function">        : <span class="title">base</span>(<span class="params">game</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Initialize</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">this</span>.foo = <span class="keyword">this</span>.Game.Services.GetService(<span class="keyword">typeof</span>(IFooService)) <span class="keyword">as</span> IFooService;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span>(<span class="keyword">this</span>.foo == <span class="literal">null</span>)</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> InvalidOperationException(“IFooService not found.”);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">DoBar</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">int</span> result = <span class="keyword">this</span>.foo.DoFoo();</span><br><span class="line">        <span class="comment">// Do something based on result.</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// In your Game’s constructor</span></span><br><span class="line"><span class="keyword">this</span>.Services.AddService(<span class="keyword">typeof</span>(IFooService), <span class="keyword">new</span> SimpleFooComponent(<span class="keyword">this</span>));</span><br></pre></td></tr></table></figure></p>
+<p>Not only does BarComponent no longer require an instance of IFooService in its constructor, it also no longer matters if the instance of IFooService is constructed before or after the BarComponent. So long as all the services BarComponent requires are in the GameServiceContainer before Initialize() is called, it doesn’t matter what order your components are constructed in. Now, suppose that BarComponent didn’t necessarily depend on IFooService and instead the behavior of DoBar() is changed based on whether or not IFooService is available:<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title">BarComponent</span> : <span class="title">GameComponent</span></span><br><span class="line">&#123;</span><br><span class="line">    IFooService foo;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">BarComponent</span>(<span class="params">Game game</span>)</span></span><br><span class="line"><span class="function">        : <span class="title">base</span>(<span class="params">game</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Initialize</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">this</span>.foo = <span class="keyword">this</span>.Game.Services.GetService(<span class="keyword">typeof</span>(IFooService)) <span class="keyword">as</span> IFooService;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">intDoBar</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">// If the IFooService is available, delegate to the DoFoo() method.if(this.foo != null)</span></span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">this</span>.foo.DoFoo();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> result = <span class="number">0</span>;</span><br><span class="line">        <span class="comment">// Otherwise do some other calculation.return result;</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这一点是很微妙的, Initialize对BarComponent是全局的, DoBar对BarComponent是局部的, 从Initialize移到DoBar, 进一步降低耦合性</p>
+<p>Service providers don’t always have to be GameComponent(s). Our BarComponent needs a Camera class now:<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">interface</span> <span class="title">ICamera</span></span><br><span class="line">&#123;</span><br><span class="line">    Matrix Transform &#123; <span class="keyword">get</span>; &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title">IdentityCamera</span> : <span class="title">ICamera</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> Matrix Transform</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">get</span> &#123; <span class="keyword">return</span> Matrix.Identity; &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title">MovingCamera</span> : <span class="title">ICamera</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> Matrix Transform</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">get</span>;</span><br><span class="line">        <span class="keyword">set</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title">BarComponent</span> : <span class="title">DrawableGameComponent</span></span><br><span class="line">&#123;</span><br><span class="line">    ICamera camera;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">BarComponent</span>(<span class="params">Game game</span>)</span></span><br><span class="line"><span class="function">        : <span class="title">base</span>(<span class="params">game</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Initialize</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">this</span>.camera = <span class="keyword">this</span>.Game.Services.GetService(<span class="keyword">typeof</span>(ICamera)) <span class="keyword">as</span> ICamera;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Draw</span>(<span class="params">GameTime gameTime</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        Matrix transform = <span class="keyword">this</span>.camera.Transform;</span><br><span class="line">        <span class="comment">// Draw based on the transform matrix</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// In your Game’s constructor.</span></span><br><span class="line"><span class="keyword">this</span>.Services.AddService(<span class="keyword">typeof</span>(ICamera), <span class="keyword">new</span> MovingCamera());</span><br></pre></td></tr></table></figure></p>
+<p>BarComponent uses the camera’s Transform matrix and doesn’t care how it is calculated. It’s completely decoupled from the camera’s implementation.</p>
+<p>In closing, using the GameServiceContainer and interfaces makes your classes more loosely coupled. This makes it easier to make changes to the way your game works. Your classes also become more reusable as you can now mix and match service providers and consumers as needed. If you need a specific implementation of a camera for your game, you can still use the BarComponent so long as your camera class implements the ICamera interface.</p>
+<p>Loosely coupling your classes has the added benefit of making them more testable. That’s another blog post though.</p>
+<p>GameServiceContainer和IServiceProvider在Monogame中的实现如下:<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// MIT License - Copyright (C) The Mono.Xna Team</span></span><br><span class="line"><span class="comment">// This file is subject to the terms and conditions defined in</span></span><br><span class="line"><span class="comment">// file 'LICENSE.txt', which is part of this source code package.</span></span><br><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> System.Collections.Generic;</span><br><span class="line"><span class="keyword">using</span> Microsoft.Xna.Framework.Utilities;</span><br><span class="line">​</span><br><span class="line"><span class="keyword">namespace</span> <span class="title">Microsoft.Xna.Framework</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">class</span> <span class="title">GameServiceContainer</span> : <span class="title">IServiceProvider</span></span><br><span class="line">    &#123;</span><br><span class="line">        Dictionary&lt;Type, <span class="keyword">object</span>&gt; services;</span><br><span class="line">​</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">GameServiceContainer</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            services = <span class="keyword">new</span> Dictionary&lt;Type, <span class="keyword">object</span>&gt;();</span><br><span class="line">        &#125;</span><br><span class="line">​</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">AddService</span>(<span class="params">Type type, <span class="keyword">object</span> provider</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            <span class="keyword">if</span> (type == <span class="literal">null</span>)</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> ArgumentNullException(<span class="string">"type"</span>);</span><br><span class="line">            <span class="keyword">if</span> (provider == <span class="literal">null</span>)</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> ArgumentNullException(<span class="string">"provider"</span>);</span><br><span class="line">            <span class="keyword">if</span> (!ReflectionHelpers.IsAssignableFrom(type, provider))</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> ArgumentException(<span class="string">"The provider does not match the specified service type!"</span>);</span><br><span class="line">​</span><br><span class="line">            services.Add(type, provider);</span><br><span class="line">        &#125;</span><br><span class="line">​</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">object</span> <span class="title">GetService</span>(<span class="params">Type type</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            <span class="keyword">if</span> (type == <span class="literal">null</span>)</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> ArgumentNullException(<span class="string">"type"</span>);</span><br><span class="line">                        </span><br><span class="line">            <span class="keyword">object</span> service;</span><br><span class="line">            <span class="keyword">if</span> (services.TryGetValue(type, <span class="keyword">out</span> service))</span><br><span class="line">                <span class="keyword">return</span> service;</span><br><span class="line">​</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line">​</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">RemoveService</span>(<span class="params">Type type</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            <span class="keyword">if</span> (type == <span class="literal">null</span>)</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> ArgumentNullException(<span class="string">"type"</span>);</span><br><span class="line">​</span><br><span class="line">            services.Remove(type);</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">void</span> AddService&lt;T&gt;(T provider)</span><br><span class="line">        &#123;</span><br><span class="line">            AddService(<span class="keyword">typeof</span>(T), provider);</span><br><span class="line">        &#125;</span><br><span class="line">​</span><br><span class="line">        <span class="keyword">public</span> T GetService&lt;T&gt;() <span class="keyword">where</span> T : <span class="keyword">class</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">var</span> service = GetService(<span class="keyword">typeof</span>(T));</span><br><span class="line">​</span><br><span class="line">            <span class="keyword">if</span> (service == <span class="literal">null</span>)</span><br><span class="line">                <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">​</span><br><span class="line">            <span class="keyword">return</span> (T)service;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title">IServiceProvider</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function">Object <span class="title">GetService</span>(<span class="params"></span></span></span><br><span class="line"><span class="function"><span class="params">        Type serviceType</span></span></span><br><span class="line"><span class="function"><span class="params">    </span>)</span></span><br><span class="line"><span class="function">&#125;</span></span><br></pre></td></tr></table></figure></p>
+<p>这种设计方法也是一种设计模式: Service Locator(<a href="http://gameprogrammingpatterns.com/service-locator.html" target="_blank" rel="noopener">http://gameprogrammingpatterns.com/service-locator.html</a>)</p>
+<blockquote>
+<p>The Service Locator pattern is a sibling to Singleton in many ways, so it’s worth looking at both to see which is most appropriate for your needs.</p>
+</blockquote>
+<blockquote>
+<p>The Unity framework uses this pattern in concert with the Component pattern in its GetComponent() method.在Unity3D中, GameObject.GetComponent/GetComponentInParent也是同样的方式.</p>
+</blockquote>
+<blockquote>
+<p>Microsoft’s XNA framework for game development has this pattern built into its core Game class. Each instance has a GameServices object that can be used to register and locate services of any type.</p>
+</blockquote>
+<p>如同前一篇Component模式在Unity3D和XNA中的异同,  Service Locator模式在Unity3D和XNA中的异同是一样的. 区别在于Unity3D中是在Entity的level, 而XNA是在Game的level.</p>
+<p>这种模式并非游戏专用, 在MSDN中有更一般化的介绍<a href="https://msdn.microsoft.com/en-us/library/ee413842.aspx" target="_blank" rel="noopener">https://msdn.microsoft.com/en-us/library/ee413842.aspx</a></p>
+<p>You have classes with dependencies on services whose concrete types are specified at compile time. In the following example, ClassA has compile time dependencies on ServiceA and ServiceB. The following diagram illustrates this.<br>Classes with dependencies on services<br><img src="/img/monogame-servicelocator-1.png" alt=""></p>
+<p>This situation has the following drawbacks:</p>
+<ul>
+<li>To replace or update the dependencies, you must change your classes’ source code and recompile the solution.</li>
+<li>The concrete implementation of the dependencies must be available at compile time.</li>
+<li>Your classes are difficult to test in isolation because they have a direct reference to their dependencies. This means that these dependencies cannot be replaced with stubs or mock objects.</li>
+<li>Your classes contain repetitive code for creating, locating, and managing their dependencies.</li>
+</ul>
+<p>The next section describes how to address these issues.</p>
+<p>Objectives<br>Use the Service Locator pattern to achieve any of the following objectives:</p>
+<ul>
+<li>You want to decouple your classes from their dependencies so that these dependencies can be replaced or updated with little or no change to the classes.</li>
+<li>You want to write logic that depends on classes whose concrete implementation is not known at compile time.</li>
+<li>You want to be able to test your classes in isolation, without the dependencies.</li>
+<li>You do not want the logic that locates and manages the dependencies to be in your classes.</li>
+<li>You want to divide your application into loosely coupled modules that can be independently developed, tested, versioned, and deployed.</li>
+</ul>
+<p>Solution<br>Create a service locator that contains references to the services and that encapsulates the logic that locates them. In your classes, use the service locator to obtain service instances. The following diagram illustrates how classes use a service locator.</p>
+<p>How classes use a service locator<br><img src="/img/monogame-servicelocator-2.png" alt=""></p>
+<p>The Service Locator pattern does not describe how to instantiate the services. It describes a way to register services and locate them. Typically, the Service Locator pattern is combined with the Factory pattern and/or the Dependency Injection pattern. This combination allows a service locator to create instances of services.</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/编程/" rel="tag"># 编程</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/12/17/MonoGame笔记(十)GameComponent/" rel="next" title="MonoGame笔记(十)GameComponent">
+                <i class="fa fa-chevron-left"></i> MonoGame笔记(十)GameComponent
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/12/19/MonoGame笔记(十二)Content Pipeline/" rel="prev" title="MonoGame笔记(十二)Content Pipeline介绍">
+                MonoGame笔记(十二)Content Pipeline介绍 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">zmapleaf</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">66</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#Game-services"><span class="nav-number">1.</span> <span class="nav-text">Game services</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Game-Components-Consuming-Game-Services"><span class="nav-number">2.</span> <span class="nav-text">Game Components Consuming Game Services</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Creating-and-consuming-services-in-your-XNA-Game"><span class="nav-number">3.</span> <span class="nav-text">Creating and consuming services in your XNA Game</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zmapleaf</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

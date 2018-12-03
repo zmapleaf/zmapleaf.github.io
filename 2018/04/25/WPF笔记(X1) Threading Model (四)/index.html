@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="WPF,Test,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="这一篇整理一下DispatcherTimer. 看DispatcherTimer之前, 先看一下.Net中的其他Timer Timer(C# in a nutshell 6th)The .NET Framework provides four timers. Two of these are general-purpose multithreaded timers:  System.Threadi">
+<meta name="keywords" content="WPF,Test">
+<meta property="og:type" content="article">
+<meta property="og:title" content="WPF笔记(X1) Threading Model (四)">
+<meta property="og:url" content="http://yoursite.com/2018/04/25/WPF笔记(X1) Threading Model (四)/index.html">
+<meta property="og:site_name" content="远">
+<meta property="og:description" content="这一篇整理一下DispatcherTimer. 看DispatcherTimer之前, 先看一下.Net中的其他Timer Timer(C# in a nutshell 6th)The .NET Framework provides four timers. Two of these are general-purpose multithreaded timers:  System.Threadi">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-04-28T00:54:11.066Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="WPF笔记(X1) Threading Model (四)">
+<meta name="twitter:description" content="这一篇整理一下DispatcherTimer. 看DispatcherTimer之前, 先看一下.Net中的其他Timer Timer(C# in a nutshell 6th)The .NET Framework provides four timers. Two of these are general-purpose multithreaded timers:  System.Threadi">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/04/25/WPF笔记(X1) Threading Model (四)/">
+
+
+
+
+
+  <title>WPF笔记(X1) Threading Model (四) | 远</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">远</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/25/WPF笔记(X1) Threading Model (四)/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zmapleaf">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="远">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">WPF笔记(X1) Threading Model (四)</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-25T10:21:37+08:00">
+                2018-04-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/编程/" itemprop="url" rel="index">
+                    <span itemprop="name">编程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>这一篇整理一下DispatcherTimer. 看DispatcherTimer之前, 先看一下.Net中的其他Timer</p>
+<p>Timer(C# in a nutshell 6th)<br>The .NET Framework provides four timers. Two of these are general-purpose <strong>multithreaded</strong> timers:</p>
+<ul>
+<li>System.Threading.Timer</li>
+<li>System.Timers.Timer</li>
+</ul>
+<p>The other two are special-purpose <strong>single-threaded</strong> timers:</p>
+<ul>
+<li>System.Windows.Forms.Timer (Windows Forms timer)</li>
+<li>System.Windows.Threading.DispatcherTimer (WPF timer)</li>
+</ul>
+<p>The multithreaded timers are more powerful, accurate, and flexible; the singlethreaded timers are safer and more convenient for running simple tasks that update Windows Forms controls or WPF elements.<br>System.Threading.Timer is the simplest multithreaded timer: it has just a constructor and two methods </p>
+<p>The .NET Framework provides another timer class of the same name in the System.Timers namespace. This simply wraps the System.Threading.Timer (参考:<a href="https://www.gnu.org/software/dotgnu/pnetlib-doc/System/Threading/Timer.html" target="_blank" rel="noopener">https://www.gnu.org/software/dotgnu/pnetlib-doc/System/Threading/Timer.html</a>)</p>
+<p>Multithreaded timers use the <strong>thread pool</strong> to allow a few threads to serve many timers. This means that the callback method or Elapsed event may fire on a different thread each time it is called. Furthermore, the Elapsed event always fires(approximately) on time—regardless of whether the previous Elapsed event finished executing. Hence, callbacks or event handlers must be thread-safe.</p>
+<p>使用的是线程池, 回调函数有可能是在不同的线程中被调用. 不管前一个调用是否完成, 后一个调用会如期而至, 因此回调函数必须是线程安全的(可重入的)</p>
+<p>定时器精度在10-20ms之间</p>
+<p>而DispatcherTimer的时间精度就没那么准(参考:<a href="https://msdn.microsoft.com/en-us/library/system.windows.threading.dispatchertimer.interval(v=vs.110).aspx" target="_blank" rel="noopener">https://msdn.microsoft.com/en-us/library/system.windows.threading.dispatchertimer.interval(v=vs.110).aspx</a>)</p>
+<blockquote>
+<p>Timers are not guaranteed to execute exactly when the time interval occurs, but they are guaranteed to not execute before the time interval occurs. This is because <strong>DispatcherTimer operations are placed on the Dispatcher queue like other operations</strong>. When the DispatcherTimer operation executes is dependent on the other jobs in the queue and their priorities.</p>
+</blockquote>
+<p>如果要计时的话, 用stopwatch, 参考<a href="https://stackoverflow.com/questions/4251644/getting-elapsed-time-with-dispatchtimer-to-1-millisecond-accuracy" target="_blank" rel="noopener">https://stackoverflow.com/questions/4251644/getting-elapsed-time-with-dispatchtimer-to-1-millisecond-accuracy</a><br>和<a href="https://social.msdn.microsoft.com/forums/windowsapps/en-us/058a755e-059b-45ee-b5ec-3d35f3b53515/dispatchertimer-accuracy" target="_blank" rel="noopener">https://social.msdn.microsoft.com/forums/windowsapps/en-us/058a755e-059b-45ee-b5ec-3d35f3b53515/dispatchertimer-accuracy</a></p>
+<p>DispatcherTimer这个类不复杂, 阅读它的代码能学到不少东西, 可以进一步了解Dispatcher的运行方式. </p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br><span class="line">273</span><br><span class="line">274</span><br><span class="line">275</span><br><span class="line">276</span><br><span class="line">277</span><br><span class="line">278</span><br><span class="line">279</span><br><span class="line">280</span><br><span class="line">281</span><br><span class="line">282</span><br><span class="line">283</span><br><span class="line">284</span><br><span class="line">285</span><br><span class="line">286</span><br><span class="line">287</span><br><span class="line">288</span><br><span class="line">289</span><br><span class="line">290</span><br><span class="line">291</span><br><span class="line">292</span><br><span class="line">293</span><br><span class="line">294</span><br><span class="line">295</span><br><span class="line">296</span><br><span class="line">297</span><br><span class="line">298</span><br><span class="line">299</span><br><span class="line">300</span><br><span class="line">301</span><br><span class="line">302</span><br><span class="line">303</span><br><span class="line">304</span><br><span class="line">305</span><br><span class="line">306</span><br><span class="line">307</span><br><span class="line">308</span><br><span class="line">309</span><br><span class="line">310</span><br><span class="line">311</span><br><span class="line">312</span><br><span class="line">313</span><br><span class="line">314</span><br><span class="line">315</span><br><span class="line">316</span><br><span class="line">317</span><br><span class="line">318</span><br><span class="line">319</span><br><span class="line">320</span><br><span class="line">321</span><br><span class="line">322</span><br><span class="line">323</span><br><span class="line">324</span><br><span class="line">325</span><br><span class="line">326</span><br><span class="line">327</span><br><span class="line">328</span><br><span class="line">329</span><br><span class="line">330</span><br><span class="line">331</span><br><span class="line">332</span><br><span class="line">333</span><br><span class="line">334</span><br><span class="line">335</span><br><span class="line">336</span><br><span class="line">337</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> System.Threading;</span><br><span class="line"><span class="keyword">using</span> System.Windows;</span><br><span class="line"><span class="keyword">using</span> System.Diagnostics;</span><br><span class="line"><span class="keyword">using</span> System.Collections.Generic;</span><br><span class="line"><span class="keyword">using</span> MS.Internal.WindowsBase;</span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">System.Windows.Threading</span> </span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line">    <span class="comment"><span class="doctag">///</span>     A timer that is integrated into the Dispatcher queues, and will</span></span><br><span class="line">    <span class="comment"><span class="doctag">///</span>     be processed after a given amount of time at a specified priority.</span></span><br><span class="line">    <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">class</span> <span class="title">DispatcherTimer</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span>     Creates a timer that uses the current thread's Dispatcher to</span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span>     process the timer event at background priority.</span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">DispatcherTimer</span>(<span class="params"></span>) : <span class="title">this</span>(<span class="params">DispatcherPriority.Background</span>)  <span class="comment">// <span class="doctag">NOTE:</span> should be Priority Dispatcher.BackgroundPriority</span></span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span>     Creates a timer that uses the current thread's Dispatcher to</span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span>     process the timer event at the specified priority.</span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;param name="priority"&gt;</span></span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span>     The priority to process the timer at.</span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/param&gt;</span></span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">DispatcherTimer</span>(<span class="params">DispatcherPriority priority</span>) <span class="comment">// <span class="doctag">NOTE:</span> should be Priority</span></span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            Initialize(Dispatcher.CurrentDispatcher, priority, TimeSpan.FromMilliseconds(<span class="number">0</span>));</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span>     Creates a timer that uses the specified Dispatcher to</span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span>     process the timer event at the specified priority.</span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;param name="priority"&gt;</span></span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span>     The priority to process the timer at.</span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/param&gt;</span></span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;param name="dispatcher"&gt;</span></span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span>     The dispatcher to use to process the timer.</span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/param&gt;</span></span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">DispatcherTimer</span>(<span class="params">DispatcherPriority priority, Dispatcher dispatcher</span>)  <span class="comment">// <span class="doctag">NOTE:</span> should be Priority</span></span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            <span class="keyword">if</span>(dispatcher == <span class="literal">null</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> ArgumentNullException(<span class="string">"dispatcher"</span>);</span><br><span class="line">            &#125;</span><br><span class="line">            </span><br><span class="line">            Initialize(dispatcher, priority, TimeSpan.FromMilliseconds(<span class="number">0</span>));</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span>     Creates a timer that is bound to the specified dispatcher and</span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span>     will be processed at the specified priority, after the</span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span>     specified timeout.</span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;param name="interval"&gt;</span></span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span>     The interval to tick the timer after.</span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/param&gt;</span></span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;param name="priority"&gt;</span></span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span>     The priority to process the timer at.</span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/param&gt;</span></span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;param name="callback"&gt;</span></span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span>     The callback to call when the timer ticks.</span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/param&gt;</span></span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;param name="dispatcher"&gt;</span></span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span>     The dispatcher to use to process the timer.</span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/param&gt;</span></span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">DispatcherTimer</span>(<span class="params">TimeSpan interval, DispatcherPriority priority, EventHandler callback, Dispatcher dispatcher</span>) <span class="comment">// <span class="doctag">NOTE:</span> should be Priority</span></span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            <span class="comment">// </span></span><br><span class="line">            <span class="keyword">if</span>(callback == <span class="literal">null</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> ArgumentNullException(<span class="string">"callback"</span>);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span>(dispatcher == <span class="literal">null</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> ArgumentNullException(<span class="string">"dispatcher"</span>);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (interval.TotalMilliseconds &lt; <span class="number">0</span>)</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> ArgumentOutOfRangeException(<span class="string">"interval"</span>, SR.Get(SRID.TimeSpanPeriodOutOfRange_TooSmall));</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (interval.TotalMilliseconds &gt; Int32.MaxValue)</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> ArgumentOutOfRangeException(<span class="string">"interval"</span>, SR.Get(SRID.TimeSpanPeriodOutOfRange_TooLarge));</span><br><span class="line"></span><br><span class="line">            Initialize(dispatcher, priority, interval);</span><br><span class="line">            </span><br><span class="line">            Tick += callback;</span><br><span class="line">            Start();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span>     Gets the dispatcher this timer is associated with.</span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line">        <span class="keyword">public</span> Dispatcher Dispatcher</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">get</span></span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">return</span> _dispatcher;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span>     Gets or sets whether the timer is running.</span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">bool</span> IsEnabled</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">get</span></span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">return</span> _isEnabled;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">set</span></span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">lock</span>(_instanceLock)</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="keyword">if</span>(!<span class="keyword">value</span> &amp;&amp; _isEnabled)</span><br><span class="line">                    &#123;</span><br><span class="line">                        Stop();</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="keyword">else</span> <span class="keyword">if</span>(<span class="keyword">value</span> &amp;&amp; !_isEnabled)</span><br><span class="line">                    &#123;</span><br><span class="line">                        Start();</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span>     Gets or sets the time between timer ticks.</span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line">        <span class="keyword">public</span> TimeSpan Interval</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">get</span></span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">return</span> _interval;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">set</span></span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">bool</span> updateWin32Timer = <span class="literal">false</span>;</span><br><span class="line">                </span><br><span class="line">                <span class="keyword">if</span> (<span class="keyword">value</span>.TotalMilliseconds &lt; <span class="number">0</span>)</span><br><span class="line">                    <span class="keyword">throw</span> <span class="keyword">new</span> ArgumentOutOfRangeException(<span class="string">"value"</span>, SR.Get(SRID.TimeSpanPeriodOutOfRange_TooSmall));</span><br><span class="line"></span><br><span class="line">                <span class="keyword">if</span> (<span class="keyword">value</span>.TotalMilliseconds &gt; Int32.MaxValue)</span><br><span class="line">                    <span class="keyword">throw</span> <span class="keyword">new</span> ArgumentOutOfRangeException(<span class="string">"value"</span>, SR.Get(SRID.TimeSpanPeriodOutOfRange_TooLarge));</span><br><span class="line"></span><br><span class="line">                <span class="keyword">lock</span>(_instanceLock)</span><br><span class="line">                &#123;</span><br><span class="line">                    _interval = <span class="keyword">value</span>;</span><br><span class="line"></span><br><span class="line">                    <span class="keyword">if</span>(_isEnabled)</span><br><span class="line">                    &#123;</span><br><span class="line">                        _dueTimeInTicks = Environment.TickCount + (<span class="keyword">int</span>)_interval.TotalMilliseconds;</span><br><span class="line">                        updateWin32Timer = <span class="literal">true</span>;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                <span class="keyword">if</span>(updateWin32Timer)</span><br><span class="line">                &#123;</span><br><span class="line">                    _dispatcher.UpdateWin32Timer();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span>     Starts the timer.</span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Start</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            <span class="keyword">lock</span>(_instanceLock)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">if</span>(!_isEnabled)</span><br><span class="line">                &#123;</span><br><span class="line">                    _isEnabled = <span class="literal">true</span>;</span><br><span class="line"></span><br><span class="line">                    Restart();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span>     Stops the timer.</span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Stop</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            <span class="keyword">bool</span> updateWin32Timer = <span class="literal">false</span>;</span><br><span class="line">            </span><br><span class="line">            <span class="keyword">lock</span>(_instanceLock)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">if</span>(_isEnabled)</span><br><span class="line">                &#123;</span><br><span class="line">                    _isEnabled = <span class="literal">false</span>;</span><br><span class="line">                    updateWin32Timer = <span class="literal">true</span>;</span><br><span class="line"></span><br><span class="line">                    <span class="comment">// If the operation is in the queue, abort it.</span></span><br><span class="line">                    <span class="keyword">if</span>(_operation != <span class="literal">null</span>)</span><br><span class="line">                    &#123;</span><br><span class="line">                        _operation.Abort();</span><br><span class="line">                        _operation = <span class="literal">null</span>;</span><br><span class="line">                    &#125;</span><br><span class="line">                    </span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span>(updateWin32Timer)</span><br><span class="line">            &#123;</span><br><span class="line">                _dispatcher.RemoveTimer(<span class="keyword">this</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span>     Occurs when the specified timer interval has elapsed and the</span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span>     timer is enabled.</span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">event</span> EventHandler Tick;</span><br><span class="line"></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span>     Any data that the caller wants to pass along with the timer.</span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">object</span> Tag</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">get</span></span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">return</span> _tag;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">set</span></span><br><span class="line">            &#123;</span><br><span class="line">                _tag = <span class="keyword">value</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">Initialize</span>(<span class="params">Dispatcher dispatcher, DispatcherPriority priority, TimeSpan interval</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            <span class="comment">// Note: all callers of this have a "priority" parameter.</span></span><br><span class="line">            Dispatcher.ValidatePriority(priority, <span class="string">"priority"</span>);</span><br><span class="line">            <span class="keyword">if</span>(priority == DispatcherPriority.Inactive)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> ArgumentException(SR.Get(SRID.InvalidPriority), <span class="string">"priority"</span>);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            _dispatcher = dispatcher;</span><br><span class="line">            _priority = priority;</span><br><span class="line">            _interval = interval;</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">Restart</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            <span class="keyword">lock</span>(_instanceLock)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">if</span> (_operation != <span class="literal">null</span>)</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="comment">// Timer has already been restarted, e.g. Start was called form the Tick handler.</span></span><br><span class="line">                    <span class="keyword">return</span>;</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                <span class="comment">// BeginInvoke a new operation.</span></span><br><span class="line">                _operation = _dispatcher.BeginInvoke(</span><br><span class="line">                    DispatcherPriority.Inactive,</span><br><span class="line">                    <span class="keyword">new</span> DispatcherOperationCallback(FireTick),</span><br><span class="line">                    <span class="literal">null</span>);</span><br><span class="line"></span><br><span class="line">                </span><br><span class="line">                _dueTimeInTicks = Environment.TickCount + (<span class="keyword">int</span>) _interval.TotalMilliseconds;</span><br><span class="line">                </span><br><span class="line">                <span class="keyword">if</span> (_interval.TotalMilliseconds == <span class="number">0</span> &amp;&amp; _dispatcher.CheckAccess())</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="comment">// shortcut - just promote the item now</span></span><br><span class="line">                    Promote();</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">else</span></span><br><span class="line">                &#123;</span><br><span class="line">                    _dispatcher.AddTimer(<span class="keyword">this</span>);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">internal</span> <span class="keyword">void</span> <span class="title">Promote</span>(<span class="params"></span>) <span class="comment">// called from Dispatcher</span></span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            <span class="keyword">lock</span>(_instanceLock)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="comment">// Simply promote the operation to it's desired priority.</span></span><br><span class="line">                <span class="keyword">if</span>(_operation != <span class="literal">null</span>)</span><br><span class="line">                &#123;</span><br><span class="line">                    _operation.Priority = _priority;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">private</span> <span class="keyword">object</span> <span class="title">FireTick</span>(<span class="params"><span class="keyword">object</span> unused</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            <span class="comment">// The operation has been invoked, so forget about it.</span></span><br><span class="line">            _operation = <span class="literal">null</span>;</span><br><span class="line">            </span><br><span class="line">            <span class="comment">// The dispatcher thread is calling us because item's priority</span></span><br><span class="line">            <span class="comment">// was changed from inactive to something else.</span></span><br><span class="line">            <span class="keyword">if</span>(Tick != <span class="literal">null</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                Tick(<span class="keyword">this</span>, EventArgs.Empty);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// If we are still enabled, start the timer again.</span></span><br><span class="line">            <span class="keyword">if</span>(_isEnabled)</span><br><span class="line">            &#123;</span><br><span class="line">                Restart();</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// This is the object we use to synchronize access.</span></span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">object</span> _instanceLock = <span class="keyword">new</span> <span class="keyword">object</span>();</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// Note: We cannot BE a dispatcher-affinity object because we can be</span></span><br><span class="line">        <span class="comment">// created by a worker thread.  We are still associated with a</span></span><br><span class="line">        <span class="comment">// dispatcher (where we post the item) but we can be accessed</span></span><br><span class="line">        <span class="comment">// by any thread.</span></span><br><span class="line">        <span class="keyword">private</span> Dispatcher _dispatcher;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">private</span> DispatcherPriority _priority;  <span class="comment">// <span class="doctag">NOTE:</span> should be Priority</span></span><br><span class="line">        <span class="keyword">private</span> TimeSpan _interval;</span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">object</span> _tag;</span><br><span class="line">        <span class="keyword">private</span> DispatcherOperation _operation;</span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">bool</span> _isEnabled;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">internal</span> <span class="keyword">int</span> _dueTimeInTicks; <span class="comment">// used by Dispatcher</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>从DispatcherTimer的使用方式入手<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//  DispatcherTimer setup</span></span><br><span class="line">dispatcherTimer = <span class="keyword">new</span> System.Windows.Threading.DispatcherTimer();</span><br><span class="line">dispatcherTimer.Tick += <span class="keyword">new</span> EventHandler(dispatcherTimer_Tick);</span><br><span class="line">dispatcherTimer.Interval = <span class="keyword">new</span> TimeSpan(<span class="number">0</span>,<span class="number">0</span>,<span class="number">1</span>);</span><br><span class="line">dispatcherTimer.Start();</span><br></pre></td></tr></table></figure></p>
+<p>无参构造方法DispatcherTimer()将DispatcherPriority设为Background<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span>     Creates a timer that uses the current thread's Dispatcher to</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span>     process the timer event at background priority.</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">DispatcherTimer</span>(<span class="params"></span>) : <span class="title">this</span>(<span class="params">DispatcherPriority.Background</span>)  <span class="comment">// <span class="doctag">NOTE:</span> should be Priority Dispatcher.BackgroundPriority</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>Background优先级很低, 所以不一定能够按时执行.</p>
+<p>再看Start方法<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span>     Starts the timer.</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Start</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">lock</span>(_instanceLock)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span>(!_isEnabled)</span><br><span class="line">        &#123;</span><br><span class="line">            _isEnabled = <span class="literal">true</span>;</span><br><span class="line"></span><br><span class="line">            Restart();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>调用的是Restart()<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">Restart</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">lock</span>(_instanceLock)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span> (_operation != <span class="literal">null</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="comment">// Timer has already been restarted, e.g. Start was called form the Tick handler.</span></span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// BeginInvoke a new operation.</span></span><br><span class="line">        _operation = _dispatcher.BeginInvoke(</span><br><span class="line">            DispatcherPriority.Inactive,</span><br><span class="line">            <span class="keyword">new</span> DispatcherOperationCallback(FireTick),</span><br><span class="line">            <span class="literal">null</span>);</span><br><span class="line"></span><br><span class="line">        </span><br><span class="line">        _dueTimeInTicks = Environment.TickCount + (<span class="keyword">int</span>) _interval.TotalMilliseconds;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span> (_interval.TotalMilliseconds == <span class="number">0</span> &amp;&amp; _dispatcher.CheckAccess())</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="comment">// shortcut - just promote the item now</span></span><br><span class="line">            Promote();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">        &#123;</span><br><span class="line">            _dispatcher.AddTimer(<span class="keyword">this</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这个方法比较关键</p>
+<ol>
+<li>它往Dispatcher Queue里面放了一个Operation, 但它的优先级是DispatcherPriority.Inactive. 顾名思义, 这个优先级表示该Operation是不激活状态. 它不会被执行<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span>     Operations at this priority are not processed.</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line">Inactive = <span class="number">0</span>,</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>因为时间间隔不到, Operation不能被执行. 只有时间间隔到了, Operation才会被激活. 如何激活? 且看下面</p>
+<ol start="2">
+<li>Promote()方法, 就是激活该Operation. Promote是提升的意思, 也就是提升Operation的优先级. <figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">internal</span> <span class="keyword">void</span> <span class="title">Promote</span>(<span class="params"></span>) <span class="comment">// called from Dispatcher</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">lock</span>(_instanceLock)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// Simply promote the operation to it's desired priority.</span></span><br><span class="line">        <span class="keyword">if</span>(_operation != <span class="literal">null</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            _operation.Priority = _priority;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>_priority构造的时候为DispatcherPriority.Background. 即从DispatcherPriority.Inactive提升(Promote)到<br>DispatcherPriority.Background. 如此, Operation就可以被执行了.</p>
+<p>注意<strong>called from Dispatcher</strong>, 表示, 时间间隔到了, 提升Operation的优先级是由Dispatcher来完成的.<br>Dispatcher和DispatcherTimer有什么关系呢? 且看下面</p>
+<ol start="3">
+<li>_dispatcher.AddTimer(this);<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">internal</span> <span class="keyword">void</span> <span class="title">AddTimer</span>(<span class="params">DispatcherTimer timer</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">lock</span>(_instanceLock)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span>(!_hasShutdownFinished) <span class="comment">// Could be a non-dispatcher thread, lock to read</span></span><br><span class="line">        &#123;</span><br><span class="line">            _timers.Add(timer);</span><br><span class="line">            _timersVersion++;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    UpdateWin32Timer();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>添加了一个DispatcherTimer, 需要UpdateWin32Timer, 去操作系统设置定时器</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">internal</span> <span class="keyword">void</span> <span class="title">UpdateWin32Timer</span>(<span class="params"></span>) <span class="comment">// Called from DispatcherTimer</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(CheckAccess())</span><br><span class="line">    &#123;</span><br><span class="line">        UpdateWin32TimerFromDispatcherThread(<span class="literal">null</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        BeginInvoke(DispatcherPriority.Send,</span><br><span class="line">                    <span class="keyword">new</span> DispatcherOperationCallback(UpdateWin32TimerFromDispatcherThread),</span><br><span class="line">                    <span class="literal">null</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">object</span> <span class="title">UpdateWin32TimerFromDispatcherThread</span>(<span class="params"><span class="keyword">object</span> unused</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">lock</span>(_instanceLock)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span>(!_hasShutdownFinished) <span class="comment">// Dispatcher thread, does not technically need the lock to read</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">bool</span> oldDueTimeFound = _dueTimeFound;</span><br><span class="line">            <span class="keyword">int</span> oldDueTimeInTicks = _dueTimeInTicks;</span><br><span class="line">            _dueTimeFound = <span class="literal">false</span>;</span><br><span class="line">            _dueTimeInTicks = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span>(_timers.Count &gt; <span class="number">0</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="comment">// We could do better if we sorted the list of timers.</span></span><br><span class="line">                <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; _timers.Count; i++)</span><br><span class="line">                &#123;</span><br><span class="line">                    DispatcherTimer timer = _timers[i];</span><br><span class="line"></span><br><span class="line">                    <span class="keyword">if</span>(!_dueTimeFound || timer._dueTimeInTicks - _dueTimeInTicks &lt; <span class="number">0</span>)</span><br><span class="line">                    &#123;</span><br><span class="line">                        _dueTimeFound = <span class="literal">true</span>;</span><br><span class="line">                        _dueTimeInTicks = timer._dueTimeInTicks;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span>(_dueTimeFound)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">if</span>(!_isWin32TimerSet || !oldDueTimeFound || (oldDueTimeInTicks != _dueTimeInTicks))</span><br><span class="line">                &#123;</span><br><span class="line">                    SetWin32Timer(_dueTimeInTicks);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">else</span> <span class="keyword">if</span>(oldDueTimeFound)</span><br><span class="line">            &#123;</span><br><span class="line">                KillWin32Timer();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment"><span class="doctag">///</span><span class="doctag">&lt;SecurityNote&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> Critical - accesses critical data</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> TreatAsSafe - we think it's ok to expose timers in the SEE.</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span>                      a denial-of-service attack may be possible - but these are low-pri and possible in many other ways.</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span>                      we can never bring down the iexplore process.</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span><span class="doctag">&lt;/SecurityNote&gt;</span></span></span><br><span class="line">[<span class="meta">SecurityCritical, SecurityTreatAsSafe</span>]</span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">SetWin32Timer</span>(<span class="params"><span class="keyword">int</span> dueTimeInTicks</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(!IsWindowNull())</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">int</span> delta = dueTimeInTicks - Environment.TickCount;</span><br><span class="line">        <span class="keyword">if</span>(delta &lt; <span class="number">1</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            delta = <span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// We are being called on the dispatcher thread so we can rely on</span></span><br><span class="line">        <span class="comment">// _window.Value being non-null without taking the instance lock.</span></span><br><span class="line"></span><br><span class="line">        SafeNativeMethods.SetTimer(</span><br><span class="line">            <span class="keyword">new</span> HandleRef(<span class="keyword">this</span>, _window.Value.Handle),</span><br><span class="line">            TIMERID_TIMERS,</span><br><span class="line">            delta);</span><br><span class="line"></span><br><span class="line">        _isWin32TimerSet = <span class="literal">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这样, 系统才会发WM_TIMER给窗口处理函数, Dispatcher才会从DispatcherQueue里面取出Operation, 看下面的代码<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> IntPtr <span class="title">WndProcHook</span>(<span class="params">IntPtr hwnd, <span class="keyword">int</span> msg, IntPtr wParam, IntPtr lParam, <span class="keyword">ref</span> <span class="keyword">bool</span> handled</span>)</span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function">    else <span class="title">if</span>(<span class="params">message == WindowMessage.WM_TIMER &amp;&amp; (<span class="keyword">int</span></span>) wParam</span> == TIMERID_TIMERS)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// We want 1-shot only timers.  So stop the timer</span></span><br><span class="line">        <span class="comment">// that just fired.</span></span><br><span class="line">        KillWin32Timer();</span><br><span class="line"></span><br><span class="line">        PromoteTimers(Environment.TickCount);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+<p>PromoteTimers()判断时间间隔有没有到; 如果到了,调用的是timer.Promote()方法, 提升Operation的优先级<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">internal</span> <span class="keyword">void</span> <span class="title">PromoteTimers</span>(<span class="params"><span class="keyword">int</span> currentTimeInTicks</span>)</span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function">                    <span class="title">while</span>(<span class="params">iTimer &lt; _timers.Count</span>)</span></span><br><span class="line"><span class="function"></span>                    &#123;</span><br><span class="line">                        <span class="comment">// WARNING: this is vulnerable to wrapping</span></span><br><span class="line">                        <span class="keyword">if</span>(timers[iTimer]._dueTimeInTicks - currentTimeInTicks &lt;= <span class="number">0</span>) <span class="comment">//判断时间有没有到</span></span><br><span class="line">                        &#123;</span><br><span class="line">                            <span class="comment">// Remove this timer from our list.</span></span><br><span class="line">                            <span class="comment">// Do not increment the index.</span></span><br><span class="line">                            timer = timers[iTimer];</span><br><span class="line">                            timers.RemoveAt(iTimer);</span><br><span class="line">                            <span class="keyword">break</span>;</span><br><span class="line">                        &#125;</span><br><span class="line">                        <span class="keyword">else</span></span><br><span class="line">                        &#123;</span><br><span class="line">                            iTimer++;</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line"></span><br><span class="line">                <span class="comment">// Now that we are outside of the lock, promote the timer.</span></span><br><span class="line">                <span class="keyword">if</span>(timer != <span class="literal">null</span>)</span><br><span class="line">                &#123;</span><br><span class="line">                    timer.Promote();</span><br><span class="line">                &#125;</span><br></pre></td></tr></table></figure></p>
+<ol start="4">
+<li>时间间隔到了, 执行FireTick方法<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">object</span> <span class="title">FireTick</span>(<span class="params"><span class="keyword">object</span> unused</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// The operation has been invoked, so forget about it.</span></span><br><span class="line">    _operation = <span class="literal">null</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// The dispatcher thread is calling us because item's priority</span></span><br><span class="line">    <span class="comment">// was changed from inactive to something else.</span></span><br><span class="line">    <span class="keyword">if</span>(Tick != <span class="literal">null</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        Tick(<span class="keyword">this</span>, EventArgs.Empty);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// If we are still enabled, start the timer again.</span></span><br><span class="line">    <span class="keyword">if</span>(_isEnabled)</span><br><span class="line">    &#123;</span><br><span class="line">        Restart();<span class="comment">//再把op放到queue中</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>前面由于DispatcherOperation已经从DispatcherQueue里面取出, 所以这里需要重新再向DispatcherQueue放入DispatcherOperation, 等下一个时间间隔来临时执行. 做法是, 再次调用Restart方法.</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/WPF/" rel="tag"># WPF</a>
+          
+            <a href="/tags/Test/" rel="tag"># Test</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/04/25/WPF笔记(X1) Threading Model (三)/" rel="next" title="WPF笔记(X1) Threading Model (三)">
+                <i class="fa fa-chevron-left"></i> WPF笔记(X1) Threading Model (三)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/04/28/2D Visualization笔记(X0) HueRing/" rel="prev" title="2D Visualization笔记(X0) HueRing">
+                2D Visualization笔记(X0) HueRing <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">zmapleaf</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">66</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zmapleaf</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

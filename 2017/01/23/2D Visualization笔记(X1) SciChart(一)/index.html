@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="编程,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="SciChart(3.1.4549版本) 目录 BindToDataSeriesSetView.xaml NumericAxis FastLineRenderableSeries SciChartSurface HighSpeedRenderSurface ViewConverter IRenderContext2D IRenderPassData  摘要 BindToDataSeriesSetV">
+<meta name="keywords" content="编程">
+<meta property="og:type" content="article">
+<meta property="og:title" content="2D Visualization笔记(X1) SciChart(一)">
+<meta property="og:url" content="http://yoursite.com/2017/01/23/2D Visualization笔记(X1) SciChart(一)/index.html">
+<meta property="og:site_name" content="远">
+<meta property="og:description" content="SciChart(3.1.4549版本) 目录 BindToDataSeriesSetView.xaml NumericAxis FastLineRenderableSeries SciChartSurface HighSpeedRenderSurface ViewConverter IRenderContext2D IRenderPassData  摘要 BindToDataSeriesSetV">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-04-28T03:09:41.521Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="2D Visualization笔记(X1) SciChart(一)">
+<meta name="twitter:description" content="SciChart(3.1.4549版本) 目录 BindToDataSeriesSetView.xaml NumericAxis FastLineRenderableSeries SciChartSurface HighSpeedRenderSurface ViewConverter IRenderContext2D IRenderPassData  摘要 BindToDataSeriesSetV">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/01/23/2D Visualization笔记(X1) SciChart(一)/">
+
+
+
+
+
+  <title>2D Visualization笔记(X1) SciChart(一) | 远</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">远</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/01/23/2D Visualization笔记(X1) SciChart(一)/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zmapleaf">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="远">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">2D Visualization笔记(X1) SciChart(一)</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-01-23T16:49:51+08:00">
+                2017-01-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/编程/" itemprop="url" rel="index">
+                    <span itemprop="name">编程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><em>SciChart(3.1.4549版本)</em></p>
+<h3 id="目录"><a href="#目录" class="headerlink" title="目录"></a>目录</h3><ul>
+<li>BindToDataSeriesSetView.xaml</li>
+<li>NumericAxis</li>
+<li>FastLineRenderableSeries</li>
+<li>SciChartSurface</li>
+<li>HighSpeedRenderSurface</li>
+<li>ViewConverter</li>
+<li>IRenderContext2D</li>
+<li>IRenderPassData</li>
+</ul>
+<h3 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h3><ol>
+<li>BindToDataSeriesSetView.xaml由NumericAxis(坐标轴), FastLineRenderableSeries(曲线), SciChartSurface(Chart区域)构成;</li>
+<li>SciChartSurface的DoDrawingLoop用到IRenderSurface2D(HighSpeedRenderSurfaceu实现, 用来获取IRenderContext2D, 类似Winform中的Graphics)和ISciChartRenderer(ViewConverter实现, 以IRenderContext2D为参数进行绘制);  </li>
+<li>ViewConverter的RenderLoop中会调用NumericAxis和FastLineRenderableSeries的OnDraw方法, 而IRenderContext2D和IRenderPassData是OnDraw的两个参数</li>
+</ol>
+<hr>
+<h3 id="BindToDataSeriesSetView-xaml"><a href="#BindToDataSeriesSetView-xaml" class="headerlink" title="BindToDataSeriesSetView.xaml"></a>BindToDataSeriesSetView.xaml</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">UserControl</span> <span class="attr">x:Class</span>=<span class="string">"Abt.Controls.SciChart.Example.Examples.IWantTo.UseSciChartWithMvvm.BindToDataSeriesSetView"</span></span></span><br><span class="line"><span class="tag">             <span class="attr">xmlns</span>=<span class="string">"http://schemas.microsoft.com/winfx/2006/xaml/presentation"</span></span></span><br><span class="line"><span class="tag">             <span class="attr">xmlns:x</span>=<span class="string">"http://schemas.microsoft.com/winfx/2006/xaml"</span></span></span><br><span class="line"><span class="tag">             <span class="attr">xmlns:mc</span>=<span class="string">"http://schemas.openxmlformats.org/markup-compatibility/2006"</span> </span></span><br><span class="line"><span class="tag">             <span class="attr">xmlns:d</span>=<span class="string">"http://schemas.microsoft.com/expression/blend/2008"</span></span></span><br><span class="line"><span class="tag">             <span class="attr">xmlns:SciChart</span>=<span class="string">"http://schemas.abtsoftware.co.uk/scichart"</span>  </span></span><br><span class="line"><span class="tag">             <span class="attr">mc:Ignorable</span>=<span class="string">"d"</span> </span></span><br><span class="line"><span class="tag">             <span class="attr">d:DesignHeight</span>=<span class="string">"300"</span> <span class="attr">d:DesignWidth</span>=<span class="string">"300"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Grid</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">Grid.RowDefinitions</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">RowDefinition</span> <span class="attr">Height</span>=<span class="string">"32"</span>/&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">RowDefinition</span> <span class="attr">Height</span>=<span class="string">"*"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">Grid.RowDefinitions</span>&gt;</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">&lt;!-- Button is used to invoke a delegate in the ViewModel to append 50 points. --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">Button</span> <span class="attr">Grid.Row</span>=<span class="string">"0"</span> <span class="attr">Command</span>=<span class="string">"&#123;Binding AppendDataCommand&#125;"</span> <span class="attr">Content</span>=<span class="string">"Append 50 Points"</span>/&gt;</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">&lt;!-- Declare a SciChartSurface and bind to data --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">SciChart:SciChartSurface</span> <span class="attr">Grid.Row</span>=<span class="string">"1"</span>  <span class="attr">SciChart:ThemeManager.Theme</span>=<span class="string">"ExpressionLight"</span>&gt;</span></span><br><span class="line">            </span><br><span class="line">            <span class="tag">&lt;<span class="name">SciChart:SciChartSurface.RenderableSeries</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">SciChart:FastLineRenderableSeries</span> <span class="attr">DataSeries</span>=<span class="string">"&#123;Binding ChartData&#125;"</span> <span class="attr">SeriesColor</span>=<span class="string">"#279B27"</span>/&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">SciChart:SciChartSurface.RenderableSeries</span>&gt;</span></span><br><span class="line">            </span><br><span class="line">            <span class="tag">&lt;<span class="name">SciChart:SciChartSurface.XAxis</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">SciChart:NumericAxis</span> <span class="attr">AutoRange</span>=<span class="string">"Always"</span>/&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">SciChart:SciChartSurface.XAxis</span>&gt;</span></span><br><span class="line">            </span><br><span class="line">            <span class="tag">&lt;<span class="name">SciChart:SciChartSurface.YAxis</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">SciChart:NumericAxis</span> <span class="attr">AutoRange</span>=<span class="string">"Always"</span> <span class="attr">GrowBy</span>=<span class="string">"0.1, 0.1"</span>/&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">SciChart:SciChartSurface.YAxis</span>&gt;</span></span><br><span class="line">            </span><br><span class="line">        <span class="tag">&lt;/<span class="name">SciChart:SciChartSurface</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">Grid</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">UserControl</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>程序仅绘制了一条曲线和XY坐标轴</p>
+<p>工具: ILSpy<br>dll: Abt.Controls.SciChart.Wpf.dll(3.1.4549版本)</p>
+<p>程序中是<br>绘制1个FastLineRenderableSeries<br>绘制2个NumericAxis </p>
+<hr>
+<p>先看NumericAxis</p>
+<h3 id="NumericAxis"><a href="#NumericAxis" class="headerlink" title="NumericAxis"></a>NumericAxis</h3><p>public class NumericAxis : AxisBase<br>public abstract class AxisBase : ContentControl, INotifyPropertyChanged, IXmlSerializable, <strong>IDrawable</strong>, IAxisParams, IHitTestable, ISuspendable, IInvalidatableElement, IAxis</p>
+<p>看<strong>IDrawable</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">namespace Abt.Controls.SciChart.Visuals</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">/// &lt;summary&gt;</span></span><br><span class="line">    <span class="comment">/// Defines the base interface for an object that can be drawn</span></span><br><span class="line">    <span class="comment">/// &lt;/summary&gt;</span></span><br><span class="line">    <span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">IDrawable</span></span></span><br><span class="line"><span class="class">    </span>&#123;</span><br><span class="line">        <span class="comment">/// &lt;summary&gt;</span></span><br><span class="line">        <span class="comment">/// Gets or sets the width of the &lt;see cref="T:Abt.Controls.SciChart.Visuals.IDrawable" /&gt; in pixels</span></span><br><span class="line">        <span class="comment">/// &lt;/summary&gt;</span></span><br><span class="line">        <span class="keyword">double</span> Width</span><br><span class="line">        &#123;</span><br><span class="line">            get;</span><br><span class="line">            set;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/// &lt;summary&gt;</span></span><br><span class="line">        <span class="comment">/// Gets or sets the height of the &lt;see cref="T:Abt.Controls.SciChart.Visuals.IDrawable" /&gt; in pixels</span></span><br><span class="line">        <span class="comment">/// &lt;/summary&gt;</span></span><br><span class="line">        <span class="keyword">double</span> Height</span><br><span class="line">        &#123;</span><br><span class="line">            get;</span><br><span class="line">            set;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/// &lt;summary&gt;</span></span><br><span class="line">        <span class="comment">/// Called when the instance is drawn</span></span><br><span class="line">        <span class="comment">/// &lt;/summary&gt;</span></span><br><span class="line">        <span class="comment">/// &lt;param name="renderContext"&gt;The &lt;see cref="T:Abt.Controls.SciChart.Rendering.Common.IRenderContext2D" /&gt; used for drawing&lt;/param&gt;</span></span><br><span class="line">        <span class="comment">/// &lt;param name="renderPassData"&gt;Contains arguments and parameters for this render pass&lt;/param&gt;</span></span><br><span class="line">        <span class="function"><span class="keyword">void</span> <span class="title">OnDraw</span><span class="params">(IRenderContext2D renderContext, IRenderPassData renderPassData)</span></span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>回看<strong>AxisBase</strong>类中有OnDraw方法, 有计算ticks, 绘制坐标网格, 绘制坐标轴; NumericAxis使用OnDraw进行绘制</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/// &lt;summary&gt;</span></span><br><span class="line"><span class="comment">/// Called when the instance is drawn</span></span><br><span class="line"><span class="comment">/// &lt;/summary&gt;</span></span><br><span class="line"><span class="comment">/// &lt;param name="renderContext"&gt;The &lt;see cref="T:Abt.Controls.SciChart.Rendering.Common.IRenderContext2D" /&gt; used for drawing&lt;/param&gt;</span></span><br><span class="line"><span class="comment">/// &lt;param name="renderPassData"&gt;Contains arguments and parameters for this render pass&lt;/param&gt;</span></span><br><span class="line"><span class="comment">/// &lt;seealso cref="T:Abt.Controls.SciChart.Visuals.IDrawable" /&gt;</span></span><br><span class="line"><span class="comment">/// &lt;seealso cref="T:Abt.Controls.SciChart.Rendering.Common.IRenderContext2D" /&gt;</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">OnDraw</span><span class="params">(IRenderContext2D renderContext, IRenderPassData renderPassData)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (!<span class="keyword">this</span>.IsSuspended &amp;&amp; <span class="keyword">this</span>.DisconnectSelection() &amp;&amp; <span class="keyword">this</span>.IsLicenseValid)</span><br><span class="line">    &#123;</span><br><span class="line">        using (IUpdateSuspender updateSuspender = <span class="keyword">this</span>.SuspendUpdates())</span><br><span class="line">        &#123;</span><br><span class="line">            updateSuspender.ResumeTargetOnDispose = <span class="keyword">false</span>;</span><br><span class="line">            Stopwatch stopwatch = Stopwatch.StartNew();</span><br><span class="line">            <span class="keyword">if</span> (<span class="keyword">this</span>.LabelProvider != <span class="keyword">null</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">this</span>.LabelProvider.OnBeginAxisDraw();</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">this</span>.uriInstance = <span class="keyword">this</span>.CalculateTicks();</span><br><span class="line">            <span class="keyword">if</span> (<span class="keyword">this</span>.IsPrimaryAxis)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">this</span>.DrawGridLines(renderContext, <span class="keyword">this</span>.uriInstance);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (base.Visibility == Visibility.Visible &amp;&amp; <span class="keyword">this</span>.ConnectContext())</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">this</span>.OnDrawAxis(<span class="keyword">this</span>.uriInstance);</span><br><span class="line">            &#125;</span><br><span class="line">            stopwatch.Stop();</span><br><span class="line">            SciChartDebugLogger.Instance.WriteLine(<span class="string">"Drawn &#123;0&#125;: Width=&#123;1&#125;, Height=&#123;2&#125; in &#123;3&#125;ms"</span>, <span class="keyword">new</span> object[]</span><br><span class="line">            &#123;</span><br><span class="line">                base.GetType().Name,</span><br><span class="line">                base.ActualWidth,</span><br><span class="line">                base.ActualHeight,</span><br><span class="line">                stopwatch.ElapsedMilliseconds</span><br><span class="line">            &#125;);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<hr>
+<p>再看FastLineRenderableSeries </p>
+<h3 id="FastLineRenderableSeries"><a href="#FastLineRenderableSeries" class="headerlink" title="FastLineRenderableSeries"></a>FastLineRenderableSeries</h3><p>public class FastLineRenderableSeries : BaseRenderableSeries<br>FastLineRenderableSeries中发现方法<strong>InternalDraw</strong><br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> Draws the series using the <span class="doctag">&lt;see cref="T:Abt.Controls.SciChart.Rendering.Common.IRenderContext2D" /&gt;</span> and the <span class="doctag">&lt;see cref="T:Abt.Controls.SciChart.Visuals.RenderableSeries.IRenderPassData" /&gt;</span> passed in</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;param name="renderContext"&gt;</span>The render context. This is a graphics object which has methods to draw lines, quads and polygons to the screen<span class="doctag">&lt;/param&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;param name="renderPassData"&gt;</span>The render pass data. Contains a resampled <span class="doctag">&lt;see cref="T:Abt.Controls.SciChart.Model.DataSeries.IPointSeries" /&gt;</span>, the <span class="doctag">&lt;see cref="T:Abt.Controls.SciChart.IndexRange" /&gt;</span> of points on the screen</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> and the current YAxis and XAxis <span class="doctag">&lt;see cref="T:Abt.Controls.SciChart.Numerics.CoordinateCalculators.ICoordinateCalculator`1" /&gt;</span> to convert data-points to screen points<span class="doctag">&lt;/param&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">InternalDraw</span>(<span class="params">IRenderContext2D renderContext, IRenderPassData renderPassData</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Func&lt;<span class="keyword">double</span>, <span class="keyword">double</span>, Color&gt; func = <span class="literal">null</span>;</span><br><span class="line">    IPointSeries pointSeries = <span class="keyword">base</span>.CurrentRenderPassData.PointSeries;</span><br><span class="line">    LinesEnumerable linesEnumerable = <span class="keyword">new</span> LinesEnumerable(pointSeries, renderPassData.XCoordinateCalculator, renderPassData.YCoordinateCalculator, <span class="keyword">this</span>.IsDigitalLine);</span><br><span class="line">    Func&lt;Color, IPen2D&gt; func2 = <span class="literal">null</span>;</span><br><span class="line">    FastLineRenderableSeries.ToolbarCollection toolbarCollection = <span class="keyword">new</span> FastLineRenderableSeries.ToolbarCollection();</span><br><span class="line">    toolbarCollection.uriInstance = <span class="keyword">new</span> DeploymentInvoker(renderContext, <span class="keyword">base</span>.AntiAliasing, (<span class="keyword">float</span>)<span class="keyword">base</span>.StrokeThickness, <span class="keyword">base</span>.Opacity);</span><br><span class="line">    <span class="keyword">try</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">base</span>.SeriesColor.A != <span class="number">0</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span> (<span class="keyword">base</span>.PaletteProvider != <span class="literal">null</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                IEnumerable&lt;Point&gt; arg_98_1 = linesEnumerable;</span><br><span class="line">                <span class="keyword">bool</span> arg_98_2 = <span class="keyword">base</span>.DrawNaNAs == LineDrawMode.ClosedLines;</span><br><span class="line">                <span class="keyword">if</span> (func == <span class="literal">null</span>)</span><br><span class="line">                &#123;</span><br><span class="line">                    func = <span class="keyword">new</span> Func&lt;<span class="keyword">double</span>, <span class="keyword">double</span>, Color&gt;(<span class="keyword">this</span>.DisconnectSelection);</span><br><span class="line">                &#125;</span><br><span class="line">                Func&lt;<span class="keyword">double</span>, <span class="keyword">double</span>, Color&gt; arg_98_3 = func;</span><br><span class="line">                <span class="keyword">if</span> (func2 == <span class="literal">null</span>)</span><br><span class="line">                &#123;</span><br><span class="line">                    func2 = <span class="keyword">new</span> Func&lt;Color, IPen2D&gt;(toolbarCollection.ViewReference);</span><br><span class="line">                &#125;</span><br><span class="line">                renderContext.DrawLinesReusablePens(arg_98_1, arg_98_2, arg_98_3, func2);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">this</span>.DisconnectSelection(renderContext, <span class="keyword">base</span>.SeriesColor, linesEnumerable, <span class="keyword">base</span>.DrawNaNAs == LineDrawMode.ClosedLines, (<span class="keyword">this</span>.StrokeDashArray != <span class="literal">null</span>) ? <span class="keyword">this</span>.StrokeDashArray.ToArray&lt;<span class="keyword">double</span>&gt;() : <span class="literal">null</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">finally</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span> (toolbarCollection.uriInstance != <span class="literal">null</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            ((IDisposable)toolbarCollection.uriInstance).Dispose();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    IPointMarker pointMarker = <span class="keyword">base</span>.GetPointMarker();</span><br><span class="line">    <span class="keyword">if</span> (pointMarker != <span class="literal">null</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">this</span>.IsDigitalLine)</span><br><span class="line">        &#123;</span><br><span class="line">            linesEnumerable = <span class="keyword">new</span> LinesEnumerable(pointSeries, renderPassData.XCoordinateCalculator, renderPassData.YCoordinateCalculator, <span class="literal">false</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">using</span> (IPen2D pen2D = renderContext.CreatePen(<span class="keyword">base</span>.SeriesColor, <span class="keyword">base</span>.AntiAliasing, (<span class="keyword">float</span>)<span class="keyword">base</span>.StrokeThickness, <span class="keyword">base</span>.Opacity, <span class="literal">null</span>, PenLineCap.Round))</span><br><span class="line">        &#123;</span><br><span class="line">            IPointMarker arg_156_0 = pointMarker;</span><br><span class="line">            IEnumerable&lt;Point&gt; arg_14E_0 = linesEnumerable;</span><br><span class="line">            <span class="keyword">if</span> (FastLineRenderableSeries.CS$&lt;&gt;<span class="number">9</span>__CachedAnonymousMethodDelegate4 == <span class="literal">null</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                FastLineRenderableSeries.CS$&lt;&gt;<span class="number">9</span>__CachedAnonymousMethodDelegate4 = <span class="keyword">new</span> Func&lt;Point, <span class="keyword">bool</span>&gt;(FastLineRenderableSeries.DisconnectSelection);</span><br><span class="line">            &#125;</span><br><span class="line">            arg_156_0.Draw(renderContext, arg_14E_0.Where(FastLineRenderableSeries.CS$&lt;&gt;<span class="number">9</span>__CachedAnonymousMethodDelegate4), pen2D, <span class="literal">null</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>搜索<code>DrawLinesReusablePens</code>, 发现只有RenderContextBase实现IRenderContext2D接口, 然后DrawLinesReusablePens内部foreach遍历调用DrawLineSegment<br>后者调用DrawLine  </p>
+<p><strong>那么谁调用了InternalDraw</strong><br>protected override void InternalDraw 是虚方法，那么在父类BaseRenderableSeries中找, 发现<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> IDrawable.ProcessContext(IRenderContext2D uriInstance, IRenderPassData windowCache)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">this</span>.CurrentRenderPassData = windowCache;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.IsValidForDrawing)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">this</span>.uriInstance != uriInstance.ViewportSize)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">this</span>.OnParentSurfaceViewportSizeChanged();</span><br><span class="line">            <span class="keyword">this</span>.uriInstance = uriInstance.ViewportSize;</span><br><span class="line">        &#125;</span><br><span class="line">        Stopwatch stopwatch = <span class="keyword">new</span> Stopwatch();</span><br><span class="line">        stopwatch.Start();</span><br><span class="line">        <span class="keyword">this</span>.InternalDraw(uriInstance, windowCache);</span><br><span class="line">        stopwatch.Stop();</span><br><span class="line">        SciChartDebugLogger.Instance.WriteLine(<span class="string">"&#123;0&#125; DrawTime: &#123;1&#125;ms"</span>, <span class="keyword">new</span> object[]</span><br><span class="line">        &#123;</span><br><span class="line">            base.GetType().Name,</span><br><span class="line">            stopwatch.ElapsedMilliseconds</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>而且没有找到OnDraw方法，初步推断<strong>IDrawable.ProcessContext就是OnDraw</strong></p>
+<hr>
+<p>结束了FastLineRenderableSeries和NumericAxis, 再来看<br><strong>SciChartSurface</strong><br>它是如何调用FastLineRenderableSeries和NumericAxis的OnDraw</p>
+<p>SciChartSurface的父类是SciChartSurfaceBase (SciChartSurfaceBase 继承Control，base指Control)，里面有一个虚方法<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/// &lt;summary&gt;</span></span><br><span class="line"><span class="comment">/// The inner drawing loop. Called once per frame. Do your drawing here. </span></span><br><span class="line"><span class="comment">/// &lt;/summary&gt;</span></span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">DoDrawingLoop</span><span class="params">()</span></span>;</span><br></pre></td></tr></table></figure></p>
+<p>由于是protected，该方法在<code>public virtual void InvalidateElement()</code>中被用到，终于出现public了<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/// &lt;summary&gt;</span></span><br><span class="line"><span class="comment">/// Asynchronously requests that the element redraws itself plus children.</span></span><br><span class="line"><span class="comment">/// Will be ignored if the element is ISuspendable and currently IsSuspended (within a SuspendUpdates/ResumeUpdates call)</span></span><br><span class="line"><span class="comment">/// &lt;/summary&gt;</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> virtual <span class="keyword">void</span> <span class="title">InvalidateElement</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.IsSuspended)</span><br><span class="line">    &#123;</span><br><span class="line">        SciChartDebugLogger.Instance.WriteLine(<span class="string">"SciChartSurface.IsSuspended=true. Ignoring InvalidateElement() call"</span>, <span class="keyword">new</span> object[<span class="number">0</span>]);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (!OptionsList.SearchOptions() &amp;&amp; <span class="keyword">this</span>.RenderPriority != RenderPriority.Immediate)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">this</span>.uriInstance != <span class="keyword">null</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">this</span>.uriInstance.InvalidateElement();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">this</span>.Services.GetService&lt;ProjectSettings&gt;().SelectClient(<span class="keyword">new</span> Action(<span class="keyword">this</span>.DoDrawingLoop), DispatcherPriority.Normal);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>InvalidateElement在SciChartSurfaceBase中的OnSciChartSurfaceLoaded中被调用, 后者在OnLoad中被调用<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/// &lt;summary&gt;</span></span><br><span class="line"><span class="comment">/// Forces initialization of the SciChartSurface in the case it is being used to render off-screen (on server)</span></span><br><span class="line"><span class="comment">/// &lt;/summary&gt;</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">OnLoad</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">this</span>.OnSciChartSurfaceLoaded();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><strong>回到SciChartSurface看DoDrawingLoop</strong><br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> override <span class="keyword">void</span> <span class="title">DoDrawingLoop</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.windowCache)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">try</span></span><br><span class="line">    &#123;</span><br><span class="line">        using (IRenderContext2D renderContext = <span class="keyword">this</span>.uriInstance.GetRenderContext()) <span class="comment">//         private IRenderSurface2D uriInstance;</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">try</span></span><br><span class="line">            &#123;</span><br><span class="line">                RendererErrorCode rendererErrorCode = <span class="keyword">this</span>.uriInstance.RenderLoop(renderContext); <span class="comment">//          private ISciChartRenderer uriInstance;</span></span><br><span class="line">                <span class="keyword">if</span> (!GroupSettings.keywordsMap.Equals(rendererErrorCode) &amp;&amp; base.DebugWhyDoesntSciChartRender)</span><br><span class="line">                &#123;</span><br><span class="line">                    Console.WriteLine(<span class="string">" SciChartSurface didn't render, "</span> + rendererErrorCode);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">catch</span> (Exception caught)</span><br><span class="line">            &#123;</span><br><span class="line">                base.OnRenderFault(caught);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">catch</span> (Exception caught2)</span><br><span class="line">    &#123;</span><br><span class="line">        base.OnRenderFault(caught2);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>搜索<code>GetRenderContext</code>和<code>RenderLoop</code>, 可知<br>private IRenderSurface2D uriInstance可以认为是HighSpeedRenderSurface<br>private ISciChartRenderer uriInstance;是ViewConverter </p>
+<hr>
+<h4 id="HighSpeedRenderSurface"><a href="#HighSpeedRenderSurface" class="headerlink" title="HighSpeedRenderSurface"></a>HighSpeedRenderSurface</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">namespace Abt.Controls.SciChart.Rendering.HighSpeedRasterizer</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">/// &lt;summary&gt;</span></span><br><span class="line">    <span class="comment">/// Provides a &lt;see cref="T:Abt.Controls.SciChart.Rendering.Common.RenderSurfaceBase" /&gt; implementation that uses a High-Speed software rasterizer, capable of outputting many millions of points (line-series) </span></span><br><span class="line">    <span class="comment">/// at interactive framerates. The downside is, the &lt;see cref="T:Abt.Controls.SciChart.Rendering.HighSpeedRasterizer.HighSpeedRenderSurface" /&gt; uses integer fixed-point math which results in jagged lines. </span></span><br><span class="line">    <span class="comment">/// &lt;/summary&gt;</span></span><br><span class="line">    <span class="comment">/// &lt;seealso cref="T:Abt.Controls.SciChart.Rendering.HighQualityRasterizer.HighQualityRenderSurface" /&gt;</span></span><br><span class="line">    <span class="comment">/// &lt;seealso cref="T:Abt.Controls.SciChart.Rendering.Common.RenderSurfaceBase" /&gt;</span></span><br><span class="line">    <span class="comment">/// &lt;seealso cref="T:Abt.Controls.SciChart.Rendering.Common.IRenderContext2D" /&gt;</span></span><br><span class="line">    [AbtLicenseProvider(typeof(XmlFileSite))]</span><br><span class="line">    public class HighSpeedRenderSurface : RenderSurfaceBase</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">/// &lt;summary&gt;</span></span><br><span class="line">        <span class="comment">/// When overridden in a derived class, returns a RenderContext valid for the current render pass</span></span><br><span class="line">        <span class="comment">/// &lt;/summary&gt;</span></span><br><span class="line">        <span class="comment">/// &lt;returns&gt;&lt;/returns&gt;</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> override IRenderContext2D <span class="title">GetRenderContext</span><span class="params">()</span></span></span><br><span class="line"><span class="function">        </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">this</span>.RenderWriteableBitmap.ViewReference(base.Image, <span class="keyword">this</span>.uriInstance);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>protected WriteableBitmap RenderWriteableBitmap;<br>WriteableBitmap<br><a href="https://msdn.microsoft.com/en-us/library/system.windows.media.imaging.writeablebitmap(v=vs.110).aspx" target="_blank" rel="noopener">https://msdn.microsoft.com/en-us/library/system.windows.media.imaging.writeablebitmap(v=vs.110).aspx</a><br>WriteableBitmap使用的双缓冲技术</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Use the WriteableBitmap class to update and render a bitmap on a per-frame basis. This is useful for generating algorithmic content, such as a fractal image, and for data visualization, such as a music visualizer.</span><br><span class="line">The WriteableBitmap class uses two buffers. The back buffer is allocated in system memory and accumulates content that is not currently displayed. The front buffer is allocated in system memory and contains the content that is currently displayed. The rendering system copies the front buffer to video memory for display.</span><br><span class="line">Two threads use these buffers. The user interface (UI) thread generates the UI but does not present it to the screen. The UI thread responds to user input, timers, and other events. An application can have multiple UI threads. The render thread composes and renders changes from the UI thread. There is only one render thread per application.</span><br><span class="line">The UI thread writes content to the back buffer. The render thread reads content from the front buffer and copies it to video memory. Changes to the back buffer are tracked with changed rectangular regions.</span><br></pre></td></tr></table></figure>
+<p>ViewReference是扩展方法, 经常出现这个ViewReference, 不是特别清楚意义</p>
+<hr>
+<h4 id="ViewConverter"><a href="#ViewConverter" class="headerlink" title="ViewConverter"></a>ViewConverter</h4><p>internal class ViewConverter : ISciChartRenderer<br>看ViewConverter的RenderLoop方法<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> RendererErrorCode <span class="title">RenderLoop</span><span class="params">(IRenderContext2D renderContext)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">//...忽略</span></span><br><span class="line">    <span class="comment">//</span></span><br><span class="line">    using (IUpdateSuspender updateSuspender = <span class="keyword">this</span>.uriInstance.SuspendUpdates())</span><br><span class="line">    &#123;</span><br><span class="line">        updateSuspender.ResumeTargetOnDispose = <span class="keyword">false</span>;</span><br><span class="line">        SciChartDebugLogger.Instance.WriteLine(<span class="string">"Beginning Render Loop ... "</span>, <span class="keyword">new</span> object[<span class="number">0</span>]);</span><br><span class="line">        Size size = <span class="keyword">this</span>.ViewReference(<span class="keyword">this</span>.uriInstance);</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">this</span>.ViewReference(<span class="keyword">this</span>.uriInstance, size, out result))</span><br><span class="line">        &#123;</span><br><span class="line">            RenderPassInfo renderPassInfo = ViewConverter.ViewReference(<span class="keyword">this</span>.uriInstance, size);</span><br><span class="line">            renderContext.Clear();</span><br><span class="line"></span><br><span class="line">            <span class="comment">//绘制坐标轴</span></span><br><span class="line">            ViewConverter.ViewReference(<span class="keyword">this</span>.uriInstance, renderPassInfo, renderContext);</span><br><span class="line"></span><br><span class="line">            <span class="comment">//绘制renderableSeries</span></span><br><span class="line">            ViewConverter.SelectClient(<span class="keyword">this</span>.uriInstance, renderPassInfo, renderContext);</span><br><span class="line"></span><br><span class="line">            <span class="comment">//更新Annotations</span></span><br><span class="line">            ViewConverter.ViewReference(<span class="keyword">this</span>.uriInstance, renderPassInfo);</span><br><span class="line">            <span class="keyword">this</span>.uriInstance.OnSciChartRendered();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>绘制坐标轴, 出现OnDraw<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">internal <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">ViewReference</span><span class="params">(ISciChartSurface uriInstance, RenderPassInfo windowCache, IRenderContext2D lastKeywords)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    foreach (IAxis current in uriInstance.XAxes)</span><br><span class="line">    &#123;</span><br><span class="line">        current.ValidateAxis();</span><br><span class="line">        current.OnDraw(lastKeywords, <span class="keyword">null</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    foreach (IAxis current2 in uriInstance.YAxes)</span><br><span class="line">    &#123;</span><br><span class="line">        current2.ValidateAxis();</span><br><span class="line">        current2.OnDraw(lastKeywords, <span class="keyword">null</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    lastKeywords.Layers.Flush();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>遍历绘制renderableSeries<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">internal <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">SelectClient</span><span class="params">(ISciChartSurface uriInstance, RenderPassInfo windowCache, IRenderContext2D lastKeywords)</span></span></span><br><span class="line"><span class="function"> </span>&#123;</span><br><span class="line">     <span class="keyword">if</span> (windowCache.RenderableSeries == <span class="keyword">null</span>)</span><br><span class="line">     &#123;</span><br><span class="line">         <span class="keyword">return</span>;</span><br><span class="line">     &#125;</span><br><span class="line">     List&lt;<span class="keyword">int</span>&gt; list = <span class="keyword">new</span> List&lt;<span class="keyword">int</span>&gt;();</span><br><span class="line">     <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; windowCache.RenderableSeries.Length; i++)</span><br><span class="line">     &#123;</span><br><span class="line">         IRenderableSeries renderableSeries = windowCache.RenderableSeries[i];</span><br><span class="line">         <span class="keyword">if</span> (renderableSeries != <span class="keyword">null</span>)</span><br><span class="line">         &#123;</span><br><span class="line">             renderableSeries.XAxis = uriInstance.XAxes.GetAxisById(renderableSeries.XAxisId, <span class="keyword">true</span>);</span><br><span class="line">             renderableSeries.YAxis = uriInstance.YAxes.GetAxisById(renderableSeries.YAxisId, <span class="keyword">true</span>);</span><br><span class="line">             <span class="keyword">if</span> (windowCache.RenderableSeries[i].IsSelected)</span><br><span class="line">             &#123;</span><br><span class="line">                 list.Add(i);</span><br><span class="line">             &#125;</span><br><span class="line">             <span class="keyword">else</span></span><br><span class="line">             &#123;</span><br><span class="line">                 ViewConverter.ViewReference(uriInstance, windowCache, lastKeywords, i);</span><br><span class="line">             &#125;</span><br><span class="line">         &#125;</span><br><span class="line">     &#125;</span><br><span class="line">     foreach (<span class="keyword">int</span> current in list)</span><br><span class="line">     &#123;</span><br><span class="line">         ViewConverter.ViewReference(uriInstance, windowCache, lastKeywords, current);</span><br><span class="line">     &#125;</span><br><span class="line">     uriInstance.Services.GetService&lt;IEventAggregator&gt;().Publish&lt;SciChartRenderedMessage&gt;(<span class="keyword">new</span> SciChartRenderedMessage(uriInstance, lastKeywords));</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">ViewReference</span><span class="params">(ISciChartSurface uriInstance, RenderPassInfo windowCache, IRenderContext2D lastKeywords, <span class="keyword">int</span> categoryDisposed)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    IRenderableSeries renderableSeries = windowCache.RenderableSeries[categoryDisposed];</span><br><span class="line">    ICoordinateCalculator&lt;<span class="keyword">double</span>&gt; yCoordinateCalculator;</span><br><span class="line">    ICoordinateCalculator&lt;<span class="keyword">double</span>&gt; xCoordinateCalculator;</span><br><span class="line">    <span class="keyword">if</span> (windowCache.YCoordinateCalculators.TryGetValue(renderableSeries.YAxisId, out yCoordinateCalculator) &amp;&amp; windowCache.XCoordinateCalculators.TryGetValue(renderableSeries.XAxisId, out xCoordinateCalculator))</span><br><span class="line">    &#123;</span><br><span class="line">        RenderPassData renderPassData = <span class="keyword">new</span> RenderPassData(windowCache.IndicesRanges[categoryDisposed], xCoordinateCalculator, yCoordinateCalculator, windowCache.PointSeries[categoryDisposed]);</span><br><span class="line">        renderableSeries.OnDraw(lastKeywords, renderPassData);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<hr>
+<p>最后看一下IRenderContext2D和IRenderPassData </p>
+<h4 id="IRenderContext2D"><a href="#IRenderContext2D" class="headerlink" title="IRenderContext2D"></a>IRenderContext2D</h4><p>相当于Winform中的Graphics<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line">namespace Abt.Controls.SciChart.Rendering.Common</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">//删掉了一些</span></span><br><span class="line">    <span class="comment">/// &lt;summary&gt;</span></span><br><span class="line">    <span class="comment">/// Defines the interface to a 2D RenderContext, allowing drawing, blitting and creation of pens and brushes on the &lt;see cref="T:Abt.Controls.SciChart.Rendering.Common.RenderSurfaceBase" /&gt;</span></span><br><span class="line">    <span class="comment">/// &lt;/summary&gt;</span></span><br><span class="line">    <span class="comment">/// &lt;remarks&gt;The &lt;see cref="T:Abt.Controls.SciChart.Rendering.Common.IRenderContext2D" /&gt; is a graphics context valid for the current render pass. Any class which implements &lt;see cref="T:Abt.Controls.SciChart.Visuals.IDrawable" /&gt; has an OnDraw method</span></span><br><span class="line">    <span class="comment">/// in which an &lt;see cref="T:Abt.Controls.SciChart.Rendering.Common.IRenderContext2D" /&gt; is passed in. Use this to draw penned lines, fills, rectangles, ellipses and blit graphics to the screen.&lt;/remarks&gt;</span></span><br><span class="line">    public interface IRenderContext2D : IDisposable</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">/// &lt;summary&gt;</span></span><br><span class="line">        <span class="comment">/// Gets a collection of &lt;see cref="T:Abt.Controls.SciChart.Rendering.Common.RenderOperationLayers" /&gt;, which allow rendering operations to be posted to a layered queue for later</span></span><br><span class="line">        <span class="comment">/// execution in order (and correct Z-ordering). </span></span><br><span class="line">        <span class="comment">/// &lt;/summary&gt;</span></span><br><span class="line">        <span class="comment">/// &lt;example&gt;</span></span><br><span class="line">        <span class="comment">///     &lt;code title="RenderOperationLayers Example" description="Demonstrates how to enqueue operations to the RenderOperationLayers collection and later flush to ensure rendering operations get processed in the correct Z-order" lang="C#"&gt;</span></span><br><span class="line">        <span class="comment">/// RenderOperationLayers layers = renderContext.Layers;</span></span><br><span class="line">        <span class="comment">///</span></span><br><span class="line">        <span class="comment">/// // Enqueue some operations in the layers in any order</span></span><br><span class="line">        <span class="comment">/// layers[RenderLayer.AxisMajorGridlines].Enqueue(() =&amp;gt; renderContext.DrawLine(/* .. */));</span></span><br><span class="line">        <span class="comment">/// layers[RenderLayer.AxisBands].Enqueue(() =&amp;gt; renderContext.DrawRectangle(/* .. */));</span></span><br><span class="line">        <span class="comment">/// layers[RenderLayer.AxisMinorGridlines].Enqueue(() =&amp;gt; renderContext.DrawLine(/* .. */));</span></span><br><span class="line">        <span class="comment">///</span></span><br><span class="line">        <span class="comment">/// // Processes all layers by executing enqueued operations in order of adding, </span></span><br><span class="line">        <span class="comment">/// // and in Z-order of layers</span></span><br><span class="line">        <span class="comment">/// layers.Flush();&lt;/code&gt;</span></span><br><span class="line">        <span class="comment">/// &lt;/example&gt;</span></span><br><span class="line">        RenderOperationLayers Layers</span><br><span class="line">        &#123;</span><br><span class="line">            get;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/// &lt;summary&gt;</span></span><br><span class="line">        <span class="comment">/// Gets the current size of the viewport.</span></span><br><span class="line">        <span class="comment">/// &lt;/summary&gt;</span></span><br><span class="line">        Size ViewportSize</span><br><span class="line">        &#123;</span><br><span class="line">            get;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function">IBrush2D <span class="title">CreateBrush</span><span class="params">(Color color, <span class="keyword">double</span> opacity = <span class="number">1.0</span>, bool? alphaBlend = <span class="keyword">null</span>)</span></span>;</span><br><span class="line"></span><br><span class="line">        <span class="function">IPen2D <span class="title">CreatePen</span><span class="params">(Color color, bool antiAliasing, <span class="keyword">float</span> strokeThickness, <span class="keyword">double</span> opacity = <span class="number">1.0</span>, <span class="keyword">double</span>[] strokeDashArray = <span class="keyword">null</span>, PenLineCap strokeEndLineCap = PenLineCap.Round)</span></span>;</span><br><span class="line"></span><br><span class="line">        <span class="function">ISprite2D <span class="title">CreateSprite</span><span class="params">(FrameworkElement fe)</span></span>;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">void</span> <span class="title">Clear</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">void</span> <span class="title">DrawSprite</span><span class="params">(Point destPoint, ISprite2D srcSprite, Rect srcRect)</span></span>;</span><br><span class="line">   </span><br><span class="line">        <span class="function"><span class="keyword">void</span> <span class="title">FillRectangle</span><span class="params">(IBrush2D brush, Point pt1, Point pt2, <span class="keyword">double</span> gradientRotationAngle)</span></span>;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">void</span> <span class="title">FillPolygon</span><span class="params">(IBrush2D brush, IEnumerable&lt;Point&gt; points)</span></span>;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">void</span> <span class="title">FillArea</span><span class="params">(IBrush2D brush, IEnumerable&lt;Tuple&lt;Point, Point&gt;&gt; lines, <span class="keyword">double</span> gradientRotationAngle = <span class="number">0.0</span>, bool isVerticalChart = <span class="keyword">false</span>)</span></span>;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">void</span> <span class="title">DrawQuad</span><span class="params">(IPen2D pen, Point pt1, Point pt2)</span></span>;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">void</span> <span class="title">DrawEllipse</span><span class="params">(<span class="keyword">double</span> width, <span class="keyword">double</span> height, Point center, IBrush2D brush, IPen2D pen)</span></span>;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">void</span> <span class="title">DrawLine</span><span class="params">(IPen2D pen, Point pt1, Point pt2)</span></span>;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+<hr>
+<h4 id="IRenderPassData"><a href="#IRenderPassData" class="headerlink" title="IRenderPassData"></a>IRenderPassData</h4><p>这个接口将原始数据变换到Chart所在的视窗上<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line">using Abt.Controls.SciChart.Model.DataSeries;</span><br><span class="line">using Abt.Controls.SciChart.Numerics.CoordinateCalculators;</span><br><span class="line">using System;</span><br><span class="line"></span><br><span class="line">namespace Abt.Controls.SciChart.Visuals.RenderableSeries</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">/// &lt;summary&gt;</span></span><br><span class="line">    <span class="comment">/// Defines the interface to &lt;see cref="T:Abt.Controls.SciChart.Visuals.RenderableSeries.RenderPassData" /&gt;, the data used in a single render pass by &lt;see cref="T:Abt.Controls.SciChart.Visuals.RenderableSeries.BaseRenderableSeries" /&gt; derived types</span></span><br><span class="line">    <span class="comment">/// &lt;/summary&gt;</span></span><br><span class="line">    <span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">IRenderPassData</span></span></span><br><span class="line"><span class="class">    </span>&#123;</span><br><span class="line">        <span class="comment">/// &lt;summary&gt;</span></span><br><span class="line">        <span class="comment">/// Gets the integer indices of the X-Data array that are currently in range.</span></span><br><span class="line">        <span class="comment">/// &lt;/summary&gt;</span></span><br><span class="line">        <span class="comment">/// &lt;returns&gt;The indices to the X-Data that are currently in range&lt;/returns&gt;</span></span><br><span class="line">        <span class="comment">/// &lt;example&gt;If the input X-data is 0...100 in steps of 1, the VisibleRange is 10, 30 then the PointRange will be 10, 30&lt;/example&gt;</span></span><br><span class="line">        <span class="comment">/// &lt;remarks&gt;&lt;/remarks&gt;</span></span><br><span class="line">        IndexRange PointRange </span><br><span class="line">        &#123;</span><br><span class="line">            get;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/// &lt;summary&gt;</span></span><br><span class="line">        <span class="comment">/// Gets the current point series.</span></span><br><span class="line">        <span class="comment">/// &lt;/summary&gt;</span></span><br><span class="line">        IPointSeries PointSeries</span><br><span class="line">        &#123;</span><br><span class="line">            get;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/// &lt;summary&gt;</span></span><br><span class="line">        <span class="comment">/// Gets a value, indicating whether current chart is vertical</span></span><br><span class="line">        <span class="comment">/// &lt;/summary&gt;</span></span><br><span class="line">        bool IsVerticalChart</span><br><span class="line">        &#123;</span><br><span class="line">            get;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/// &lt;summary&gt;</span></span><br><span class="line">        <span class="comment">/// Gets the current Y coordinate calculator.</span></span><br><span class="line">        <span class="comment">/// &lt;/summary&gt;</span></span><br><span class="line">        ICoordinateCalculator&lt;<span class="keyword">double</span>&gt; YCoordinateCalculator</span><br><span class="line">        &#123;</span><br><span class="line">            get;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/// &lt;summary&gt;</span></span><br><span class="line">        <span class="comment">/// Gets the current X coordinate calculator.</span></span><br><span class="line">        <span class="comment">/// &lt;/summary&gt;</span></span><br><span class="line">        ICoordinateCalculator&lt;<span class="keyword">double</span>&gt; XCoordinateCalculator</span><br><span class="line">        &#123;</span><br><span class="line">            get;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/编程/" rel="tag"># 编程</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/01/22/P&P笔记(Z3) 工具使用(三)(totalcommander)/" rel="next" title="P&P笔记(Z3)工具使用(三)(totalcommander)">
+                <i class="fa fa-chevron-left"></i> P&P笔记(Z3)工具使用(三)(totalcommander)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/02/03/2D Visualization笔记(X3) DynamicDataDisplay(wpf)(二)/" rel="prev" title="2D Visualization笔记(X3) DynamicDataDisplay(wpf)(二)">
+                2D Visualization笔记(X3) DynamicDataDisplay(wpf)(二) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">zmapleaf</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">66</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#目录"><span class="nav-number">1.</span> <span class="nav-text">目录</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#摘要"><span class="nav-number">2.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#BindToDataSeriesSetView-xaml"><span class="nav-number">3.</span> <span class="nav-text">BindToDataSeriesSetView.xaml</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#NumericAxis"><span class="nav-number">4.</span> <span class="nav-text">NumericAxis</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#FastLineRenderableSeries"><span class="nav-number">5.</span> <span class="nav-text">FastLineRenderableSeries</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#HighSpeedRenderSurface"><span class="nav-number">5.1.</span> <span class="nav-text">HighSpeedRenderSurface</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ViewConverter"><span class="nav-number">5.2.</span> <span class="nav-text">ViewConverter</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#IRenderContext2D"><span class="nav-number">5.3.</span> <span class="nav-text">IRenderContext2D</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#IRenderPassData"><span class="nav-number">5.4.</span> <span class="nav-text">IRenderPassData</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zmapleaf</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Pattern&Practice,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="这一篇主要整理WPF中的异常处理. WPF中的异常处理类似于Task中对unobserved exception的处理, WPF中有Application.DispatcherUnhandledException事件监听那些unhandled exception. 关于这点, 官方链接提供了最重要的信息https://msdn.microsoft.com/en-us/library/system.">
+<meta name="keywords" content="Pattern&amp;Practice">
+<meta property="og:type" content="article">
+<meta property="og:title" content="P&amp;P笔记(X1) Exception Handle (三)">
+<meta property="og:url" content="http://yoursite.com/2018/04/22/P&P笔记(X1) Exception Handle (三)/index.html">
+<meta property="og:site_name" content="远">
+<meta property="og:description" content="这一篇主要整理WPF中的异常处理. WPF中的异常处理类似于Task中对unobserved exception的处理, WPF中有Application.DispatcherUnhandledException事件监听那些unhandled exception. 关于这点, 官方链接提供了最重要的信息https://msdn.microsoft.com/en-us/library/system.">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-05-08T03:22:09.858Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="P&amp;P笔记(X1) Exception Handle (三)">
+<meta name="twitter:description" content="这一篇主要整理WPF中的异常处理. WPF中的异常处理类似于Task中对unobserved exception的处理, WPF中有Application.DispatcherUnhandledException事件监听那些unhandled exception. 关于这点, 官方链接提供了最重要的信息https://msdn.microsoft.com/en-us/library/system.">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/04/22/P&P笔记(X1) Exception Handle (三)/">
+
+
+
+
+
+  <title>P&P笔记(X1) Exception Handle (三) | 远</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">远</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/22/P&P笔记(X1) Exception Handle (三)/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zmapleaf">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="远">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">P&P笔记(X1) Exception Handle (三)</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-22T17:19:37+08:00">
+                2018-04-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/编程/" itemprop="url" rel="index">
+                    <span itemprop="name">编程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>这一篇主要整理WPF中的异常处理.</p>
+<h2 id="WPF中的异常处理"><a href="#WPF中的异常处理" class="headerlink" title="WPF中的异常处理"></a>WPF中的异常处理</h2><p>类似于Task中对unobserved exception的处理, WPF中有Application.DispatcherUnhandledException事件监听那些unhandled exception. 关于这点, 官方链接提供了最重要的信息<a href="https://msdn.microsoft.com/en-us/library/system.windows.application.dispatcherunhandledexception(v=vs.110).aspx" target="_blank" rel="noopener">https://msdn.microsoft.com/en-us/library/system.windows.application.dispatcherunhandledexception(v=vs.110).aspx</a></p>
+<blockquote>
+<p>By default, Windows Presentation Foundation (WPF) catches unhandled exceptions, notifies users of the exception from a dialog box (from which they can report the exception), and automatically shuts down an application.</p>
+</blockquote>
+<blockquote>
+<p>However, if an application needs to perform custom unhandled exception processing from a centralized location, you should handle DispatcherUnhandledException.</p>
+</blockquote>
+<blockquote>
+<p><strong>DispatcherUnhandledException</strong> is raised by an Application for each exception that is unhandled by code running on the main UI thread.</p>
+</blockquote>
+<blockquote>
+<p>If an exception is not handled on either a <strong>background user interface (UI) thread (a thread with its own Dispatcher)</strong> or a <strong>background worker thread (a thread without a Dispatcher)</strong>, the exception is not forwarded to the main UI thread. Consequently, DispatcherUnhandledException is <strong>not</strong> raised. In these circumstances, you will need to write code to do the following:</p>
+</blockquote>
+<ol>
+<li><p>Handle exceptions on the background thread.</p>
+</li>
+<li><p>Dispatch those exceptions to the main UI thread.</p>
+</li>
+<li><p>Rethrow them on the main UI thread without handling them to allow DispatcherUnhandledException to be raised.</p>
+</li>
+</ol>
+<p>先看background worker thread中抛出异常的捕获<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">partial</span> <span class="keyword">class</span> <span class="title">MainWindow</span> : <span class="title">Window</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">MainWindow</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        InitializeComponent();</span><br><span class="line"></span><br><span class="line">        Title = <span class="string">$"Running on Main UI Thread <span class="subst">&#123;Thread.CurrentThread.ManagedThreadId&#125;</span>"</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">startSecondaryWorkerThreadButton_Click</span>(<span class="params"><span class="keyword">object</span> sender, RoutedEventArgs e</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">// Creates and starts a secondary thread in a single threaded apartment (STA)</span></span><br><span class="line">        <span class="keyword">var</span> thread = <span class="keyword">new</span> Thread(MethodRunningOnSecondaryWorkerThread);</span><br><span class="line">        thread.SetApartmentState(ApartmentState.STA);</span><br><span class="line">        thread.IsBackground = <span class="literal">true</span>;</span><br><span class="line">        thread.Start();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// THIS METHOD RUNS ON A SECONDARY WORKER THREAD (THREAD WITHOUT A DISPATCHER)</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">MethodRunningOnSecondaryWorkerThread</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">try</span></span><br><span class="line">        &#123;</span><br><span class="line">            WorkerMethod();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">catch</span> (Exception ex)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="comment">// Dispatch the exception back to the main UI thread. Then, reraise</span></span><br><span class="line">            <span class="comment">// the exception on the main UI thread and handle it from the handler </span></span><br><span class="line">            <span class="comment">// the Application object's DispatcherUnhandledException event.</span></span><br><span class="line">            <span class="comment">// 注意这里是Invoke和Send, 表示同步执行</span></span><br><span class="line">            <span class="keyword">var</span> secondaryWorkerThreadId = Thread.CurrentThread.ManagedThreadId;</span><br><span class="line">            Application.Current.Dispatcher.Invoke(</span><br><span class="line">                DispatcherPriority.Send,</span><br><span class="line">                (DispatcherOperationCallback) <span class="keyword">delegate</span></span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="comment">// THIS CODE RUNS BACK ON THE MAIN UI THREAD</span></span><br><span class="line">                    <span class="keyword">string</span> msg = <span class="string">$"Exception forwarded from secondary worker thread <span class="subst">&#123;secondaryWorkerThreadId&#125;</span>."</span>;</span><br><span class="line">                    <span class="keyword">throw</span> <span class="keyword">new</span> Exception(msg, ex);</span><br><span class="line">                &#125;</span><br><span class="line">                , <span class="literal">null</span>);</span><br><span class="line"></span><br><span class="line">            <span class="comment">// NOTE - Application execution will only continue from this point</span></span><br><span class="line">            <span class="comment">//        onwards if the exception was handled on the main UI thread.</span></span><br><span class="line">            <span class="comment">//        by Application.DispatcherUnhandledException</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">WorkerMethod</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">// This method would do real processing on the secondary worker thread.</span></span><br><span class="line">        <span class="comment">// For the purposes of this sample, it throws an exception</span></span><br><span class="line">        <span class="keyword">string</span> msg =</span><br><span class="line">            <span class="string">$"Exception raised secondary on worker thread <span class="subst">&#123;Dispatcher.CurrentDispatcher.Thread.ManagedThreadId&#125;</span>."</span>;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> Exception(msg);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>再来看看对background ui thread中抛出异常的捕获, 从中也可以学习如何启动一个ui thread<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">partial</span> <span class="keyword">class</span> <span class="title">MainWindow</span> : <span class="title">Window</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">MainWindow</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        InitializeComponent();</span><br><span class="line">        Title = <span class="string">$"Running on Main UI Thread <span class="subst">&#123;Thread.CurrentThread.ManagedThreadId&#125;</span>"</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// THIS EVENT HANDLER RUNS ON THE MAIN UI THREAD</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">startSecondaryUIThreadButton_Click</span>(<span class="params"><span class="keyword">object</span> sender, RoutedEventArgs e</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">// Creates and starts a secondary thread in a single threaded apartment (STA)</span></span><br><span class="line">        <span class="keyword">var</span> thread = <span class="keyword">new</span> Thread(MethodRunningOnSecondaryUIThread);</span><br><span class="line">        thread.SetApartmentState(ApartmentState.STA);</span><br><span class="line">        thread.IsBackground = <span class="literal">true</span>;</span><br><span class="line">        thread.Start();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// THIS METHOD RUNS ON A SECONDARY UI THREAD (THREAD WITH A DISPATCHER)</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">MethodRunningOnSecondaryUIThread</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">var</span> secondaryUiThreadId = Thread.CurrentThread.ManagedThreadId;</span><br><span class="line">        <span class="keyword">try</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="comment">// On secondary thread, show a new Window before starting a new Dispatcher</span></span><br><span class="line">            <span class="comment">// ie turn secondary thread into a UI thread</span></span><br><span class="line">            <span class="keyword">var</span> window = <span class="keyword">new</span> SecondaryUIThreadWindow();</span><br><span class="line">            window.Show();</span><br><span class="line">            Dispatcher.Run();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">catch</span> (Exception ex)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="comment">// Dispatch the exception back to the main ui thread and reraise it</span></span><br><span class="line">            Application.Current.Dispatcher.Invoke(</span><br><span class="line">                DispatcherPriority.Send,</span><br><span class="line">                (DispatcherOperationCallback) <span class="keyword">delegate</span></span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="comment">// THIS CODE RUNS BACK ON THE MAIN UI THREAD</span></span><br><span class="line">                    <span class="keyword">string</span> msg = <span class="string">$"Exception forwarded from secondary UI thread <span class="subst">&#123;secondaryUiThreadId&#125;</span>."</span>;</span><br><span class="line">                    <span class="keyword">throw</span> <span class="keyword">new</span> Exception(msg, ex);</span><br><span class="line">                &#125;</span><br><span class="line">                , <span class="literal">null</span>);</span><br><span class="line"></span><br><span class="line">            <span class="comment">// NOTE - Application execution will only continue from this point</span></span><br><span class="line">            <span class="comment">//        onwards if the exception was handled on the main UI thread</span></span><br><span class="line">            <span class="comment">//        by Application.DispatcherUnhandledException</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">partial</span> <span class="keyword">class</span> <span class="title">SecondaryUIThreadWindow</span> : <span class="title">Window</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">SecondaryUIThreadWindow</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        InitializeComponent();</span><br><span class="line">        Title = <span class="string">$"Running on Secondary UI Thread <span class="subst">&#123;Thread.CurrentThread.ManagedThreadId&#125;</span>"</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">raiseExceptionOnSecondaryUIThreadButton_Click</span>(<span class="params"><span class="keyword">object</span> sender, RoutedEventArgs e</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">// Raise an exception on the secondary UI thread</span></span><br><span class="line">        <span class="keyword">string</span> msg = <span class="string">$"Exception raised on secondary UI thread <span class="subst">&#123;Dispatcher.Thread.ManagedThreadId&#125;</span>."</span>;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> Exception(msg);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">SecondaryUiThreadWindow_Closed</span>(<span class="params"><span class="keyword">object</span> sender, EventArgs e</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">// End this thread of execution</span></span><br><span class="line">        Dispatcher.InvokeShutdown();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>The DispatcherUnhandledException event handler is passed a DispatcherUnhandledExceptionEventArgs argument that contains contextual information regarding the exception, including: 1.The exception (Exception). 2.The Dispatcher from which it originated (Dispatcher).</p>
+</blockquote>
+<blockquote>
+<p>You can use this information to determine whether an exception is recoverable or not. A recoverable exception might be a <strong>FileNotFoundException</strong>, for example, while an unrecoverable exception might be a <strong>StackOverflowException</strong>, for example.</p>
+</blockquote>
+<blockquote>
+<p>When you process an unhandled exception from DispatcherUnhandledException, and you don’t want WPF to continue processing it, you need to set the <strong>Handled</strong> property to true.</p>
+</blockquote>
+<p>例如:<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">partial</span> <span class="keyword">class</span> <span class="title">MainWindow</span> : <span class="title">Window</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">MainWindow</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        InitializeComponent();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">raiseRecoverableException_Click</span>(<span class="params"><span class="keyword">object</span> sender, RoutedEventArgs e</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> DivideByZeroException(<span class="string">"Recoverable Exception"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">raiseUnecoverableException_Click</span>(<span class="params"><span class="keyword">object</span> sender, RoutedEventArgs e</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> ArgumentNullException(<span class="string">@"Unrecoverable Exception"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">partial</span> <span class="keyword">class</span> <span class="title">App</span> : <span class="title">Application</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">App_DispatcherUnhandledException</span>(<span class="params"><span class="keyword">object</span> sender, DispatcherUnhandledExceptionEventArgs e</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">// Process unhandled exception</span></span><br><span class="line">        <span class="keyword">var</span> shutdown = <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Process exception</span></span><br><span class="line">        <span class="keyword">if</span> (e.Exception <span class="keyword">is</span> DivideByZeroException)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="comment">// Recoverable - continue processing</span></span><br><span class="line">            shutdown = <span class="literal">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (e.Exception <span class="keyword">is</span> ArgumentNullException)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="comment">// Unrecoverable - end processing</span></span><br><span class="line">            shutdown = <span class="literal">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (shutdown)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="comment">// If unrecoverable, attempt to save data</span></span><br><span class="line">            <span class="keyword">var</span> result =</span><br><span class="line">                MessageBox.Show(<span class="string">"Application must exit:\n\n"</span> + e.Exception.Message + <span class="string">"\n\nSave before exit?"</span>, <span class="string">"app"</span>,</span><br><span class="line">                    MessageBoxButton.YesNo, MessageBoxImage.Error);</span><br><span class="line">            <span class="keyword">if</span> (result == MessageBoxResult.Yes)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="comment">// Save data</span></span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// Add entry to event log</span></span><br><span class="line">            EventLog.WriteEntry(<span class="string">"app"</span>, <span class="string">"Unrecoverable Exception: "</span> + e.Exception.Message, EventLogEntryType.Error);</span><br><span class="line"></span><br><span class="line">            <span class="comment">// Return exit code</span></span><br><span class="line">            Shutdown(<span class="number">-1</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Prevent default unhandled exception processing</span></span><br><span class="line">        e.Handled = <span class="literal">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>以上示例代码来自WPFSample(<a href="https://github.com/Microsoft/WPF-Samples" target="_blank" rel="noopener">https://github.com/Microsoft/WPF-Samples</a>)</p>
+<p>其他参考: </p>
+<ol>
+<li><p>Handling Unhandled Exceptions in WPF (The most complete collection of handlers)<br>(<a href="https://code.msdn.microsoft.com/windowsdesktop/Handling-Unhandled-47492d0b" target="_blank" rel="noopener">https://code.msdn.microsoft.com/windowsdesktop/Handling-Unhandled-47492d0b</a>)</p>
+</li>
+<li><p>Order in Chaos: Handling unhandled exceptions in a WPF application<br>(<a href="https://dzone.com/articles/order-chaos-handling-unhandled" target="_blank" rel="noopener">https://dzone.com/articles/order-chaos-handling-unhandled</a>)</p>
+</li>
+<li><p>Unhandled Exception Handler For WPF Applications(<a href="https://www.codeproject.com/articles/90866/unhandled-exception-handler-for-wpf-applications" target="_blank" rel="noopener">https://www.codeproject.com/articles/90866/unhandled-exception-handler-for-wpf-applications</a>)</p>
+</li>
+</ol>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Pattern-Practice/" rel="tag"># Pattern&Practice</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/04/22/P&P笔记(X1) Exception Handle (二)/" rel="next" title="P&P笔记(X1) Exception Handle (二)">
+                <i class="fa fa-chevron-left"></i> P&P笔记(X1) Exception Handle (二)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/04/24/WPF笔记(X1) Threading Model (一)/" rel="prev" title="WPF笔记(X1) Threading Model (一)">
+                WPF笔记(X1) Threading Model (一) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">zmapleaf</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">66</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#WPF中的异常处理"><span class="nav-number">1.</span> <span class="nav-text">WPF中的异常处理</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zmapleaf</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

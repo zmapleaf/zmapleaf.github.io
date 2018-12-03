@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="MonoGame,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="上一篇笔记中提到的进阶版, 官方有一个样例http://xbox.create.msdn.com/en-US/education/catalog/sample/game_state_management, 是对该版本的一个加强, 实用程度和评价都很高, 非常具有参考价值. XNA官方样例中不少都是采用了这种方式, 例如RolePlayingGameStarterKit. 官方的介绍如下: The">
+<meta name="keywords" content="MonoGame">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MonoGame笔记(X5)Game State Management (二)">
+<meta property="og:url" content="http://yoursite.com/2017/12/25/MonoGame笔记(X5)Game State Management(二)/index.html">
+<meta property="og:site_name" content="远">
+<meta property="og:description" content="上一篇笔记中提到的进阶版, 官方有一个样例http://xbox.create.msdn.com/en-US/education/catalog/sample/game_state_management, 是对该版本的一个加强, 实用程度和评价都很高, 非常具有参考价值. XNA官方样例中不少都是采用了这种方式, 例如RolePlayingGameStarterKit. 官方的介绍如下: The">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-05-13T07:40:41.741Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="MonoGame笔记(X5)Game State Management (二)">
+<meta name="twitter:description" content="上一篇笔记中提到的进阶版, 官方有一个样例http://xbox.create.msdn.com/en-US/education/catalog/sample/game_state_management, 是对该版本的一个加强, 实用程度和评价都很高, 非常具有参考价值. XNA官方样例中不少都是采用了这种方式, 例如RolePlayingGameStarterKit. 官方的介绍如下: The">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/12/25/MonoGame笔记(X5)Game State Management(二)/">
+
+
+
+
+
+  <title>MonoGame笔记(X5)Game State Management (二) | 远</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">远</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/25/MonoGame笔记(X5)Game State Management(二)/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zmapleaf">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="远">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">MonoGame笔记(X5)Game State Management (二)</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-12-25T15:13:37+08:00">
+                2017-12-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/编程/" itemprop="url" rel="index">
+                    <span itemprop="name">编程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>上一篇笔记中提到的进阶版, 官方有一个样例<a href="http://xbox.create.msdn.com/en-US/education/catalog/sample/game_state_management" target="_blank" rel="noopener">http://xbox.create.msdn.com/en-US/education/catalog/sample/game_state_management</a>, 是对该版本的一个加强, 实用程度和评价都很高, 非常具有参考价值. XNA官方样例中不少都是采用了这种方式, 例如RolePlayingGameStarterKit.</p>
+<p>官方的介绍如下:</p>
+<p>The ScreenManager class is a reusable component that maintains a <strong>stack</strong> of one or more GameScreen instances. It coordinates the transitions from one screen to another, and takes care of routing user input to whichever screen is on top of the stack.</p>
+<p>Each screen class (<strong>including the actual gameplay, which is just another screen</strong>) derives from GameScreen. This provides Update, HandleInput, and Draw methods, plus some logic for managing the transition state. GameScreen doesn’t actually implement any transition rendering effects, however: it merely provides information such as “you are currently 30% of the way through transitioning off,” leaving it up to the derived screen classes to do something sensible with that information in their drawing code. This makes it easy for screens to implement different visual effects on top of the same underlying transition infrastructure.</p>
+<p>这里提到的transitioning off是指淡出状态, transitioning on是淡入, 共有四种状态.<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">enum</span> ScreenState</span><br><span class="line">&#123;</span><br><span class="line">    TransitionOn,</span><br><span class="line">    Active,</span><br><span class="line">    TransitionOff,</span><br><span class="line">    Hidden,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>类图和上一篇笔记中的类图结构差不多. 样例中有以下几种GameScreen, 是一个游戏当中必须的游戏界面. 其他各种和具体游戏相关的Screen见RolePlayingGameStarterKit</p>
+<p>BackgroundScreen<br>GameplayScreen<br>LoadingScreen<br>MenuScreen (MenuEntry)<br>—–MainMenuScreen<br>—–OptionsMenuScreen<br>—–PauseMenuScreen<br>MessageBoxScreen  </p>
+<h4 id="BackgroundScreen"><a href="#BackgroundScreen" class="headerlink" title="BackgroundScreen"></a>BackgroundScreen</h4><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"><span class="doctag">///</span> The background screen sits behind all the other menu screens.</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> It draws a background image that remains fixed in place regardless</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> of whatever transitions the screens on top of it may be doing.</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> 和菜单界面一起</span></span><br></pre></td></tr></table></figure>
+<h4 id="GameplayScreen"><a href="#GameplayScreen" class="headerlink" title="GameplayScreen"></a>GameplayScreen</h4><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"><span class="doctag">///</span> This screen implements the actual game logic. It is just a</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> placeholder to get the idea across: you'll probably want to</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> put some more interesting gameplay in here!</span></span><br></pre></td></tr></table></figure>
+<h4 id="LoadingScreen"><a href="#LoadingScreen" class="headerlink" title="LoadingScreen"></a>LoadingScreen</h4><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"><span class="doctag">///</span> The loading screen coordinates transitions between the menu system and the</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> game itself. Normally one screen will transition off at the same time as</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> the next screen is transitioning on, but for larger transitions that can</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> take a longer time to load their data, we want the menu system to be entirely</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> gone before we start loading the game. This is done as follows:</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> </span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> - Tell all the existing screens to transition off.</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> - Activate a loading screen, which will transition on at the same time.</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> - The loading screen watches the state of the previous screens.</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> - When it sees they have finished transitioning off, it activates the real</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span>   next screen, which may take a long time to load its data. The loading</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span>   screen will be the only thing displayed while this load is taking place.</span></span><br></pre></td></tr></table></figure>
+<h4 id="MainMenuScreen"><a href="#MainMenuScreen" class="headerlink" title="MainMenuScreen"></a>MainMenuScreen</h4><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"><span class="doctag">///</span> The main menu screen is the first thing displayed when the game starts up.</span></span><br></pre></td></tr></table></figure>
+<h4 id="OptionsMenuScreen"><a href="#OptionsMenuScreen" class="headerlink" title="OptionsMenuScreen"></a>OptionsMenuScreen</h4><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"><span class="doctag">///</span> The options screen is brought up over the top of the main menu</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> screen, and gives the user a chance to configure the game</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> in various hopefully useful ways.</span></span><br></pre></td></tr></table></figure>
+<h4 id="PauseMenuScreen"><a href="#PauseMenuScreen" class="headerlink" title="PauseMenuScreen"></a>PauseMenuScreen</h4><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"><span class="doctag">///</span> The pause menu comes up over the top of the game,</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> giving the player options to resume or quit.</span></span><br></pre></td></tr></table></figure>
+<h4 id="MessageBoxScreen"><a href="#MessageBoxScreen" class="headerlink" title="MessageBoxScreen"></a>MessageBoxScreen</h4><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"><span class="doctag">///</span> A popup message box screen, used to display "are you sure?"</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> confirmation messages.</span></span><br></pre></td></tr></table></figure>
+<p>初始游戏启动时只有MainMenuScreen存在<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> The main game constructor.</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">GameStateManagementGame</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// Create the screen manager component.</span></span><br><span class="line">    screenManager = <span class="keyword">new</span> ScreenManager(<span class="keyword">this</span>);</span><br><span class="line"></span><br><span class="line">    Components.Add(screenManager);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Activate the first screens.</span></span><br><span class="line">    screenManager.AddScreen(<span class="keyword">new</span> BackgroundScreen(), <span class="literal">null</span>);</span><br><span class="line">    screenManager.AddScreen(<span class="keyword">new</span> MainMenuScreen(), <span class="literal">null</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>方向键选择<strong>Play Game</strong>, 按下Enter键, 调用的是MainMenuScreen的<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> Event handler for when the Play Game menu entry is selected.</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">PlayGameMenuEntrySelected</span>(<span class="params"><span class="keyword">object</span> sender, PlayerIndexEventArgs e</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    LoadingScreen.Load(ScreenManager, <span class="literal">true</span>, e.PlayerIndex,</span><br><span class="line">                       <span class="keyword">new</span> GameplayScreen());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>LoadingScreen的Load方法和Update方法. Update会等其他GameScreen都transitioning Off(淡出), 然后加载GamePlayScreen<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> Activates the loading screen.</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Load</span>(<span class="params">ScreenManager screenManager, <span class="keyword">bool</span> loadingIsSlow,</span></span></span><br><span class="line"><span class="function"><span class="params">                        PlayerIndex? controllingPlayer,</span></span></span><br><span class="line"><span class="function"><span class="params">                        <span class="keyword">params</span> GameScreen[] screensToLoad</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// Tell all the current screens to transition off.</span></span><br><span class="line">    <span class="keyword">foreach</span> (GameScreen screen <span class="keyword">in</span> screenManager.GetScreens())</span><br><span class="line">        screen.ExitScreen();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Create and activate the loading screen.</span></span><br><span class="line">    LoadingScreen loadingScreen = <span class="keyword">new</span> LoadingScreen(screenManager,</span><br><span class="line">                                                    loadingIsSlow,</span><br><span class="line">                                                    screensToLoad);</span><br><span class="line"></span><br><span class="line">    screenManager.AddScreen(loadingScreen, controllingPlayer);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> Updates the loading screen.</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Update</span>(<span class="params">GameTime gameTime, <span class="keyword">bool</span> otherScreenHasFocus,</span></span></span><br><span class="line"><span class="function"><span class="params">                                               <span class="keyword">bool</span> coveredByOtherScreen</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">base</span>.Update(gameTime, otherScreenHasFocus, coveredByOtherScreen);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// If all the previous screens have finished transitioning</span></span><br><span class="line">    <span class="comment">// off, it is time to actually perform the load.</span></span><br><span class="line">    <span class="keyword">if</span> (otherScreensAreGone)</span><br><span class="line">    &#123;</span><br><span class="line">        ScreenManager.RemoveScreen(<span class="keyword">this</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">foreach</span> (GameScreen screen <span class="keyword">in</span> screensToLoad)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span> (screen != <span class="literal">null</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                ScreenManager.AddScreen(screen, ControllingPlayer);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Once the load has finished, we use ResetElapsedTime to tell</span></span><br><span class="line">        <span class="comment">// the  game timing mechanism that we have just finished a very</span></span><br><span class="line">        <span class="comment">// long frame, and that it should not try to catch up.</span></span><br><span class="line">        ScreenManager.Game.ResetElapsedTime();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>ScreenManager的AddScreen方法内部会调用GamePlayScreen的LoadContent方法, 加载各类游戏资源.<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> Adds a new screen to the screen manager.</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">AddScreen</span>(<span class="params">GameScreen screen, PlayerIndex? controllingPlayer</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    screen.ControllingPlayer = controllingPlayer;</span><br><span class="line">    screen.ScreenManager = <span class="keyword">this</span>;</span><br><span class="line">    screen.IsExiting = <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// If we have a graphics device, tell the screen to load content.</span></span><br><span class="line">    <span class="keyword">if</span> (isInitialized)</span><br><span class="line">    &#123;</span><br><span class="line">        screen.LoadContent();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    screens.Add(screen);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// update the TouchPanel to respond to gestures this screen is interested in</span></span><br><span class="line">    TouchPanel.EnabledGestures = screen.EnabledGestures;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>GamePlayScreen的LoadContent方法, 注意ResetElapsedTime用法<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> Load graphics content for the game.</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">LoadContent</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (content == <span class="literal">null</span>)</span><br><span class="line">        content = <span class="keyword">new</span> ContentManager(ScreenManager.Game.Services, <span class="string">"Content"</span>);</span><br><span class="line"></span><br><span class="line">    gameFont = content.Load&lt;SpriteFont&gt;(<span class="string">"gamefont"</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// A real game would probably have more content than this sample, so</span></span><br><span class="line">    <span class="comment">// it would take longer to load. We simulate that by delaying for a</span></span><br><span class="line">    <span class="comment">// while, giving you a chance to admire the beautiful loading screen.</span></span><br><span class="line">    Thread.Sleep(<span class="number">1000</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// once the load has finished, we use ResetElapsedTime to tell the game's</span></span><br><span class="line">    <span class="comment">// timing mechanism that we have just finished a very long frame, and that</span></span><br><span class="line">    <span class="comment">// it should not try to catch up.</span></span><br><span class="line">    ScreenManager.Game.ResetElapsedTime();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>Game的ResetElapsedTime方法<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">ResetElapsedTime</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Platform.ResetElapsedTime();</span><br><span class="line">    _gameTimer.Reset();</span><br><span class="line">    _gameTimer.Start();</span><br><span class="line">    _accumulatedElapsedTime = TimeSpan.Zero;</span><br><span class="line">    _gameTime.ElapsedGameTime = TimeSpan.Zero;</span><br><span class="line">    _previousTicks = <span class="number">0L</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>至此, ScreenManager的Update方法会调用GamePlayScreen的Update方法, ScreenManager的Draw方法会调用GamePlayScreen的Draw方法.</p>
+<p>GamePlayScreen的HandleInput方法中有对Escape键的轮询:<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (input.IsPauseGame(ControllingPlayer) || gamePadDisconnected)</span><br><span class="line">&#123;</span><br><span class="line">    ScreenManager.AddScreen(<span class="keyword">new</span> PauseMenuScreen(), ControllingPlayer);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>PauseMenuScreen中选择退出游戏, 弹出一个MessageBoxScreen, 点击确定, 会调用ConfirmQuitMessageBoxAccepted方法, 确认退出游戏, 然后退回到主菜单界面.<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> Event handler for when the Quit Game menu entry is selected.</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">QuitGameMenuEntrySelected</span>(<span class="params"><span class="keyword">object</span> sender, PlayerIndexEventArgs e</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">string</span> message = <span class="string">"Are you sure you want to quit this game?"</span>;</span><br><span class="line"></span><br><span class="line">    MessageBoxScreen confirmQuitMessageBox = <span class="keyword">new</span> MessageBoxScreen(message);</span><br><span class="line"></span><br><span class="line">    confirmQuitMessageBox.Accepted += ConfirmQuitMessageBoxAccepted;</span><br><span class="line"></span><br><span class="line">    ScreenManager.AddScreen(confirmQuitMessageBox, ControllingPlayer);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> Event handler for when the user selects ok on the "are you sure</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> you want to quit" message box. This uses the loading screen to</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> transition from the game back to the main menu screen.</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">ConfirmQuitMessageBoxAccepted</span>(<span class="params"><span class="keyword">object</span> sender, PlayerIndexEventArgs e</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    LoadingScreen.Load(ScreenManager, <span class="literal">false</span>, <span class="literal">null</span>, <span class="keyword">new</span> BackgroundScreen(),</span><br><span class="line">                                                   <span class="keyword">new</span> MainMenuScreen());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>最后点击MainMenuScreen的Exit菜单项, 关闭游戏<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> Event handler for when the user selects ok on the "are you sure</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> you want to exit" message box.</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">ConfirmExitMessageBoxAccepted</span>(<span class="params"><span class="keyword">object</span> sender, PlayerIndexEventArgs e</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    ScreenManager.Game.Exit();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>以上是一个大致的过程, 从主菜单进入游戏, 然后从游戏中退出. 还有不少细节值得推敲, 见下一篇笔记.</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/MonoGame/" rel="tag"># MonoGame</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/12/25/MonoGame笔记(X4)Game State Management(一)/" rel="next" title="MonoGame笔记(X4)Game State Management (一)">
+                <i class="fa fa-chevron-left"></i> MonoGame笔记(X4)Game State Management (一)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/12/25/MonoGame笔记(X6)Game State Management(三)/" rel="prev" title="MonoGame笔记(X6)Game State Management (三)">
+                MonoGame笔记(X6)Game State Management (三) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">zmapleaf</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">66</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#BackgroundScreen"><span class="nav-number">1.</span> <span class="nav-text">BackgroundScreen</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#GameplayScreen"><span class="nav-number">2.</span> <span class="nav-text">GameplayScreen</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#LoadingScreen"><span class="nav-number">3.</span> <span class="nav-text">LoadingScreen</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#MainMenuScreen"><span class="nav-number">4.</span> <span class="nav-text">MainMenuScreen</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#OptionsMenuScreen"><span class="nav-number">5.</span> <span class="nav-text">OptionsMenuScreen</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#PauseMenuScreen"><span class="nav-number">6.</span> <span class="nav-text">PauseMenuScreen</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#MessageBoxScreen"><span class="nav-number">7.</span> <span class="nav-text">MessageBoxScreen</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zmapleaf</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

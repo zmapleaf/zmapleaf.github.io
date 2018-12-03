@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="WPF,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="上一篇整理了Dispatcher的使用方式, 这一篇窥探一下Dispatcher的内部机制. 1234567891011121314151617//https://msdn.microsoft.com/en-us/library/system.windows.application(v=vs.110).aspxusing System; // STAThreadusing System.Windo">
+<meta name="keywords" content="WPF">
+<meta property="og:type" content="article">
+<meta property="og:title" content="WPF笔记(X1) Threading Model (二)">
+<meta property="og:url" content="http://yoursite.com/2018/04/24/WPF笔记(X1) Threading Model (二)/index.html">
+<meta property="og:site_name" content="远">
+<meta property="og:description" content="上一篇整理了Dispatcher的使用方式, 这一篇窥探一下Dispatcher的内部机制. 1234567891011121314151617//https://msdn.microsoft.com/en-us/library/system.windows.application(v=vs.110).aspxusing System; // STAThreadusing System.Windo">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://yoursite.com/img/wpf-threadingmodel-2.png">
+<meta property="og:updated_time" content="2018-04-24T09:21:48.584Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="WPF笔记(X1) Threading Model (二)">
+<meta name="twitter:description" content="上一篇整理了Dispatcher的使用方式, 这一篇窥探一下Dispatcher的内部机制. 1234567891011121314151617//https://msdn.microsoft.com/en-us/library/system.windows.application(v=vs.110).aspxusing System; // STAThreadusing System.Windo">
+<meta name="twitter:image" content="http://yoursite.com/img/wpf-threadingmodel-2.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/04/24/WPF笔记(X1) Threading Model (二)/">
+
+
+
+
+
+  <title>WPF笔记(X1) Threading Model (二) | 远</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">远</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/24/WPF笔记(X1) Threading Model (二)/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zmapleaf">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="远">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">WPF笔记(X1) Threading Model (二)</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-24T16:37:37+08:00">
+                2018-04-24
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/编程/" itemprop="url" rel="index">
+                    <span itemprop="name">编程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>上一篇整理了Dispatcher的使用方式, 这一篇窥探一下Dispatcher的内部机制.</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//https://msdn.microsoft.com/en-us/library/system.windows.application(v=vs.110).aspx</span></span><br><span class="line"><span class="keyword">using</span> System; <span class="comment">// STAThread</span></span><br><span class="line"><span class="keyword">using</span> System.Windows; <span class="comment">// Application</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">SDKSample</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">class</span> <span class="title">AppCode</span> : <span class="title">Application</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// Entry point method</span></span><br><span class="line">        [<span class="meta">STAThread</span>]</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Main</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            AppCode app = <span class="keyword">new</span> AppCode();</span><br><span class="line">            app.Run();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>app.Run()层层调用, 最后会到达Dispatcher.Run();</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//Dispatcher.cs</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Run</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        PushFrame(<span class="keyword">new</span> DispatcherFrame());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">PushFrame</span>(<span class="params">DispatcherFrame frame</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">if</span>(frame == <span class="literal">null</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> ArgumentNullException(<span class="string">"frame"</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        Dispatcher dispatcher = Dispatcher.CurrentDispatcher;</span><br><span class="line">        <span class="keyword">if</span>(dispatcher._hasShutdownFinished) <span class="comment">// Dispatcher thread - no lock needed for read</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> InvalidOperationException(SR.Get(SRID.DispatcherHasShutdown));</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span>(frame.Dispatcher != dispatcher)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> InvalidOperationException(SR.Get(SRID.MismatchedDispatchers));</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span>(dispatcher._disableProcessingCount &gt; <span class="number">0</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> InvalidOperationException(SR.Get(SRID.DispatcherProcessingDisabled));</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        dispatcher.PushFrameImpl(frame);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//&lt;SecurityNote&gt;</span></span><br><span class="line">    <span class="comment">// Critical - as this calls critical methods (GetMessage, TranslateMessage, DispatchMessage).</span></span><br><span class="line">    <span class="comment">// TreatAsSafe - as the critical method is not leaked out, and not controlled by external inputs.</span></span><br><span class="line">    <span class="comment">//&lt;/SecurityNote&gt;</span></span><br><span class="line">    [<span class="meta">SecurityCritical, SecurityTreatAsSafe </span>]</span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">PushFrameImpl</span>(<span class="params">DispatcherFrame frame</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        SynchronizationContext oldSyncContext = <span class="literal">null</span>;</span><br><span class="line">        SynchronizationContext newSyncContext = <span class="literal">null</span>;</span><br><span class="line">        MSG msg = <span class="keyword">new</span> MSG();</span><br><span class="line"></span><br><span class="line">        _frameDepth++;</span><br><span class="line">        <span class="keyword">try</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="comment">// Change the CLR SynchronizationContext to be compatable with our Dispatcher.</span></span><br><span class="line">            oldSyncContext = SynchronizationContext.Current;</span><br><span class="line">            newSyncContext = <span class="keyword">new</span> DispatcherSynchronizationContext(<span class="keyword">this</span>);</span><br><span class="line">            SynchronizationContext.SetSynchronizationContext(newSyncContext);</span><br><span class="line">            </span><br><span class="line">            <span class="keyword">try</span></span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">while</span>(frame.Continue)</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="keyword">if</span> (!GetMessage(<span class="keyword">ref</span> msg, IntPtr.Zero, <span class="number">0</span>, <span class="number">0</span>))</span><br><span class="line">                        <span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">                    TranslateAndDispatchMessage(<span class="keyword">ref</span> msg);</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                <span class="comment">// If this was the last frame to exit after a quit, we</span></span><br><span class="line">                <span class="comment">// can now dispose the dispatcher.</span></span><br><span class="line">                <span class="keyword">if</span>(_frameDepth == <span class="number">1</span>)</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="keyword">if</span>(_hasShutdownStarted)</span><br><span class="line">                    &#123;</span><br><span class="line">                        ShutdownImpl();</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">finally</span></span><br><span class="line">            &#123;</span><br><span class="line">                <span class="comment">// Restore the old SynchronizationContext.</span></span><br><span class="line">                SynchronizationContext.SetSynchronizationContext(oldSyncContext);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">finally</span></span><br><span class="line">        &#123;</span><br><span class="line">            _frameDepth--;</span><br><span class="line">            <span class="keyword">if</span>(_frameDepth == <span class="number">0</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="comment">// We have exited all frames.</span></span><br><span class="line">                _exitAllFrames = <span class="literal">false</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>出现了GetMessage和TranslateAndDispatchMessage, 后者将消息派发到窗口的消息处理函数中(WndProcHook)</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//Dispatcher.cs</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> IntPtr <span class="title">WndProcHook</span>(<span class="params">IntPtr hwnd, <span class="keyword">int</span> msg, IntPtr wParam, IntPtr lParam, <span class="keyword">ref</span> <span class="keyword">bool</span> handled</span>)  </span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">//...</span></span><br><span class="line">        <span class="keyword">if</span>(message == WindowMessage.WM_DESTROY)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span>(!_hasShutdownStarted &amp;&amp; !_hasShutdownFinished) <span class="comment">// Dispatcher thread - no lock needed for read</span></span><br><span class="line">            &#123;</span><br><span class="line">                <span class="comment">// Aack!  We are being torn down rudely!  Try to</span></span><br><span class="line">                <span class="comment">// shut the dispatcher down as nicely as we can.</span></span><br><span class="line">                ShutdownImpl();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span>(message == _msgProcessQueue)</span><br><span class="line">        &#123;</span><br><span class="line">            ProcessQueue();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span>(message == WindowMessage.WM_TIMER &amp;&amp; (<span class="keyword">int</span>) wParam == TIMERID_BACKGROUND)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="comment">// This timer is just used to process background operations.</span></span><br><span class="line">            <span class="comment">// Stop the timer so that it doesn't fire again.</span></span><br><span class="line">            SafeNativeMethods.KillTimer(<span class="keyword">new</span> HandleRef(<span class="keyword">this</span>, hwnd), TIMERID_BACKGROUND);</span><br><span class="line"></span><br><span class="line">            ProcessQueue();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//...</span></span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>当收到的消息为_msgProcessQueue时, 调用的是ProcessQueue方法. ProcessQueue方法从DispatcherQueue里面(PriorityQueue<dispatcheroperation>)取出DispatcherOperation执行.</dispatcheroperation></p>
+<p>那么WndProcHook是在哪里被注册的呢? 看Dispatcher的构造方法<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="title">Dispatcher</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    _queue = <span class="keyword">new</span> PriorityQueue&lt;DispatcherOperation&gt;();</span><br><span class="line"></span><br><span class="line">    _tlsDispatcher = <span class="keyword">this</span>; <span class="comment">// use TLS for ownership only</span></span><br><span class="line">    _dispatcherThread = Thread.CurrentThread;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Add ourselves to the map of dispatchers to threads.</span></span><br><span class="line">    <span class="keyword">lock</span>(_globalLock)</span><br><span class="line">    &#123;</span><br><span class="line">        _dispatchers.Add(<span class="keyword">new</span> WeakReference(<span class="keyword">this</span>));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    _unhandledExceptionEventArgs = <span class="keyword">new</span> DispatcherUnhandledExceptionEventArgs(<span class="keyword">this</span>);</span><br><span class="line">    _exceptionFilterEventArgs = <span class="keyword">new</span> DispatcherUnhandledExceptionFilterEventArgs(<span class="keyword">this</span>);</span><br><span class="line"></span><br><span class="line">    _defaultDispatcherSynchronizationContext = <span class="keyword">new</span> DispatcherSynchronizationContext(<span class="keyword">this</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Create the message-only window we use to receive messages</span></span><br><span class="line">    <span class="comment">// that tell us to process the queue.</span></span><br><span class="line">    MessageOnlyHwndWrapper window = <span class="keyword">new</span> MessageOnlyHwndWrapper();</span><br><span class="line">    _window = <span class="keyword">new</span> SecurityCriticalData&lt;MessageOnlyHwndWrapper&gt;( window );</span><br><span class="line"></span><br><span class="line">    _hook = <span class="keyword">new</span> HwndWrapperHook(WndProcHook);</span><br><span class="line">    _window.Value.AddHook(_hook);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>_msgProcessQueue是什么时候被放入消息队列中的? 搜了一下代码, 只一处有:<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">bool</span> <span class="title">RequestForegroundProcessing</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(_postedProcessingType &lt; PROCESS_FOREGROUND)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// If we have already set a timer to do background processing,</span></span><br><span class="line">        <span class="comment">// make sure we stop it before posting a message for foreground</span></span><br><span class="line">        <span class="comment">// processing.</span></span><br><span class="line">        <span class="keyword">if</span>(_postedProcessingType == PROCESS_BACKGROUND)</span><br><span class="line">        &#123;</span><br><span class="line">            SafeNativeMethods.KillTimer(<span class="keyword">new</span> HandleRef(<span class="keyword">this</span>, _window.Value.Handle), TIMERID_BACKGROUND);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        _postedProcessingType = PROCESS_FOREGROUND;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// We have foreground items to process.</span></span><br><span class="line">        <span class="comment">// By posting a message, Win32 will service us fairly promptly.</span></span><br><span class="line">        <span class="keyword">return</span> UnsafeNativeMethods.TryPostMessage(<span class="keyword">new</span> HandleRef(<span class="keyword">this</span>, _window.Value.Handle), _msgProcessQueue, IntPtr.Zero, IntPtr.Zero);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>查找RequestForegroundProcessing被调用的过程为, InvokeAsyncImpl调用RequestProcessing, RequestProcessing调用CriticalRequestProcessing</p>
+<p>看看InvokeAsyncImpl的实现<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;SecurityNote&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span>     Critical:This code causes arbitrary delegate to execute asynchronously, also calls critical code.</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/SecurityNote&gt;</span></span></span><br><span class="line">[<span class="meta">SecurityCritical</span>]</span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">InvokeAsyncImpl</span>(<span class="params">DispatcherOperation operation, CancellationToken cancellationToken</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    DispatcherHooks hooks = <span class="literal">null</span>;</span><br><span class="line">    <span class="keyword">bool</span> succeeded = <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Could be a non-dispatcher thread, lock to read</span></span><br><span class="line">    <span class="keyword">lock</span>(_instanceLock)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span> (!cancellationToken.IsCancellationRequested &amp;&amp;</span><br><span class="line">            !_hasShutdownFinished &amp;&amp; </span><br><span class="line">            !Environment.HasShutdownStarted)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="comment">// Add the operation to the work queue</span></span><br><span class="line">            operation._item = _queue.Enqueue(operation.Priority, operation);</span><br><span class="line"></span><br><span class="line">            <span class="comment">// Make sure we will wake up to process this operation.</span></span><br><span class="line">            succeeded = RequestProcessing();</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (succeeded)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="comment">// Grab the hooks to use inside the lock; but we will</span></span><br><span class="line">                <span class="comment">// call them below, outside of the lock.</span></span><br><span class="line">                hooks = _hooks;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">            &#123;</span><br><span class="line">                <span class="comment">// Dequeue the item since we failed to request</span></span><br><span class="line">                <span class="comment">// processing for it.  Note we will mark it aborted</span></span><br><span class="line">                <span class="comment">// below.</span></span><br><span class="line">                _queue.RemoveItem(operation._item);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (succeeded == <span class="literal">true</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// We have enqueued the operation.  Register a callback</span></span><br><span class="line">        <span class="comment">// with the cancellation token to abort the operation</span></span><br><span class="line">        <span class="comment">// when cancellation is requested.</span></span><br><span class="line">        <span class="keyword">if</span>(cancellationToken.CanBeCanceled)</span><br><span class="line">        &#123;</span><br><span class="line">            CancellationTokenRegistration cancellationRegistration = cancellationToken.Register(s =&gt; ((DispatcherOperation)s).Abort(), operation);</span><br><span class="line">        </span><br><span class="line">            <span class="comment">// Revoke the cancellation when the operation is done. </span></span><br><span class="line">            operation.Aborted += (s,e) =&gt; cancellationRegistration.Dispose();</span><br><span class="line">            operation.Completed += (s,e) =&gt; cancellationRegistration.Dispose();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span>(hooks != <span class="literal">null</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            hooks.RaiseOperationPosted(<span class="keyword">this</span>, operation);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (EventTrace.IsEnabled(EventTrace.Keyword.KeywordDispatcher | EventTrace.Keyword.KeywordPerf, EventTrace.Level.Info))</span><br><span class="line">        &#123;</span><br><span class="line">            EventTrace.EventProvider.TraceEvent(EventTrace.Event.WClientUIContextPost, EventTrace.Keyword.KeywordDispatcher | EventTrace.Keyword.KeywordPerf, EventTrace.Level.Info, operation.Priority, operation.Name, operation.Id);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// We failed to enqueue the operation, and the caller that</span></span><br><span class="line">        <span class="comment">// created the operation does not expose it before we return,</span></span><br><span class="line">        <span class="comment">// so it is safe to modify the operation outside of the lock.</span></span><br><span class="line">        <span class="comment">// Just mark the operation as aborted, which we can safely</span></span><br><span class="line">        <span class="comment">// return to the user.</span></span><br><span class="line">        operation._status = DispatcherOperationStatus.Aborted;</span><br><span class="line">        operation._taskSource.SetCanceled();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>先将operation加入queue, 然后调用RequestProcessing, 发出_msgProcessQueue.<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Add the operation to the work queue</span></span><br><span class="line">operation._item = _queue.Enqueue(operation.Priority, operation);</span><br><span class="line"></span><br><span class="line"><span class="comment">// Make sure we will wake up to process this operation.</span></span><br><span class="line">succeeded = RequestProcessing();</span><br></pre></td></tr></table></figure></p>
+<p>另一处RequestProcessing是在processQueue中调用, 假如queue中还有其他operation<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// If there is more to do, request processing for it.</span></span><br><span class="line">RequestProcessing();</span><br></pre></td></tr></table></figure></p>
+<p>以上过程, 大致可以用下面这幅图联系起来<a href="http://www.cnblogs.com/powertoolsteam/archive/2010/12/31/1922794.html#2007193" target="_blank" rel="noopener">http://www.cnblogs.com/powertoolsteam/archive/2010/12/31/1922794.html#2007193</a><br><img src="/img/wpf-threadingmodel-2.png" alt=""></p>
+<p>从上图可以看到Dispatcher在调用BeginInvoke之后所经历的流程.</p>
+<ol>
+<li><p>将调用的Delegate和优先级包装成一个DispatcherOperation放入Dispatcher维护的优先级队列当中, 这个Queue是按DispatcherPriority排序的, 高优先级的DispatcherOperation先被处理</p>
+</li>
+<li><p>往当前线程的消息队列中Post一个名为MsgProcessQueue的Message。这个消息是WPF自己定义的，见Dispatcher的静态构造函数当中的_msgProcessQueue = UnsafeNativeMethods.RegisterWindowMessage(“DispatcherProcessQueue”);   这个消息被Post到消息队列之前，还要设置MSG.Handle，这个Handle就是Window 1#的Handle. 指定Handle是为了在消息泵派发消息的时候，指定哪个窗口的WndProc（窗口过程）处理这个消息. 在这里所有BeginInvoke引起的消息都是Window1#的窗口过程来处理的.见return UnsafeNativeMethods.TryPostMessage(new HandleRef(this, _window.Value.Handle), _msgProcessQueue, IntPtr.Zero, IntPtr.Zero);</p>
+</li>
+<li><p>消息泵读取消息</p>
+</li>
+<li><p>系统根据消息的Handle, 发现跟Window1#的Handle相同，然后将这个消息派发到Window1#的窗口过程，让其处理</p>
+</li>
+<li><p>在窗口过程中，调用ProcessQueue方法, 从优先级队列中取出一个优先级最高的DispatcherOperation</p>
+</li>
+<li><p>执行DispatcherOperation.Invoke方法. Invoke方法的核心就是调用DispatcherOperation构造时传入的Delegate, 也就是Dispatcher.BeginInvoke传入的Delegate. 最终这个Foo()方法被执行了</p>
+</li>
+</ol>
+<p>小结如下, 每Invoke或者BeginInvoke</p>
+<ol>
+<li><strong>放一个DispatcherOperation到PriorityQueue<dispatcheroperation>中</dispatcheroperation></strong></li>
+<li><strong>放一个_msgProcessQueue到消息队列中</strong></li>
+<li><strong>GetMessage从消息队列中取出_msgProcessQueue, 派发到窗口过程, 窗口过程调用ProcessQueue, 从PriorityQueue<dispatcheroperation>中取出DispatcherOperation, 然后执行</dispatcheroperation></strong></li>
+</ol>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/WPF/" rel="tag"># WPF</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/04/24/CSharp笔记(X1) IDisposable/" rel="next" title="CSharp笔记(X1) IDisposable">
+                <i class="fa fa-chevron-left"></i> CSharp笔记(X1) IDisposable
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/04/25/WPF笔记(X1) Threading Model (三)/" rel="prev" title="WPF笔记(X1) Threading Model (三)">
+                WPF笔记(X1) Threading Model (三) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">zmapleaf</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">66</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zmapleaf</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

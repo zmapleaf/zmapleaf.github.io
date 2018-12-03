@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="编程,MonoGame,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Game State Management 是指管理主菜单界面, 游戏界面, 设置菜单界面, 游戏暂停界面等不同游戏状态之间的过渡与切换. 先看一个原始的版本: 使用goto, 联想到Flash中的gotoAndStop123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495">
+<meta name="keywords" content="编程,MonoGame">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MonoGame笔记(X4)Game State Management (一)">
+<meta property="og:url" content="http://yoursite.com/2017/12/25/MonoGame笔记(X4)Game State Management(一)/index.html">
+<meta property="og:site_name" content="远">
+<meta property="og:description" content="Game State Management 是指管理主菜单界面, 游戏界面, 设置菜单界面, 游戏暂停界面等不同游戏状态之间的过渡与切换. 先看一个原始的版本: 使用goto, 联想到Flash中的gotoAndStop123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://yoursite.com/img/monogame-gamestatemanagement-1.png">
+<meta property="og:updated_time" content="2017-12-25T07:17:15.049Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="MonoGame笔记(X4)Game State Management (一)">
+<meta name="twitter:description" content="Game State Management 是指管理主菜单界面, 游戏界面, 设置菜单界面, 游戏暂停界面等不同游戏状态之间的过渡与切换. 先看一个原始的版本: 使用goto, 联想到Flash中的gotoAndStop123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495">
+<meta name="twitter:image" content="http://yoursite.com/img/monogame-gamestatemanagement-1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/12/25/MonoGame笔记(X4)Game State Management(一)/">
+
+
+
+
+
+  <title>MonoGame笔记(X4)Game State Management (一) | 远</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">远</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/25/MonoGame笔记(X4)Game State Management(一)/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zmapleaf">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="远">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">MonoGame笔记(X4)Game State Management (一)</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-12-25T14:06:37+08:00">
+                2017-12-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/编程/" itemprop="url" rel="index">
+                    <span itemprop="name">编程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Game State Management 是指管理主菜单界面, 游戏界面, 设置菜单界面, 游戏暂停界面等不同游戏状态之间的过渡与切换.</p>
+<p>先看一个<strong>原始</strong>的版本: 使用goto, 联想到Flash中的gotoAndStop<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">namespace</span> <span class="title">ScreenManager</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line">    <span class="comment"><span class="doctag">///</span> Screen Manager</span></span><br><span class="line">    <span class="comment"><span class="doctag">///</span> Keeps a list of available screens</span></span><br><span class="line">    <span class="comment"><span class="doctag">///</span> so you can switch between them, </span></span><br><span class="line">    <span class="comment"><span class="doctag">///</span> ie. jumping from the start screen to the game screen </span></span><br><span class="line">    <span class="comment"><span class="doctag">///</span> http://www.david-amador.com/2010/01/xna-screen-manager/</span></span><br><span class="line">    <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">class</span> <span class="title">SCREEN_MANAGER</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// Protected Members</span></span><br><span class="line">        <span class="keyword">static</span> <span class="keyword">private</span> List&lt;Screen&gt; _screens = <span class="keyword">new</span> List&lt;Screen&gt;();</span><br><span class="line">        <span class="keyword">static</span> <span class="keyword">private</span> <span class="keyword">bool</span> _started = <span class="literal">false</span>;</span><br><span class="line">        <span class="keyword">static</span> <span class="keyword">private</span> Screen _previous = <span class="literal">null</span>;</span><br><span class="line">        <span class="comment">// Public Members</span></span><br><span class="line">        <span class="keyword">static</span> <span class="keyword">public</span> Screen ActiveScreen = <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> Add new Screen</span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;param name="screen"&gt;</span>New screen, name must be unique<span class="doctag">&lt;/param&gt;</span></span></span><br><span class="line">        <span class="function"><span class="keyword">static</span> <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">add_screen</span>(<span class="params">Screen screen</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            <span class="keyword">foreach</span> (Screen scr <span class="keyword">in</span> _screens)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">if</span> (scr.Name == screen.Name)</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="keyword">return</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            _screens.Add(screen);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> Go to screen</span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;param name="name"&gt;</span>Screen name<span class="doctag">&lt;/param&gt;</span></span></span><br><span class="line">        <span class="function"><span class="keyword">static</span> <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">goto_screen</span>(<span class="params"><span class="keyword">string</span> name</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            <span class="keyword">foreach</span> (Screen screen <span class="keyword">in</span> _screens)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">if</span> (screen.Name == name)</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="comment">// Shutsdown Previous Screen           </span></span><br><span class="line">                    _previous = ActiveScreen;</span><br><span class="line">                    <span class="keyword">if</span> (ActiveScreen != <span class="literal">null</span>)</span><br><span class="line">                    &#123;</span><br><span class="line">                        ActiveScreen.Shutdown();</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="comment">// Inits New Screen</span></span><br><span class="line">                    ActiveScreen = screen;</span><br><span class="line">                    <span class="keyword">if</span> (_started) ActiveScreen.Init();</span><br><span class="line">                    <span class="keyword">return</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> Updates Active Screen</span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;param name="elapsed"&gt;</span>GameTime<span class="doctag">&lt;/param&gt;</span></span></span><br><span class="line">        <span class="function"><span class="keyword">static</span> <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Update</span>(<span class="params">GameTime gameTime</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            <span class="keyword">if</span> (_started == <span class="literal">false</span>) <span class="keyword">return</span>;</span><br><span class="line">            <span class="keyword">if</span> (ActiveScreen!=<span class="literal">null</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                ActiveScreen.Update(gameTime);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">static</span> <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Draw</span>(<span class="params">GameTime gameTime</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            <span class="keyword">if</span> (_started == <span class="literal">false</span>) <span class="keyword">return</span>;</span><br><span class="line">            <span class="keyword">if</span> (ActiveScreen != <span class="literal">null</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                ActiveScreen.Draw(gameTime);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>再看一个进阶的版本(<a href="http://blogs.msdn.com/b/etayrien/archive/2006/12/12/game-engine-structure.aspx" target="_blank" rel="noopener">http://blogs.msdn.com/b/etayrien/archive/2006/12/12/game-engine-structure.aspx</a>)<br><img src="/img/monogame-gamestatemanagement-1.png" alt=""><br>为什么使用Stack, 作者是这样说的:</p>
+<p>so why a stack? Let’s say, for example, that when the user pauses the game, you just want to stop everything from updating, and put an image over the top of everything that says “Paused.” With a stack, that’s easy: you can just push a new PauseScreen onto the stack. When the user unpauses, pop the PauseScreen back off again. To implement the “everything still draws, but nothing updates” functionality, we’ll add two new properties to GameScreen. <strong>BlocksDraw</strong> says that no screens under this one can draw, and <strong>BlocksUpdate</strong> does the same thing for update.</p>
+<p> 对于Update, GameScreenManager自顶向下遍历Stack中的GameScreens, 调用它们的Update方法, 直到遇到<strong>BlocksUpdate</strong>为true.</p>
+<p> 对于Draw, 和Update有点不同. Draw本是自底向上绘制的, 先绘制下面的GameScreen, 再绘制上面的GameSreen. 而<strong>BlocksDraw</strong> 的意思是指, 当前GameScreen以下的GameScreen不绘制. 于是要先遍历一遍Stack中的GameScreens, 找到那些可见的GameScreen, 然后再对这些GameScreen以自底向上的方式进行绘制.</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">List&lt;GameScreen&gt; screensToDraw = new List&lt;GameScreen&gt;();</span><br><span class="line">foreach (GameScreen screen in ActiveGameScreens)</span><br><span class="line">&#123;</span><br><span class="line">    screensToDraw.Add( screen );</span><br><span class="line">    if (screen.BlocksDraw)</span><br><span class="line">        break;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">for (int i = screensToDraw.Count - 1; i &lt;= 0; i--)</span><br><span class="line">&#123;</span><br><span class="line">    screensToDraw[i].Draw( gameTime );</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p> 如何进行状态切换呢</p>
+<p> We saw above how pause would work: PlayScreen watches for the pause key, and pushes on a new PauseScreen. PauseScreen watches for pause button, and pops itself off. GameScreenManager’s constructor takes a GameScreen for the startup screen</p>
+<p> 注意这里的PlayScreen. 作者将游戏逻辑放在该GameScreen中. 也就是说游戏的GameScreen和各种菜单的GameScreen地位是等同的. XNA官方的样例RolePlayingGameStarterKit, 也是这样做的. 而在ZombieSmash中, 是将游戏状态先分为Playing和Menu, Menu下面再进一步细分</p>
+ <figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">enum</span> GameModes : <span class="keyword">int</span></span><br><span class="line">&#123;</span><br><span class="line">    Menu = <span class="number">0</span>,</span><br><span class="line">    Playing = <span class="number">1</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">enum</span> MenuMode : <span class="keyword">int</span></span><br><span class="line">&#123;</span><br><span class="line">    Main = <span class="number">0</span>,</span><br><span class="line">    Pause = <span class="number">1</span>,</span><br><span class="line">    Dead = <span class="number">2</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> This is called when the game should draw itself.</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;param name="gameTime"&gt;</span>Provides a snapshot of timing values.<span class="doctag">&lt;/param&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Draw</span>(<span class="params">GameTime gameTime</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    graphics.GraphicsDevice.Clear(Color.Black);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">switch</span> (gameMode)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">case</span> GameModes.Playing:</span><br><span class="line">            DrawGame();</span><br><span class="line">            hud.Draw();</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">case</span> GameModes.Menu:</span><br><span class="line">            <span class="keyword">if</span> (menu.menuMode == Menu.MenuMode.Pause ||</span><br><span class="line">                menu.menuMode == Menu.MenuMode.Dead)</span><br><span class="line">                DrawGame();</span><br><span class="line">            menu.Draw();</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line"></span><br><span class="line">    <span class="keyword">base</span>.Draw(gameTime);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p> 当处于GameModes.Menu模式时, 显示主菜单时不显示游戏画面, 如果是暂停和死亡, 仍然会显示游戏画面.</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/编程/" rel="tag"># 编程</a>
+          
+            <a href="/tags/MonoGame/" rel="tag"># MonoGame</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/12/22/MonoGame笔记(X3)SpriteBatch Test/" rel="next" title="MonoGame笔记(X3)SpriteBatch Test">
+                <i class="fa fa-chevron-left"></i> MonoGame笔记(X3)SpriteBatch Test
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/12/25/MonoGame笔记(X5)Game State Management(二)/" rel="prev" title="MonoGame笔记(X5)Game State Management (二)">
+                MonoGame笔记(X5)Game State Management (二) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">zmapleaf</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">66</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zmapleaf</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

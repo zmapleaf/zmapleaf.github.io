@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="WPF,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="上一篇整理了Dispatcher的消息循环和BeginInvoke机制, 这一篇继续深入窥探一下DispatcherFrame.12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152535455565758//Dispatcher.csprivate void P">
+<meta name="keywords" content="WPF">
+<meta property="og:type" content="article">
+<meta property="og:title" content="WPF笔记(X1) Threading Model (三)">
+<meta property="og:url" content="http://yoursite.com/2018/04/25/WPF笔记(X1) Threading Model (三)/index.html">
+<meta property="og:site_name" content="远">
+<meta property="og:description" content="上一篇整理了Dispatcher的消息循环和BeginInvoke机制, 这一篇继续深入窥探一下DispatcherFrame.12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152535455565758//Dispatcher.csprivate void P">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://yoursite.com/img/wpf-threadingmodel-3-estedpumping.png">
+<meta property="og:updated_time" content="2018-04-25T02:18:25.792Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="WPF笔记(X1) Threading Model (三)">
+<meta name="twitter:description" content="上一篇整理了Dispatcher的消息循环和BeginInvoke机制, 这一篇继续深入窥探一下DispatcherFrame.12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152535455565758//Dispatcher.csprivate void P">
+<meta name="twitter:image" content="http://yoursite.com/img/wpf-threadingmodel-3-estedpumping.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/04/25/WPF笔记(X1) Threading Model (三)/">
+
+
+
+
+
+  <title>WPF笔记(X1) Threading Model (三) | 远</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">远</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/25/WPF笔记(X1) Threading Model (三)/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zmapleaf">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="远">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">WPF笔记(X1) Threading Model (三)</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-25T08:03:37+08:00">
+                2018-04-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/编程/" itemprop="url" rel="index">
+                    <span itemprop="name">编程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>上一篇整理了Dispatcher的消息循环和BeginInvoke机制, 这一篇继续深入窥探一下DispatcherFrame.<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//Dispatcher.cs</span></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">PushFrameImpl</span>(<span class="params">DispatcherFrame frame</span>)</span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function">    <span class="comment">//&lt;SecurityNote&gt;</span></span></span><br><span class="line"><span class="function">    <span class="comment">// Critical - as this calls critical methods (GetMessage, TranslateMessage, DispatchMessage).</span></span></span><br><span class="line"><span class="function">    <span class="comment">// TreatAsSafe - as the critical method is not leaked out, and not controlled by external inputs.</span></span></span><br><span class="line"><span class="function">    <span class="comment">//&lt;/SecurityNote&gt;</span></span></span><br><span class="line"><span class="function">    [SecurityCritical, SecurityTreatAsSafe ]</span></span><br><span class="line"><span class="function">    <span class="keyword">private</span> <span class="keyword">void</span> <span class="title">PushFrameImpl</span>(<span class="params">DispatcherFrame frame</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        SynchronizationContext oldSyncContext = <span class="literal">null</span>;</span><br><span class="line">        SynchronizationContext newSyncContext = <span class="literal">null</span>;</span><br><span class="line">        MSG msg = <span class="keyword">new</span> MSG();</span><br><span class="line"></span><br><span class="line">        _frameDepth++;</span><br><span class="line">        <span class="keyword">try</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="comment">// Change the CLR SynchronizationContext to be compatable with our Dispatcher.</span></span><br><span class="line">            oldSyncContext = SynchronizationContext.Current;</span><br><span class="line">            newSyncContext = <span class="keyword">new</span> DispatcherSynchronizationContext(<span class="keyword">this</span>);</span><br><span class="line">            SynchronizationContext.SetSynchronizationContext(newSyncContext);</span><br><span class="line">            </span><br><span class="line">            <span class="keyword">try</span></span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">while</span>(frame.Continue)</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="keyword">if</span> (!GetMessage(<span class="keyword">ref</span> msg, IntPtr.Zero, <span class="number">0</span>, <span class="number">0</span>))</span><br><span class="line">                        <span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">                    TranslateAndDispatchMessage(<span class="keyword">ref</span> msg);</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                <span class="comment">// If this was the last frame to exit after a quit, we</span></span><br><span class="line">                <span class="comment">// can now dispose the dispatcher.</span></span><br><span class="line">                <span class="keyword">if</span>(_frameDepth == <span class="number">1</span>)</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="keyword">if</span>(_hasShutdownStarted)</span><br><span class="line">                    &#123;</span><br><span class="line">                        ShutdownImpl();</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">finally</span></span><br><span class="line">            &#123;</span><br><span class="line">                <span class="comment">// Restore the old SynchronizationContext.</span></span><br><span class="line">                SynchronizationContext.SetSynchronizationContext(oldSyncContext);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">finally</span></span><br><span class="line">        &#123;</span><br><span class="line">            _frameDepth--;</span><br><span class="line">            <span class="keyword">if</span>(_frameDepth == <span class="number">0</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="comment">// We have exited all frames.</span></span><br><span class="line">                _exitAllFrames = <span class="literal">false</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+<p>DispatcherFrame的代码如下,<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> System.Security; </span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">System.Windows.Threading</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line">    <span class="comment"><span class="doctag">///</span>     Representation of Dispatcher frame.</span></span><br><span class="line">    <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">class</span> <span class="title">DispatcherFrame</span> : <span class="title">DispatcherObject</span></span><br><span class="line">    &#123;</span><br><span class="line"></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;SecurityNote&gt;</span></span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span>     Critical: This code exists to ensure that the static variables initialized</span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span>     do not cause security violations.The reason this comes into existance is because</span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span>     of the call to RegisterWindowMessage</span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span>     TreatAsSafe:This is safe to call</span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/SecurityNote&gt;</span></span></span><br><span class="line">        [<span class="meta">SecurityCritical,SecurityTreatAsSafe</span>]</span><br><span class="line">        <span class="function"><span class="keyword">static</span> <span class="title">DispatcherFrame</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span>     Constructs a new instance of the DispatcherFrame class.</span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">DispatcherFrame</span>(<span class="params"></span>) : <span class="title">this</span>(<span class="params"><span class="literal">true</span></span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span>     Constructs a new instance of the DispatcherFrame class.</span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;param name="exitWhenRequested"&gt;</span></span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span>     Indicates whether or not this frame will exit when all frames</span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span>     are requested to exit.</span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span>     <span class="doctag">&lt;p/&gt;</span></span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span>     Dispatcher frames typically break down into two categories:</span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span>     1) Long running, general purpose frames, that exit only when</span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span>        told to.  These frames should exit when requested.</span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span>     2) Short running, very specific frames that exit themselves</span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span>        when an important criteria is met.  These frames may</span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span>        consider not exiting when requested in favor of waiting</span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span>        for their important criteria to be met.  These frames</span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span>        should have a timeout associated with them.</span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/param&gt;</span></span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">DispatcherFrame</span>(<span class="params"><span class="keyword">bool</span> exitWhenRequested</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            _exitWhenRequested = exitWhenRequested;</span><br><span class="line">            _continue = <span class="literal">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span>     Indicates that this dispatcher frame should exit.</span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;SecurityNote&gt;</span></span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span>     Critical - calls a critical method - postThreadMessage. </span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span>     PublicOK - all we're doing is posting a current message to our thread. </span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span>                net effect is the dispatcher "wakes up"</span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span>                and uses the continue flag ( which may have just changed). </span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/SecurityNote&gt;</span> </span></span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">bool</span> Continue</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">get</span></span><br><span class="line">            &#123;</span><br><span class="line">                <span class="comment">// This method is free-threaded.</span></span><br><span class="line">                    </span><br><span class="line">                <span class="comment">// First check if this frame wants to continue.</span></span><br><span class="line">                <span class="keyword">bool</span> shouldContinue = _continue;</span><br><span class="line">                <span class="keyword">if</span>(shouldContinue)</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="comment">// This frame wants to continue, so next check if it will</span></span><br><span class="line">                    <span class="comment">// respect the "exit requests" from the dispatcher.</span></span><br><span class="line">                    <span class="keyword">if</span>(_exitWhenRequested)</span><br><span class="line">                    &#123;</span><br><span class="line">                        Dispatcher dispatcher = Dispatcher;</span><br><span class="line">                        </span><br><span class="line">                        <span class="comment">// This frame is willing to respect the "exit requests" of</span></span><br><span class="line">                        <span class="comment">// the dispatcher, so check them.</span></span><br><span class="line">                        <span class="keyword">if</span>(dispatcher._exitAllFrames || dispatcher._hasShutdownStarted)</span><br><span class="line">                        &#123;</span><br><span class="line">                            shouldContinue = <span class="literal">false</span>;</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">                </span><br><span class="line">                <span class="keyword">return</span> shouldContinue;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            [<span class="meta">SecurityCritical</span>] </span><br><span class="line">            <span class="keyword">set</span></span><br><span class="line">            &#123;</span><br><span class="line">                <span class="comment">// This method is free-threaded.</span></span><br><span class="line"></span><br><span class="line">                _continue = <span class="keyword">value</span>;</span><br><span class="line"></span><br><span class="line">                <span class="comment">// Post a message so that the message pump will wake up and</span></span><br><span class="line">                <span class="comment">// check our continue state.</span></span><br><span class="line">                Dispatcher.BeginInvoke(DispatcherPriority.Send, (DispatcherOperationCallback) <span class="keyword">delegate</span>(<span class="keyword">object</span> unused) &#123;<span class="keyword">return</span> <span class="literal">null</span>;&#125;, <span class="literal">null</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">bool</span> _exitWhenRequested;</span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">bool</span> _continue;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>关于DispatcherFrame, Threading Model中<a href="https://docs.microsoft.com/en-us/dotnet/framework/wpf/advanced/threading-model有一节提到**Nested" target="_blank" rel="noopener">https://docs.microsoft.com/en-us/dotnet/framework/wpf/advanced/threading-model有一节提到**Nested</a> Pumping**</p>
+<p>Sometimes it is not feasible to completely lock up the UI thread. Let’s consider the Show method of the MessageBox class. Show doesn’t return until the user clicks the OK button. It does, however, create a window that must have a message loop in order to be interactive. While we are waiting for the user to click OK, the original application window does not respond to user input. It does, however, continue to process paint messages. The original window redraws itself when covered and revealed.(移动MessageBox, 它后面的background window会重绘, 但又无法响应用户的输入)<br><img src="/img/wpf-threadingmodel-3-estedpumping.png" alt=""></p>
+<p>Some thread must be in charge of the message box window. WPF could create a new thread just for the message box window, but this thread would be unable to paint the disabled elements in the original window (remember the earlier discussion of mutual exclusion.线程A无法修改线程B中的UI元素, 所以messageBox中启动了另一个线程的假设不成立). Instead, WPF uses a <strong>nested message processing system</strong>. The Dispatcher class includes a special method called <strong>PushFrame</strong>, which stores an application’s current execution point then begins a new message loop. When the nested message loop finishes, execution resumes after the original PushFrame call.</p>
+<p>In this case, <strong>PushFrame maintains the program context at the call to MessageBox.Show, and it starts a new message loop to repaint the background window and handle input to the message box window</strong>(重绘background window, 是由new message loop负责的). When the user clicks OK and clears the pop-up window, the nested loop exits and control resumes after the call to Show.</p>
+<p>除了上面的Nested Pumping, MSDN中还提到了DispatcherFrame的另一个作用, 模拟实现Winform中Application的DoEvents功能<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//https://msdn.microsoft.com/zh-cn/library/system.windows.threading.dispatcher.pushframe.aspx</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">class</span> <span class="title">ApplicationExtensions</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="meta">#<span class="meta-keyword">region</span> DoEvents using a DispatcherFrame</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">DoEvents</span>(<span class="params"><span class="keyword">this</span> Application application</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        DispatcherFrame frame = <span class="keyword">new</span> DispatcherFrame();</span><br><span class="line">        Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Background, <span class="keyword">new</span> ExitFrameHandler(frm =&gt; frm.Continue = <span class="literal">false</span>), frame);</span><br><span class="line">        Dispatcher.PushFrame(frame);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">delegate</span> <span class="keyword">void</span> <span class="title">ExitFrameHandler</span>(<span class="params">DispatcherFrame frame</span>)</span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">#<span class="meta-keyword">endregion</span></span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>Application.DoEvents方法有什么作用, 看如下代码:<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">button1_Click</span>(<span class="params"><span class="keyword">object</span> sender, EventArgs e</span>)  </span></span><br><span class="line"><span class="function"></span>&#123;  </span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">10000</span>; i++)  </span><br><span class="line">    &#123;  </span><br><span class="line">        label1.Text = i.ToString();  </span><br><span class="line">        Application.DoEvents();  </span><br><span class="line">    &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>该方法是想让label的文本从0更新到9999. 如果注释掉Application.DoEvents(), Label只会最后显示一个9999; 而加上Application.DoEvents(), label会有一个从0到9999的跳变过程. </p>
+<p>label1.Text = i.ToString();  这一行需要更新lable1, 其实是有一个repaint消息. 但由于UI线程正在执行for循环,没有空闲去处理该消息. 所以在没有Application.DoEvents();  的情况下, 只有等UI线程执行完for循环后, UI线程才会去处理repaint消息, label才会更新.如果加了Application.DoEvents(), 该方法的功能就是强制UI线程去执行消息队列中的消息, 即使在for循环中. 于是label能够实时得到更新.</p>
+<p>Dispatcher.PushFrame(frame);强制启动了一个新的loop. UI线程会保存PushFrame之前的context. 该loop会将dispatcher queue中的所有消息进行处理, 最后退出. repaint, mousemove等都是在dispatcher queue中<br>即每一次迭代, 都强制启动了一个loop, 去处理所有消息队列中的消息. 这样每一次迭代, label都可以得到更新. 如果不强制启动新loop, UI线程的dispatcher都在处理for循环, 没有空闲去处理消息队列中的其他消息.<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Background, <span class="keyword">new</span> ExitFrameHandler(frm =&gt; frm.Continue = <span class="literal">false</span>), frame);</span><br></pre></td></tr></table></figure></p>
+<p>这一行的意思是在dispatcher queue中添加一个dispatchOperation, 该operation的作用是将DispatcherFrame的Continue属性设为false, 如此就能退出loop. 由于它的优先级是Background, 该dispatchOperation会在消息队列中的末端, 最后执行.<br>即处理完消息队列中的所有消息后退出loop.</p>
+<p>下面是Winforms中对Application.DoEvents()的解释<a href="https://msdn.microsoft.com/en-us/library/system.windows.forms.application.doevents.aspx" target="_blank" rel="noopener">https://msdn.microsoft.com/en-us/library/system.windows.forms.application.doevents.aspx</a></p>
+<blockquote>
+<p>When you run a Windows Form, it creates the new form, which then waits for events to handle. Each time the form handles an event, it processes all the code associated with that event. All other events wait in the queue. While your code handles the event, your application does not respond. For example, the window does not repaint if another window is dragged on top.</p>
+</blockquote>
+<blockquote>
+<p>If you call DoEvents in your code, your application can handle the other events. For example, if you have a form that adds data to a ListBox and add DoEvents to your code, your form repaints when another window is dragged over it. If you remove DoEvents from your code, your form will not repaint until the click event handler of the button is finished executing. For more information on messaging, see User Input in Windows Forms.</p>
+</blockquote>
+<blockquote>
+<p>Unlike Visual Basic 6.0, the DoEvents method does not call the Thread.Sleep method.Typically, you use this method in a loop to process messages.</p>
+</blockquote>
+<p>不过用Application.DoEvents也会带来一些问题, 参考<a href="https://blogs.msdn.microsoft.com/jfoscoding/2005/08/06/keeping-your-ui-responsive-and-the-dangers-of-application-doevents/" target="_blank" rel="noopener">https://blogs.msdn.microsoft.com/jfoscoding/2005/08/06/keeping-your-ui-responsive-and-the-dangers-of-application-doevents/</a></p>
+<p>其他参考:</p>
+<ol>
+<li><p><a href="https://www.codeproject.com/Articles/152137/DispatcherFrame-Look-in-Depth" target="_blank" rel="noopener">https://www.codeproject.com/Articles/152137/DispatcherFrame-Look-in-Depth</a></p>
+</li>
+<li><p><a href="https://kent-boogaart.com/blog/dispatcher-frames" target="_blank" rel="noopener">https://kent-boogaart.com/blog/dispatcher-frames</a></p>
+</li>
+</ol>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/WPF/" rel="tag"># WPF</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/04/24/WPF笔记(X1) Threading Model (二)/" rel="next" title="WPF笔记(X1) Threading Model (二)">
+                <i class="fa fa-chevron-left"></i> WPF笔记(X1) Threading Model (二)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/04/25/WPF笔记(X1) Threading Model (四)/" rel="prev" title="WPF笔记(X1) Threading Model (四)">
+                WPF笔记(X1) Threading Model (四) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">zmapleaf</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">66</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zmapleaf</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

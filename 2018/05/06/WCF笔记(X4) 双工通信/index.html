@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="WCF,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="WCF的整体结构如下图所示 图上展示的是Client调用Service的过程. 在前面的笔记中已经提到, 调用过程也可以反向进行, 从Service回调Client, 这就是WCF中的双工通信.原先的Service和Client将发生对调，Service成为Client，Client成为Service。 WCF支持3种消息交换模式： 1. Request/Reply (请求/回复); 2. One">
+<meta name="keywords" content="WCF">
+<meta property="og:type" content="article">
+<meta property="og:title" content="WCF笔记(X4) 双工通信">
+<meta property="og:url" content="http://yoursite.com/2018/05/06/WCF笔记(X4) 双工通信/index.html">
+<meta property="og:site_name" content="远">
+<meta property="og:description" content="WCF的整体结构如下图所示 图上展示的是Client调用Service的过程. 在前面的笔记中已经提到, 调用过程也可以反向进行, 从Service回调Client, 这就是WCF中的双工通信.原先的Service和Client将发生对调，Service成为Client，Client成为Service。 WCF支持3种消息交换模式： 1. Request/Reply (请求/回复); 2. One">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://yoursite.com/img/wcf-arch.png">
+<meta property="og:updated_time" content="2018-05-13T04:58:05.589Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="WCF笔记(X4) 双工通信">
+<meta name="twitter:description" content="WCF的整体结构如下图所示 图上展示的是Client调用Service的过程. 在前面的笔记中已经提到, 调用过程也可以反向进行, 从Service回调Client, 这就是WCF中的双工通信.原先的Service和Client将发生对调，Service成为Client，Client成为Service。 WCF支持3种消息交换模式： 1. Request/Reply (请求/回复); 2. One">
+<meta name="twitter:image" content="http://yoursite.com/img/wcf-arch.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/05/06/WCF笔记(X4) 双工通信/">
+
+
+
+
+
+  <title>WCF笔记(X4) 双工通信 | 远</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">远</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/05/06/WCF笔记(X4) 双工通信/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zmapleaf">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="远">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">WCF笔记(X4) 双工通信</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-05-06T17:41:51+08:00">
+                2018-05-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/编程/" itemprop="url" rel="index">
+                    <span itemprop="name">编程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>WCF的整体结构如下图所示<br><img src="/img/wcf-arch.png" alt=""></p>
+<p>图上展示的是Client调用Service的过程. 在前面的笔记中已经提到, 调用过程也可以反向进行, 从Service回调Client, 这就是WCF中的双工通信.原先的Service和Client将发生对调，Service成为Client，Client成为Service。</p>
+<p>WCF支持3种消息交换模式： 1. Request/Reply (请求/回复); 2. One-Way(单向); 3. Duplex(双工). 前面两种是基本的消息交换模式, 可以用OperationContract描述, Duplex可以看成是前两种基本消息交换模式的组合.</p>
+<p>1.Request/Reply 默认方式</p>
+<p>As the name implies, in these operations, the client issues a request in the form of a message and blocks until it gets the reply message. <strong>If the service does not respond within a default timeout of one minute, the client will get a TimeoutException</strong>. Request-reply is the <strong>default</strong> operation mode. Programming against request-reply operations is simple enough and resembles programming using the classic client/server model. The returned response message containing the results or returned values is converted to normal method return values. In addition, the proxy will throw an exception on the client side if there are any communication or service-side exceptions</p>
+<p>2.One-Way<br>One-Way 这种方式在调用方法后会立即返回。需要注意的是 One-Way 不能用在非void，或者包含 out/ref 参数的方法上，会导致抛出 InvalidOperationException 异常。 </p>
+<p>There are cases when an operation has no return value, and the client does not care about the success or failure of the invocation. To support this sort of fire-and-forget invocation, WCF offers one-way operations: once the client issues the call, WCF generates a request message, but no correlated reply message will ever return to the client. As a result, one-way operations cannot return values, and any exceptions thrown<br>on the service side will not make their way to the client.</p>
+<p>Ideally, when the client calls a one-way method, it should be blocked only for the briefest moment required to dispatch the call. However, in reality, one-way calls do not equate to asynchronous calls. When one-way calls reach the service, they may not be dispatched all at once but may instead be buffered on the service side to be dispatched one at a time, according to the service’s configured concurrency mode behavior. The<br>number of messages the service can buffer (be they one-way or request-reply operations) is a product of the configured channel and reliability mode. If the number of messages exceeds the buffer’s capacity, the client will be blocked even if it has issued a one-way call. However, once the call is deposited in the buffer, the client will be unblocked and can continue executing while the service processes the operation in<br>the background. 假如one-way call到达Service但没有立即被Dispatch, 而是在缓存队列中, 这是client会被阻塞</p>
+<p>It’s also wrong to equate one-way calls with concurrent calls. If the client uses the same proxy yet utilizes multiple threads to invoke one-way calls, the calls may or may not execute concurrently on the service, and the exact nature of the interaction will be determined by the service concurrency management mode and the transport session (see Chapter 8 for more on this subject).All of the WCF bindings support one-way operations.</p>
+<p>3.Duplex  </p>
+<p>WCF supports allowing a service to call back to its clients. During a callback, in many respects the tables are turned: the service is the client, and the client becomes the service (see Figure 5-1). Callback operations can be used in a variety of scenarios and applications, but they are especially useful when it comes to events, or notifying the client(s) that some event has happened on the service side.</p>
+<p>Not all bindings support callback operations. Only bidirectional-capable bindings support callback operations. For example, because of its connectionless nature, HTTP cannot be used for callbacks, and therefore you cannot use callbacks over the BasicHttpBinding or the WSHttpBinding. The only two commonly used bindings that offer callbacks are the NetTcpBinding and the NetNamedPipeBinding, because by their very nature, the TCP and the IPC protocols support duplex communication.</p>
+<p>一个服务契约若要定义回调，必须专门定义一个用于回调的契约。一个服务契约最多包含一个回调契约，一个服务契约一旦定义了回调契约那客户端必须支持这个回调。那如何为一个服务契约定义回调呢？使用ServiceContract特性的CallBackContract特性，代码如下：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">interface</span> <span class="title">IMyContractCallback</span></span><br><span class="line">&#123;</span><br><span class="line">    [<span class="meta">OperationContract</span>]</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">OnCallback</span>(<span class="params"></span>)</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">[<span class="meta">ServiceContract(CallbackContract = typeof(IMyContractCallback))</span>]</span><br><span class="line"><span class="keyword">interface</span> <span class="title">IMyContract</span></span><br><span class="line">&#123;</span><br><span class="line">    [<span class="meta">OperationContract</span>]</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">DoSomething</span>(<span class="params"></span>)</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="Client-Callback-Setup"><a href="#Client-Callback-Setup" class="headerlink" title="Client Callback Setup"></a>Client Callback Setup</h3><p>It is up to the client to host the callback object and expose a callback endpoint. Recall from Chapter 1 that the innermost execution scope of the service instance is the instance context. The InstanceContext class provides a constructor that takes the service instance to the host:</p>
+<p>All the client needs to do to host a callback object is instantiate the callback object and construct a context around it:<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title">MyCallback</span> : <span class="title">IMyContractCallback</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">OnCallback</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;...&#125;</span><br><span class="line">&#125;</span><br><span class="line">IMyContractCallback callback = <span class="keyword">new</span> MyCallback();</span><br><span class="line">InstanceContext context = <span class="keyword">new</span> InstanceContext(callback);</span><br><span class="line"></span><br><span class="line">MyContractClient proxy = <span class="keyword">new</span> MyContractClient(context);</span><br><span class="line">proxy.DoSomething();</span><br></pre></td></tr></table></figure></p>
+<h3 id="Service-Side-Callback-Invocation"><a href="#Service-Side-Callback-Invocation" class="headerlink" title="Service-Side Callback Invocation"></a>Service-Side Callback Invocation</h3><p>The client-side callback endpoint reference is passed along with every call the client makes to the service, and it is part of the incoming message. The OperationContext class provides the service with easy access to the callback reference via the generic method GetCallbackChannel<t>()</t></p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">[<span class="meta">ServiceBehavior(InstanceContextMode = InstanceContextMode.PerCall)</span>]</span><br><span class="line"><span class="keyword">class</span> <span class="title">MyService</span> : <span class="title">IMyContract</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">static</span> List&lt;IMyContractCallback&gt; m_Callbacks = <span class="keyword">new</span> List&lt;IMyContractCallback&gt;();</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">DoSomething</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        IMyContractCallback callback = OperationContext.Current.GetCallbackChannel&lt;IMyContractCallback&gt;();</span><br><span class="line">        <span class="keyword">if</span>(m_Callbacks.Contains(callback) == <span class="literal">false</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            m_Callbacks.Add(callback);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">CallClients</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        Action&lt;IMyContractCallback&gt; invoke = callback =&gt; callback.OnCallback();</span><br><span class="line">        m_Callbacks.ForEach (invoke);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="Callback-reentrancy"><a href="#Callback-reentrancy" class="headerlink" title="Callback reentrancy"></a>Callback reentrancy</h4><p>The service may also want to invoke the callback reference that’s passed in (or a saved copy of it) during the execution of a contract operation. However, such invocations are disallowed by default. The reason is the default service concurrency management.<strong>By default, the service class is configured for single-threaded access</strong>: the service instance context is associated with a lock, and only one thread at a time can own the<br>lock and access the service instance inside that context. <strong>Calling out to the client during an operation call requires blocking the service thread and invoking the callback. The problem is that processing the reply message from the client on the same channel once the callback returns requires reentering the same context and negotiating ownership of the same lock, which will result in a deadlock</strong>. Note that the service may still invoke callbacks to other clients or call other services; <strong>it is the callback to its calling client that will cause the deadlock</strong></p>
+<p>To prevent such a deadlock, if the single-threaded service instance tries to call back to its client, WCF will throw an InvalidOperationException. There are three possible solutions. <strong>The first</strong> is to configure the service for multithreaded access. Callbacks to the calling client will then be allowed because the service instance will not be associated with a lock; however, this will increase the burden on the service developer, because of the need to provide synchronization for the service. <strong>The second</strong> solution is to configure the service for reentrancy. When configured for reentrancy, the service instance context is still associated with a lock, and only single-threaded access is allowed. However, if the service is calling back to its client, WCF will silently release the lock first. you can set the concurrency behavior to either multithreaded or reentrant using the Concurrency Mode property of the ServiceBehavior attribute:<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">enum</span> ConcurrencyMode</span><br><span class="line">&#123;</span><br><span class="line">    Single, <span class="comment">//Default</span></span><br><span class="line">    Reentrant,</span><br><span class="line">    Multiple</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">[<span class="meta">ServiceContract(CallbackContract = typeof(IMyContractCallback))</span>]</span><br><span class="line"><span class="keyword">interface</span> <span class="title">IMyContract</span></span><br><span class="line">&#123;</span><br><span class="line">    [<span class="meta">OperationContract</span>]</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">DoSomething</span>(<span class="params"></span>)</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">interface</span> <span class="title">IMyContractCallback</span></span><br><span class="line">&#123;</span><br><span class="line">    [<span class="meta">OperationContract</span>]</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">OnCallback</span>(<span class="params"></span>)</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">[<span class="meta">ServiceBehavior(ConcurrencyMode = ConcurrencyMode.Reentrant)</span>]</span><br><span class="line"><span class="keyword">class</span> <span class="title">MyService</span> : <span class="title">IMyContract</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">DoSomething</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        IMyContractCallback callback = OperationContext.Current.GetCallbackChannel&lt;IMyContractCallback&gt;();</span><br><span class="line">        callback.OnCallback();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>The third</strong> solution that allows the service to safely call back to the calling client is to configure the callback contract operations as one-way operations. Doing so will enable the service to call back even when the concurrency mode is set to singlethreaded, because there will not be any reply message to contend for the lock.</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//Example 5-8. One-way callbacks are allowed by default</span></span><br><span class="line">[<span class="meta">ServiceContract(CallbackContract = typeof(IMyContractCallback))</span>]</span><br><span class="line"><span class="keyword">interface</span> <span class="title">IMyContract</span></span><br><span class="line">&#123;</span><br><span class="line">    [<span class="meta">OperationContract</span>]</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">DoSomething</span>(<span class="params"></span>)</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">interface</span> <span class="title">IMyContractCallback</span></span><br><span class="line">&#123;</span><br><span class="line">    [<span class="meta">OperationContract(IsOneWay = true)</span>]</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">OnCallback</span>(<span class="params"></span>)</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title">MyService</span> : <span class="title">IMyContract</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">DoSomething</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        IMyContractCallback callback = OperationContext.Current.GetCallbackChannel&lt;IMyContractCallback&gt;();</span><br><span class="line">        callback.OnCallback();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="Callbacks-and-the-UI-Synchronization-Context"><a href="#Callbacks-and-the-UI-Synchronization-Context" class="headerlink" title="Callbacks and the UI Synchronization Context"></a>Callbacks and the UI Synchronization Context</h4><p>Configuring the callback for affinity to the UI thread may trigger a deadlock. Suppose a Windows Forms client establishes an affinity between a callback object (or even itself) and the UI synchronization context, and then calls a service, passing the callback reference. The service is configured for reentrancy, and it calls back to the client.</p>
+<p>A deadlock now occurs because the callback to the client needs to execute on the UI thread, and that thread is blocked waiting for the service call to return. For example,Example 8-22 has the potential for this deadlock. Configuring the callback as a oneway operation will not resolve the problem here, because the one-way call still needs to be marshaled first to the UI thread. The only way to resolve the deadlock in this case is to turn off using the UI synchronization context by the callback, and to manually and asynchronously marshal the update to the form using its synchronization context. Example 8-24 demonstrates using this technique.</p>
+<p>Thread Affinity (线程亲和性) 和 marshal(封送), 这两个概念是一块儿的</p>
+<p>Whenever an affinity to a particular thread or threads is expected, the service cannot simply execute the call on the incoming WCF worker thread. Instead, the service must marshal the call to the correct thread(s) required by the resource that it accesses.</p>
+<p>marshal指的是A线程中向B线程发送一个调用请求, 例如工作线程marshal(封送)到UI线程</p>
+<p>UseSynchronizationContext的运用</p>
+<p>If the thread that is opening the host has a synchronization context and UseSynchronizationContext is true, WCF will establish an affinity between that synchronization context and all of the instances of the service that is hosted by that host. WCF will automatically marshal all of the incoming calls to the service’s synchronization context.</p>
+<p>The default value of UseSynchronizationContext is true,</p>
+<p>The classic use of UseSynchronizationContext is to enable the service to update UI controls and windows directly. WCF greatly simplifies UI updates by providing an affinity between all of the service instances from a particular host and a specific UI thread.</p>
+<p>Whenever you use hosting on the UI thread, deadlocks are possible. For example, the following setup is guaranteed to result with a deadlock: A Windows Forms application is hosting a service with UseSynchronizationContext set to true, and UI thread affinity is established. The Windows Forms application then calls the service over one of its endpoints. The call to the service blocks the UI thread, while WCF posts a message to the UI thread to invoke the service. That message is never processed, because of the blocking UI thread—hence, the deadlock.</p>
+<p>UseSynchronizationContext 默认为true, 那么UI线程调用服务, 服务回调默认也发生在UI线程中.<br>假如调用不是request-reply, 那么会出现死锁: UI线程等待服务结束调用(堵塞), 服务结束调用, 需要回调返回, 而回调又需要UI线程, 所以死循环了</p>
+<p>一个解决方法是UseSynchronizationContext 设为false, 那么回调就会发生在work thread中, 然后再从work thread封送到UI线程, 假如需要操作UI控件的话</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//Example 8-22 </span></span><br><span class="line"><span class="keyword">partial</span> <span class="keyword">class</span> <span class="title">MyForm</span> : <span class="title">Form</span>,<span class="title">IMyContractCallback</span></span><br><span class="line">&#123;</span><br><span class="line">    MyContractClient m_Proxy;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">MyForm</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        InitializeComponent();</span><br><span class="line">        m_Proxy = <span class="keyword">new</span> MyContractClient(<span class="keyword">new</span> InstanceContext(<span class="keyword">this</span>));</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//Called as a result of a UI event</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">OnCallService</span>(<span class="params"><span class="keyword">object</span> sender,EventArgs args</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_Proxy.MyMethod(); <span class="comment">//Affinity established here</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//This method always runs on the UI thread</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">OnCallback</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">//No need for synchronization and marshaling</span></span><br><span class="line">        Text = <span class="string">"Some Callback"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">OnClose</span>(<span class="params"><span class="keyword">object</span> sender,EventArgs args</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_Proxy.Close();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//Example 8-24. Avoiding a callback deadlock on the UI thread</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span>// Client Side <span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span></span></span><br><span class="line">[<span class="meta">CallbackBehavior(UseSynchronizationContext = false)</span>]</span><br><span class="line"><span class="keyword">partial</span> <span class="keyword">class</span> <span class="title">MyForm</span> : <span class="title">Form</span>,<span class="title">IMyContractCallback</span></span><br><span class="line">&#123;</span><br><span class="line">    SynchronizationContext m_Context;</span><br><span class="line">    MyContractClient m_Proxy;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">MyForm</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        InitializeComponent();</span><br><span class="line">        m_Context = SynchronizationContext.Current;</span><br><span class="line">        m_Proxy = <span class="keyword">new</span> MyContractClient(<span class="keyword">new</span> InstanceContext(<span class="keyword">this</span>));</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">CallService</span>(<span class="params"><span class="keyword">object</span> sender,EventArgs args</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_Proxy.MyMethod();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//Callback runs on worker threads</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">OnCallback</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        SendOrPostCallback setText = _=&gt;</span><br><span class="line">        &#123;</span><br><span class="line">            Text = <span class="string">"Manually marshaling to UI thread"</span>;</span><br><span class="line">        &#125;;</span><br><span class="line">        m_Context.Post(setText,<span class="literal">null</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">OnClose</span>(<span class="params"><span class="keyword">object</span> sender,EventArgs args</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_Proxy.Close();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span>// Service Side <span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span><span class="doctag">///</span></span></span><br><span class="line">[<span class="meta">ServiceContract(CallbackContract = typeof(IMyContractCallback))</span>]</span><br><span class="line"><span class="keyword">interface</span> <span class="title">IMyContract</span></span><br><span class="line">&#123;</span><br><span class="line">    [<span class="meta">OperationContract</span>]</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">MyMethod</span>(<span class="params"></span>)</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">interface</span> <span class="title">IMyContractCallback</span></span><br><span class="line">&#123;</span><br><span class="line">    [<span class="meta">OperationContract</span>]</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">OnCallback</span>(<span class="params"></span>)</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">[<span class="meta">ServiceBehavior(ConcurrencyMode = ConcurrencyMode.Reentrant)</span>]</span><br><span class="line"><span class="keyword">class</span> <span class="title">MyService</span> : <span class="title">IMyContract</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">MyMethod</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        IMyContractCallback callback = OperationContext.Current.GetCallbackChannel&lt;IMyContractCallback&gt;();</span><br><span class="line">        callback.OnCallback();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>WCF解决死锁的策略<br>WCF resolves service call deadlocks by eventually timing out the call and throwing a TimeoutException</p>
+<p>参考:<br>Writing Smart Clients by Using Windows Communication Foundation(<a href="https://msdn.microsoft.com/en-us/library/cc294424.aspx" target="_blank" rel="noopener">https://msdn.microsoft.com/en-us/library/cc294424.aspx</a>)</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/WCF/" rel="tag"># WCF</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/05/06/WCF笔记(X3) 实例管理/" rel="next" title="WCF笔记(X3) 实例管理">
+                <i class="fa fa-chevron-left"></i> WCF笔记(X3) 实例管理
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/05/07/WCF笔记(X5) 并发管理 /" rel="prev" title="WCF笔记(X5) 并发管理">
+                WCF笔记(X5) 并发管理 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">zmapleaf</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">66</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Client-Callback-Setup"><span class="nav-number">1.</span> <span class="nav-text">Client Callback Setup</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Service-Side-Callback-Invocation"><span class="nav-number">2.</span> <span class="nav-text">Service-Side Callback Invocation</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Callback-reentrancy"><span class="nav-number">2.1.</span> <span class="nav-text">Callback reentrancy</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Callbacks-and-the-UI-Synchronization-Context"><span class="nav-number">2.2.</span> <span class="nav-text">Callbacks and the UI Synchronization Context</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zmapleaf</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

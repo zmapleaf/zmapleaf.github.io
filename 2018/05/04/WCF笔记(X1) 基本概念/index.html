@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="WCF,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="WCF(Windows Communication Foundation)和WPF一样复杂, 这里仅记录一下WCF的基本知识. 面向服务架构WCF是微软目前的分布式通信框架(.Net3.0和WPF一起推出, 现是.Net4.5版本). 在接触WCF之前, 只知道Communication的双方, 一个叫Client, 一个叫Server. 在WCF中, Server换成了Service. 语义上来">
+<meta name="keywords" content="WCF">
+<meta property="og:type" content="article">
+<meta property="og:title" content="WCF笔记(X1) 基本概念">
+<meta property="og:url" content="http://yoursite.com/2018/05/04/WCF笔记(X1) 基本概念/index.html">
+<meta property="og:site_name" content="远">
+<meta property="og:description" content="WCF(Windows Communication Foundation)和WPF一样复杂, 这里仅记录一下WCF的基本知识. 面向服务架构WCF是微软目前的分布式通信框架(.Net3.0和WPF一起推出, 现是.Net4.5版本). 在接触WCF之前, 只知道Communication的双方, 一个叫Client, 一个叫Server. 在WCF中, Server换成了Service. 语义上来">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://yoursite.com/img/wcf-different-machine.png">
+<meta property="og:image" content="http://yoursite.com/img/wcf-same-machine.png">
+<meta property="og:image" content="http://yoursite.com/img/wcf-channel-stack.jpeg">
+<meta property="og:image" content="http://yoursite.com/img/wcf-channel-stack-2.jpeg">
+<meta property="og:updated_time" content="2018-05-13T04:58:05.554Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="WCF笔记(X1) 基本概念">
+<meta name="twitter:description" content="WCF(Windows Communication Foundation)和WPF一样复杂, 这里仅记录一下WCF的基本知识. 面向服务架构WCF是微软目前的分布式通信框架(.Net3.0和WPF一起推出, 现是.Net4.5版本). 在接触WCF之前, 只知道Communication的双方, 一个叫Client, 一个叫Server. 在WCF中, Server换成了Service. 语义上来">
+<meta name="twitter:image" content="http://yoursite.com/img/wcf-different-machine.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/05/04/WCF笔记(X1) 基本概念/">
+
+
+
+
+
+  <title>WCF笔记(X1) 基本概念 | 远</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">远</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/05/04/WCF笔记(X1) 基本概念/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zmapleaf">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="远">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">WCF笔记(X1) 基本概念</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-05-04T16:44:51+08:00">
+                2018-05-04
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/编程/" itemprop="url" rel="index">
+                    <span itemprop="name">编程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>WCF(Windows Communication Foundation)和WPF一样复杂, 这里仅记录一下WCF的基本知识.</p>
+<h3 id="面向服务架构"><a href="#面向服务架构" class="headerlink" title="面向服务架构"></a>面向服务架构</h3><p>WCF是微软目前的分布式通信框架(.Net3.0和WPF一起推出, 现是.Net4.5版本). 在接触WCF之前, 只知道Communication的双方, 一个叫Client, 一个叫Server. 在WCF中, Server换成了Service. 语义上来讲, 都和<strong>服务</strong>相关, 但Server和Service并不等同.</p>
+<p>为什么叫Service, 这和面向服务架构(SOA, Service-Oriented Architecture)有关. WCF的Wiki是这样描述的:</p>
+<blockquote>
+<p>WCF is a tool often used to implement and deploy a service-oriented architecture (SOA). It is designed using service-oriented architecture principles to support distributed computing whereservices have remote consumers. <strong>Clients can consume multiple services; services can be consumed by multiple clients</strong>. Services are loosely coupled to each other. Services typically have a WSDL interface (Web Services Description Language) that any WCF client can use to consume the service, regardless of which platform the service is hosted on. WCF implements many advanced Web services (WS) standards such as WS-Addressing, WS-ReliableMessaging and WS-Security.</p>
+</blockquote>
+<p>顺便说一下, 目前兴起一种叫做微服务的架构方式, 是从SOA发展而来. SOA的提出是在企业应用, 而微服务架构是从互联网应用兴起的. 企业应用, 不要被企业两个字吓住, 如果不是交易系统的话，并发量都不是很大的. 而互联网应用的用户规模和并发量相比企业应用就大很多.</p>
+<p>SOA中的服务(Services)就是公开的一组功能的集合. 从软件设计的角度考虑, 软件设计思想经历了从函数发展到对象，从对象发展到组件，再从组件发展到服务的几次变迁.</p>
+<p>消费服务的一方叫做Client. Client与Service通过一种SOAP(简单对象访问模型)的消息进行通信, SOAP是一种XML格式. 和具体的传输协议无关.</p>
+<p>这样Client和Service就分离开来了. WCF的Client可以与非WCF的Service交互. WCF的Service也可以与非WCF的Client交互.如此, 就做到分布式和松耦合.</p>
+<p>Client与Service之间, 并不是原始的类似Socket那样收发消息,而是通过RPC的方式进行交互.既然是RPC的方式, 那么Client需要引用Service的相关功能. 怎么做到呢?</p>
+<p>Service通过公开元数据(metadata)的方式公开服务.一个非WCF的Client可以将元数据导入到本地环境中, 生成本地的类型数据. 类似的, WCF的Client也可以导入非WCF的Service的元数据, 然后以本地CLR类与接口的方式进行调用.</p>
+<p>具体来讲, 在WCF中, Client使用proxy将服务调用转发给Service. proxy是Service在本地环境中的代理, 接口和Service一样. proxy是通过Service公开的元数据生成的(借助相关工具).</p>
+<p>WCF不仅允许Client和Service跨机器交互<br><img src="/img/wcf-different-machine.png" alt=""><br>也允许Client和Service在同一机器上交互<br><img src="/img/wcf-same-machine.png" alt=""></p>
+<h3 id="WCF架构"><a href="#WCF架构" class="headerlink" title="WCF架构"></a>WCF架构</h3><p>不仅限于简单的通信, WCF还提供了对可靠性、事务性、并发管理、安全性等技术的支持.它们依赖基于拦截(interception)机制的WCF体系架构. </p>
+<p>这部分引用<em>Programming WCF Service 4th P76</em></p>
+<blockquote>
+<p>The interception starts when the proxy serializes the <strong>call stack frame</strong> to a<br>message and sends the message down a chain of <strong>channels</strong>. The channel is merely an<br>interceptor whose purpose is to perform a specific task. Each client-side channel does<br>pre-call processing of the message. The exact structure and composition of the chain<br>depend mostly on the binding. For example, one of the channels may be responsible<br>for encoding the message (binary, text, or MTOM), another for passing the security<br>call context, another for propagating the client transaction, another for managing the<br>reliable session, another for encrypting the message body (if so configured), and so<br>on. The last channel on the client side is the transport channel, which sends the mes‐<br>sage over the configured transport to the host.</p>
+</blockquote>
+<p>具体有哪些Channel, 依赖于需求和配置.<br><img src="/img/wcf-channel-stack.jpeg" alt=""></p>
+<blockquote>
+<p>On the host side, the message goes through another chain of channels that perform<br>host-side pre-call processing of the message. The first channel on the host side is the<br>transport channel, which receives the message from the transport. Subsequent chan‐<br>nels perform various tasks, such as decryption of the message body, decoding of the<br>message, joining the propagated transaction, setting the security principal, managing<br>the session, and activating the service instance. The last channel on the host side<br>passes the message to the dispatcher. <strong>The dispatcher converts the message to a stack<br>frame and calls the service instance</strong>. </p>
+</blockquote>
+<p><img src="/img/wcf-channel-stack-2.jpeg" alt=""></p>
+<blockquote>
+<p>The service has no way of knowing that it was not called by a local client. In fact, it<br>was called by a local client—the <strong>dispatcher</strong>. </p>
+</blockquote>
+<blockquote>
+<p>The service instance executes the call and returns control to the dispatcher, which<br>then converts the returned values and error information (if any) into a return mes‐<br>sage. The process is then reversed: the dispatcher passes the message through the<br>host-side channels to perform post-call processing, such as managing the transaction,<br>deactivating the instance, encoding the reply, encrypting it, and so on. The returned<br>message then goes to the transport channel, which sends it to the client-side channels<br>for client-side post-call processing. This process in turn consists of tasks such as<br>decryption, decoding, committing or aborting the transaction, and so on. <strong>The last<br>channel passes the message to the proxy, which converts the returned message to a<br>stack frame and returns control to the client</strong>.</p>
+</blockquote>
+<p>参考:</p>
+<ol>
+<li>Programming WCF Service 4th</li>
+<li>understanding-wcf-bindings-and-channel-stack(<a href="http://www.c-sharpcorner.com/UploadFile/81a718/understanding-wcf-bindings-and-channel-stack/" target="_blank" rel="noopener">http://www.c-sharpcorner.com/UploadFile/81a718/understanding-wcf-bindings-and-channel-stack/</a>)</li>
+<li>Introducing Windows Communication Foundation in .NET Framework 4 (<a href="https://msdn.microsoft.com/en-us/library/ee958158.aspx" target="_blank" rel="noopener">https://msdn.microsoft.com/en-us/library/ee958158.aspx</a>)</li>
+</ol>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/WCF/" rel="tag"># WCF</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/04/28/Paint.Net笔记(X4) Effect/" rel="next" title="Paint.Net笔记(X4) Effect">
+                <i class="fa fa-chevron-left"></i> Paint.Net笔记(X4) Effect
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/05/06/WCF笔记(X2) 基本使用/" rel="prev" title="WCF笔记(X2) 基本使用">
+                WCF笔记(X2) 基本使用 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">zmapleaf</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">66</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#面向服务架构"><span class="nav-number">1.</span> <span class="nav-text">面向服务架构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#WCF架构"><span class="nav-number">2.</span> <span class="nav-text">WCF架构</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zmapleaf</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

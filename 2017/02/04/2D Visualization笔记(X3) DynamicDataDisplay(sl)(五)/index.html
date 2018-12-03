@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="可视化,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="官方http://research.microsoft.com/en-us/um/cambridge/groups/science/tools/d3/dynamicdatadisplay.htm Tutorialhttp://research.microsoft.com/en-us/um/cambridge/projects/ddd/d3isdk/ D3Overview 必读http://rese">
+<meta name="keywords" content="可视化">
+<meta property="og:type" content="article">
+<meta property="og:title" content="2D Visualization笔记(X3) DynamicDataDisplay(sl)(五)">
+<meta property="og:url" content="http://yoursite.com/2017/02/04/2D Visualization笔记(X3) DynamicDataDisplay(sl)(五)/index.html">
+<meta property="og:site_name" content="远">
+<meta property="og:description" content="官方http://research.microsoft.com/en-us/um/cambridge/groups/science/tools/d3/dynamicdatadisplay.htm Tutorialhttp://research.microsoft.com/en-us/um/cambridge/projects/ddd/d3isdk/ D3Overview 必读http://rese">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-05-13T04:54:59.666Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="2D Visualization笔记(X3) DynamicDataDisplay(sl)(五)">
+<meta name="twitter:description" content="官方http://research.microsoft.com/en-us/um/cambridge/groups/science/tools/d3/dynamicdatadisplay.htm Tutorialhttp://research.microsoft.com/en-us/um/cambridge/projects/ddd/d3isdk/ D3Overview 必读http://rese">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/02/04/2D Visualization笔记(X3) DynamicDataDisplay(sl)(五)/">
+
+
+
+
+
+  <title>2D Visualization笔记(X3) DynamicDataDisplay(sl)(五) | 远</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">远</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/04/2D Visualization笔记(X3) DynamicDataDisplay(sl)(五)/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zmapleaf">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="远">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">2D Visualization笔记(X3) DynamicDataDisplay(sl)(五)</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-02-04T13:35:35+08:00">
+                2017-02-04
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/编程/" itemprop="url" rel="index">
+                    <span itemprop="name">编程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>官方<br><a href="http://research.microsoft.com/en-us/um/cambridge/groups/science/tools/d3/dynamicdatadisplay.htm" target="_blank" rel="noopener">http://research.microsoft.com/en-us/um/cambridge/groups/science/tools/d3/dynamicdatadisplay.htm</a></p>
+<p>Tutorial<br><a href="http://research.microsoft.com/en-us/um/cambridge/projects/ddd/d3isdk/" target="_blank" rel="noopener">http://research.microsoft.com/en-us/um/cambridge/projects/ddd/d3isdk/</a></p>
+<p>D3Overview 必读<br><a href="http://research.microsoft.com/en-us/um/cambridge/groups/science/tools/d3/D3Overview.pdf" target="_blank" rel="noopener">http://research.microsoft.com/en-us/um/cambridge/groups/science/tools/d3/D3Overview.pdf</a></p>
+<p>Sliverlight版本: DynamicDataDisplay.2.0.907</p>
+<p>Dynamic Data Display 的Sliverlight版本和Wpf版本中的代码不一样.</p>
+<hr>
+<h3 id="Markers-Many-markers"><a href="#Markers-Many-markers" class="headerlink" title="Markers: Many markers"></a>Markers: Many markers</h3><p><strong>cs</strong><br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Copyright © 2010-2011 Microsoft Corporation, All Rights Reserved.</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> System.Collections.Generic;</span><br><span class="line"><span class="keyword">using</span> System.Globalization;</span><br><span class="line"><span class="keyword">using</span> System.IO;</span><br><span class="line"><span class="keyword">using</span> System.Linq;</span><br><span class="line"><span class="keyword">using</span> System.Windows;</span><br><span class="line"><span class="keyword">using</span> System.Windows.Controls;</span><br><span class="line"><span class="keyword">using</span> System.Windows.Resources;</span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">ManyMarkersSample</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">partial</span> <span class="keyword">class</span> <span class="title">MainPage</span> : <span class="title">UserControl</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">MainPage</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            InitializeComponent();</span><br><span class="line"></span><br><span class="line">            <span class="keyword">var</span> y = LoadData();</span><br><span class="line">            <span class="keyword">var</span> x = Enumerable.Range(<span class="number">0</span>, y.Length).Select(p =&gt; (<span class="keyword">double</span>)p).ToArray();</span><br><span class="line"></span><br><span class="line">            markers.MarkersBatchSize = <span class="number">750</span>;</span><br><span class="line">            markers.Plot(x, y);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">double</span>[] <span class="title">LoadData</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            List&lt;<span class="keyword">double</span>&gt; data = <span class="keyword">new</span> List&lt;<span class="keyword">double</span>&gt;(<span class="number">11000</span>);</span><br><span class="line">            StreamResourceInfo sri = Application.GetResourceStream(<span class="keyword">new</span> Uri(<span class="string">"r0001.csv"</span>, UriKind.Relative));</span><br><span class="line">            <span class="keyword">using</span> (<span class="keyword">var</span> sr = <span class="keyword">new</span> StreamReader(sri.Stream))</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">var</span> s = sr.ReadLine();</span><br><span class="line">                <span class="keyword">while</span> ((s = sr.ReadLine()) != <span class="literal">null</span>)</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="keyword">var</span> d = <span class="keyword">double</span>.Parse(s, CultureInfo.InvariantCulture);</span><br><span class="line">                    data.Add(d);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> data.ToArray();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<hr>
+<blockquote>
+<p>This sample renders 11000 markers. Note that markers appear on the screen gradually and quality of zoomed in/zoomed out image also increases gradually. This keeps the sample fully interactive even at the moments when rendering is in progress.</p>
+</blockquote>
+<p>MarkerGraph的继承关系<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">System.Object</span><br><span class="line">  System.Windows.DependencyObject</span><br><span class="line">    System.Windows.UIElement</span><br><span class="line">      System.Windows.FrameworkElement</span><br><span class="line">        System.Windows.Controls.Panel</span><br><span class="line">          Microsoft.Research.DynamicDataDisplay.PlotBase</span><br><span class="line">            Microsoft.Research.DynamicDataDisplay.MarkerGraph</span><br><span class="line">              Microsoft.Research.DynamicDataDisplay.BarGraph</span><br><span class="line">              Microsoft.Research.DynamicDataDisplay.CartesianMarkerGraph</span><br><span class="line">              Microsoft.Research.DynamicDataDisplay.VerticalIntervalGraph</span><br></pre></td></tr></table></figure></p>
+<hr>
+<h3 id="Rendering-optimization"><a href="#Rendering-optimization" class="headerlink" title="Rendering optimization"></a>Rendering optimization</h3><blockquote>
+<p>Silverlight has limited rendering performance and plotting more than a few thousands of elements takes signification amount of time which is enough to make application non-interactive. Scientific data sets often contain tens of thousands of data items. To overcome Silverlight limitation MarkerGraph uses <strong>bitmap caching</strong> and <strong>deferred rendering</strong>. You can see how it works in <strong>Many Markers sample</strong> in Interactive SDK. Markers appear on the screen in batches. <strong>Each new batch is rendered when application is idle</strong>, so when user navigated or interacts with UI in other manner markers rendering is suspended. When marker graph needs to be redrawn because of panning or zooming, all batches are instantly replaced with bitmaps which are translated and scaled according to user navigation. After that bitmaps are replaced with real markers batch by batch in application idle moments. You may see it clear when zooming in significantly. Markers became blurred because of bitmap scaling. Later, blurred markers are replaced with re-rendered ones which makes picture look sharp again</p>
+</blockquote>
+<blockquote>
+<p>User can control this process using two properties. <strong>MarkerBatchSize</strong> controls size of marker batch rendered at a single pass. Larger values can cause poor application resposiveness for complex marker templates, small values will result in increase of marker graph update time.</p>
+</blockquote>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title">MarkerGraph</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span> MarkerBatchSize &#123; <span class="keyword">get</span>; <span class="keyword">set</span>; &#125; <span class="comment">// Dep. prop.</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span> MaxSnapshotSize &#123; <span class="keyword">get</span>; <span class="keyword">set</span>; &#125; <span class="comment">// Dep. prop.</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">long</span> <span class="title">Plot</span>(<span class="params"><span class="keyword">params</span> <span class="keyword">object</span>[] data</span>)</span>;</span><br><span class="line">    IObservable&lt;RenderCompletion&gt; RenderCompletion;</span><br><span class="line">    …</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>Marker graph rendering is restarted when data are changed. If data changes occur more frequently than application idle times when marker graph draws itself, most or even all of the data updates may be skipped and not shown. MarkerGraph provides technique to wait until current data is completely displayed. Plot method returns rendering task Id. When this task is either completed or skipped because new data arrives task id is observed on RenderCompletion subject. Using this technique, application can wait for markers complete draw before updating data. See ‘Background rendering’ sample in Interactive SDK</p>
+</blockquote>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/可视化/" rel="tag"># 可视化</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/02/04/2D Visualization笔记(X3) DynamicDataDisplay(sl)(六)/" rel="next" title="2D Visualization笔记(X3) DynamicDataDisplay(sl)(六)">
+                <i class="fa fa-chevron-left"></i> 2D Visualization笔记(X3) DynamicDataDisplay(sl)(六)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/02/04/2D Visualization笔记(X3) DynamicDataDisplay(sl)(七)/" rel="prev" title="2D Visualization笔记(X3) DynamicDataDisplay(sl)(七)">
+                2D Visualization笔记(X3) DynamicDataDisplay(sl)(七) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">zmapleaf</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">66</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Markers-Many-markers"><span class="nav-number">1.</span> <span class="nav-text">Markers: Many markers</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Rendering-optimization"><span class="nav-number">2.</span> <span class="nav-text">Rendering optimization</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zmapleaf</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
