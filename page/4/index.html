@@ -259,6 +259,163 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/21/MonoGame笔记(X1)Camera2D/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zmapleaf">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="远">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/12/21/MonoGame笔记(X1)Camera2D/" itemprop="url">MonoGame笔记(X1)Camera2D</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-12-21T10:25:37+08:00">
+                2017-12-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/编程/" itemprop="url" rel="index">
+                    <span itemprop="name">编程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>以前学习时一些零散的笔记, 新开一个系列.</p>
+<p>不管是side-scrolling(横版卷轴)，还是tilemap，有一点是非常关键的，就是不同坐标系之间的变换。在三维中有一个视口变换。二维没有那么复杂，但原理差不多。Hero和地图上的tile(贴片)，它们的位置是地图坐标，地图就是它们所在的世界，所以也可以说是世界坐标。在游戏逻辑中，Hero位置的改变，碰撞检测都是以地图坐标（世界坐标）进行的. 而在窗口屏幕中绘制Sprite和tile时，是以屏幕坐标为参照系的。因此在Draw方法中，必须将Hero和tile的地图坐标变换成屏幕坐标，从而在屏幕的适当位置显示出来。</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Update</span>(<span class="params">GameTime gameTime</span>)  </span></span><br><span class="line"><span class="function"></span>&#123;  </span><br><span class="line">    <span class="comment">// Allows the game to exit  </span></span><br><span class="line">    <span class="keyword">if</span> (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)  </span><br><span class="line">        <span class="keyword">this</span>.Exit();  </span><br><span class="line">  </span><br><span class="line">    <span class="keyword">float</span> elapsedTime = (<span class="keyword">float</span>)gameTime.ElapsedGameTime.TotalSeconds;</span><br><span class="line">    <span class="keyword">float</span> moveRate = <span class="number">20f</span>;</span><br><span class="line">    <span class="keyword">if</span> (hero!= <span class="literal">null</span>)  </span><br><span class="line">    &#123;  </span><br><span class="line">        scroll += ((hero.Position - <span class="keyword">new</span> Vector2(screenSize.X / <span class="number">2f</span>, screenSize.Y / <span class="number">2f</span>)) - scroll) * elapsedTime * moveRate;  </span><br><span class="line">  </span><br><span class="line">        <span class="keyword">float</span> xLim = map.GetXLim();  </span><br><span class="line">        <span class="keyword">float</span> yLim = map.GetYLim();  </span><br><span class="line">  </span><br><span class="line">        <span class="keyword">if</span> (scroll.X &lt; <span class="number">0f</span>) scroll.X = <span class="number">0f</span>;  </span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (scroll.X &gt; xLim) scroll.X = xLim;  </span><br><span class="line">        <span class="keyword">if</span> (scroll.Y &lt; <span class="number">0f</span>) scroll.Y = <span class="number">0f</span>;  </span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (scroll.Y &gt; yLim) scroll.Y = yLim;  </span><br><span class="line">  </span><br><span class="line">        hero.DoInput();  </span><br><span class="line">        hero.Update(gameTime);  </span><br><span class="line">    &#125;   </span><br><span class="line">  </span><br><span class="line">    <span class="keyword">base</span>.Update(gameTime);  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>scroll表示游戏窗口与世界地图的相对位置, hero.Position表示hero的地图坐标, 如下图所示:<br><img src="/img/monogame-camera2d-1.png" alt=""></p>
+<p>上面这段代码想要解决的一个设计场景是这样的: 以横版卷轴为例, 一开始屏幕位于地图最左侧, 此时Hero从屏幕左侧出生, 随后Hero往右移动. 当Hero未达到屏幕中间时, 屏幕是不会移动的. 当Hero达到屏幕中间, 此后屏幕和Hero一起往右移动, Hero始终占据屏幕的中心位置. 当屏幕达到地图最右侧时, 屏幕不再和Hero一起往右移动, Hero可以单独继续往右移动, 直到达到屏幕最右侧.</p>
+<p>上面代码的关键是<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">scroll += ((hero.Position - <span class="keyword">new</span> Vector2(screenSize.X / <span class="number">2f</span>, screenSize.Y / <span class="number">2f</span>)) - scroll)</span><br></pre></td></tr></table></figure></p>
+<p>当未达到屏幕中间时, scroll会是一个负值, 如果是负值就会被重置为0, 屏幕停留在地图最左侧. 同理, 超出地图右侧.<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (scroll.X &lt; <span class="number">0f</span>) scroll.X = <span class="number">0f</span>;</span><br></pre></td></tr></table></figure></p>
+<p>那为什么要减去scroll呢？因为new Vector2(screenSize.X / 2f, screenSize.Y / 2f)是一个固定值，而hero.Position是一个不断变大的过程(往右移动), 假设前一帧移动后，hero.Position.x - screenSize.X = 10;这一帧移动后，hero.Position.x - screenSize.X = 20, 改变的是绝对值. 为了让不同性能的机子都能够流畅运行, scroll.x是以增量的形式增加的（scroll += ***）, 即相对值. 因此需要减去原来的scroll得到一个增量，再将这个增量加回到scroll上.</p>
+<p>这部分代码可以抽象出一个<strong>Camera2D</strong>类. scroll就是Camera2D的地图坐标, 屏幕大小就是Camera2D的ViewPort</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Camera2D</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> Vector2 position;<span class="comment">//世界坐标</span></span><br><span class="line">    <span class="keyword">public</span> Viewport viewPort;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Camera2D</span>(<span class="params">Vector2 position</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">this</span>.position = position;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Camera2D</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">this</span>.position = Vector2.Zero;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Camera2D</span>(<span class="params">Viewport viewPort</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">this</span>.viewPort = viewPort;</span><br><span class="line">        <span class="keyword">this</span>.position = Vector2.Zero;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> Matrix TransformMatrix</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">get</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">return</span> Matrix.CreateTranslation(<span class="keyword">new</span> Vector3(-position, <span class="number">0f</span>));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 一般情况下, 使得Hero位于屏幕中间</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">LockCameraToPlayer</span>(<span class="params">PlayerPosition playerPostion, Hero hero</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">// Hero本身使用的sprite图片也有大小, 加上Center.X;</span></span><br><span class="line">        position.X = playerPostion.Position.X + hero.Center.X</span><br><span class="line">                        - (viewPort.Width / <span class="number">2</span>);</span><br><span class="line">        position.Y = playerPostion.Position.Y + hero.Center.Y</span><br><span class="line">                        - (viewPort.Height / <span class="number">2</span>); </span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">LockCameraToBound</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">/*position就是Camera的左上角位置，用viewport的坐标应该也能代替*/</span></span><br><span class="line">        position.X = MathHelper.Clamp(</span><br><span class="line">            position.X,</span><br><span class="line">            <span class="number">0</span>,</span><br><span class="line">            TileEngine.tilemap.WidthInPixels - viewPort.Width);</span><br><span class="line">        position.Y = MathHelper.Clamp(</span><br><span class="line">            position.Y,</span><br><span class="line">            <span class="number">0</span>,</span><br><span class="line">            TileEngine.tilemap.HeightInPixels - viewPort.Height);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><img src="/img/monogame-camera2d-2.png" alt=""><br>红色是视口，黑色是世界地图; 绿点是相机的Position（世界坐标）; 蓝点是物体的Position（世界坐标）</p>
+<p>官方有一个Camera2D的样例(<a href="http://xbox.create.msdn.com/en-US/education/catalog/sample/tiled_sprites)" target="_blank" rel="noopener">http://xbox.create.msdn.com/en-US/education/catalog/sample/tiled_sprites)</a>, 支持rotation和zoom, 结构和上面介绍的有所不同</p>
+<p>Although a game level might have tens of thousands of tiles in the game world, only those that are visible should be drawn. Otherwise, you see a severe performance hit for submitting more draw calls than are needed to render the scene. </p>
+<p>To simplify interactions with the tiles in the game world, the sample provides a 2D Camera implementation. You will find a camera abstraction useful, particularly when <strong>rotating</strong> or <strong>zooming</strong> the world. This enables you to rapidly translate screen space to world space. </p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">namespace</span> <span class="title">TiledSprites</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Camera2D</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="meta">#<span class="meta-keyword">region</span> Fields</span></span><br><span class="line">        <span class="keyword">private</span> Vector2 positionValue;</span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">bool</span> isMovingUsingScreenAxis;</span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">float</span> rotationValue;</span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">float</span> zoomValue;</span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">bool</span> cameraChanged;</span><br><span class="line">        <span class="meta">#<span class="meta-keyword">endregion</span></span></span><br><span class="line"></span><br><span class="line">        <span class="meta">#<span class="meta-keyword">region</span> Public Properties</span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> Get/Set the postion value of the camera</span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line">        <span class="keyword">public</span> Vector2 Position</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">set</span></span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">if</span> (positionValue != <span class="keyword">value</span>)</span><br><span class="line">                &#123;</span><br><span class="line">                    cameraChanged = <span class="literal">true</span>;</span><br><span class="line">                    positionValue = <span class="keyword">value</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">get</span> &#123; <span class="keyword">return</span> positionValue; &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> Get/Set the rotation value of the camera</span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">float</span> Rotation</span><br><span class="line">        &#123;   </span><br><span class="line">            <span class="comment">//...同上</span></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> Get/Set the zoom value of the camera</span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">float</span> Zoom</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="comment">//...同上</span></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> Gets whether or not the camera has been changed since the last</span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> ResetChanged call</span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">bool</span> IsChanged</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">get</span> &#123; <span class="keyword">return</span> cameraChanged; &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> Set to TRUE to pan relative to the screen axis when</span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> the camera is rotated.</span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">bool</span> MoveUsingScreenAxis</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">set</span> &#123; isMovingUsingScreenAxis = <span class="keyword">value</span>; &#125;</span><br><span class="line">            <span class="keyword">get</span> &#123; <span class="keyword">return</span> isMovingUsingScreenAxis; &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="meta">#<span class="meta-keyword">endregion</span></span></span><br><span class="line"></span><br><span class="line">        <span class="meta">#<span class="meta-keyword">region</span> Constructor</span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> Create a new Camera2D</span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">Camera2D</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            zoomValue = <span class="number">1.0f</span>;</span><br><span class="line">            rotationValue = <span class="number">0.0f</span>;</span><br><span class="line">            positionValue = Vector2.Zero;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="meta">#<span class="meta-keyword">endregion</span></span></span><br><span class="line"></span><br><span class="line">        <span class="meta">#<span class="meta-keyword">region</span> Movement Methods</span></span><br><span class="line">        </span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> Used to inform the camera that new values are updated by the application.</span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">ResetChanged</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            cameraChanged = <span class="literal">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> Pan in the right direction.  Corrects for rotation if specified.</span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">MoveRight</span>(<span class="params"><span class="keyword">ref</span> <span class="keyword">float</span> dist</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            <span class="keyword">if</span> (dist != <span class="number">0</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                cameraChanged = <span class="literal">true</span>;</span><br><span class="line">                <span class="keyword">if</span> (isMovingUsingScreenAxis)</span><br><span class="line">                &#123;</span><br><span class="line">                    positionValue.X += (<span class="keyword">float</span>)Math.Cos(-rotationValue) * dist;</span><br><span class="line">                    positionValue.Y += (<span class="keyword">float</span>)Math.Sin(-rotationValue) * dist;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">else</span></span><br><span class="line">                &#123;</span><br><span class="line">                    positionValue.X += dist;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> Pan in the left direction.  Corrects for rotation if specified.</span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">MoveLeft</span>(<span class="params"><span class="keyword">ref</span> <span class="keyword">float</span> dist</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            <span class="comment">//...</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> Pan in the up direction.  Corrects for rotation if specified.</span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">MoveUp</span>(<span class="params"><span class="keyword">ref</span> <span class="keyword">float</span> dist</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            <span class="comment">//...</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> Pan in the down direction.  Corrects for rotation if specified.</span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">MoveDown</span>(<span class="params"><span class="keyword">ref</span> <span class="keyword">float</span> dist</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            <span class="comment">//...</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="meta">#<span class="meta-keyword">endregion</span></span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>使用<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Update</span>(<span class="params">GameTime gameTime</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line">    HandleGamePadInput((<span class="keyword">float</span>)gameTime.ElapsedGameTime.TotalSeconds);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (camera.IsChanged)</span><br><span class="line">    &#123;</span><br><span class="line">        CameraChanged();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">HandleKeyboardInput</span>(<span class="params"><span class="keyword">float</span> elapsed</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">//check for camera movement</span></span><br><span class="line">    <span class="keyword">float</span> dX = ReadKeyboardAxis(currentKeyboardState, Keys.Left, Keys.Right) *</span><br><span class="line">        elapsed * MovementRate;</span><br><span class="line">    <span class="keyword">float</span> dY = ReadKeyboardAxis(currentKeyboardState, Keys.Down, Keys.Up) *</span><br><span class="line">        elapsed * MovementRate;</span><br><span class="line">    camera.MoveRight(<span class="keyword">ref</span> dX);</span><br><span class="line">    camera.MoveUp(<span class="keyword">ref</span> dY);</span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> This function is called when the camera's values have changed</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> and is used to update the properties of the tiles and animated sprite</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">CameraChanged</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">//set rotation</span></span><br><span class="line">    groundLayer.CameraRotation = detailLayer.CameraRotation =</span><br><span class="line">    cloudLayer.CameraRotation = rockLayer.CameraRotation =</span><br><span class="line">    animatedSprite.Rotation = camera.Rotation;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//set zoom</span></span><br><span class="line">    groundLayer.CameraZoom = detailLayer.CameraZoom =</span><br><span class="line">    rockLayer.CameraZoom = camera.Zoom;</span><br><span class="line">    animatedSprite.ScaleValue = animatedSpriteScale * camera.Zoom;</span><br><span class="line">    cloudLayer.CameraZoom = camera.Zoom + <span class="number">1.0f</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//set position</span></span><br><span class="line">    groundLayer.CameraPosition = camera.Position;</span><br><span class="line">    detailLayer.CameraPosition = camera.Position;</span><br><span class="line">    rockLayer.CameraPosition = camera.Position;</span><br><span class="line">    <span class="comment">//to acheive a paralax effect（视差效果）, scale down cloud movement</span></span><br><span class="line">    cloudLayer.CameraPosition = camera.Position / <span class="number">3.0f</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> This is called when the game should draw itself.</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;param name="gameTime"&gt;</span>Provides a snapshot of timing values.<span class="doctag">&lt;/param&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Draw</span>(<span class="params">GameTime gameTime</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line">    groundLayer.Draw(spriteBatch);</span><br><span class="line">    detailLayer.Draw(spriteBatch);</span><br><span class="line">    rockLayer.Draw(spriteBatch);</span><br><span class="line"></span><br><span class="line">    animatedSprite.Draw(spriteBatch, Color.AntiqueWhite,</span><br><span class="line">        SpriteBlendMode.AlphaBlend);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//draw the clouds</span></span><br><span class="line">    cloudLayer.Draw(spriteBatch);</span><br><span class="line">    <span class="keyword">base</span>.Draw(gameTime);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/20/MonoGame笔记(十五)XML in the  Content Pipeline/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
@@ -1768,164 +1925,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/04/MonoGame笔记(六)Game与GUI的差异/">
-
-    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="zmapleaf">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="远">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/12/04/MonoGame笔记(六)Game与GUI的差异/" itemprop="url">MonoGame笔记(六)Game与GUI的差异</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-12-04T18:10:37+08:00">
-                2017-12-04
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
-                  <a href="/categories/编程/" itemprop="url" rel="index">
-                    <span itemprop="name">编程</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>上一篇笔记最后提到游戏是一种背景工作(background work)吗? 回答这个问题先要了解游戏和普通的GUI的区别在于哪里. 游戏和普通GUI程序最大的差异在于即使用户没有输入, 游戏内部也在进行大量的逻辑处理(物理碰撞, 人工智能等), 而普通的GUI程序则是根据用户输入进行某种响应. background work可以把系统的闲置资源充分利用起来, 适合于大型游戏.</p>
-<p>在游戏和普通GUI程序之间, 还有第三个选择: 图形动画程序. 这种程序要将绘制逻辑放在Idle中来处理吗? 还是有其他的方法. 我觉得MSDN论坛的一个问题做了很好的解答.</p>
-<p>Event Driven WPF vs XNA style looping<br><a href="https://social.msdn.microsoft.com/Forums/en-US/356dd3b1-4168-46fa-bc1d-ba0137feb133/event-driven-wpf-vs-xna-style-looping?forum=wpf" target="_blank" rel="noopener">https://social.msdn.microsoft.com/Forums/en-US/356dd3b1-4168-46fa-bc1d-ba0137feb133/event-driven-wpf-vs-xna-style-looping?forum=wpf</a></p>
-<p>解答如下:</p>
-<p>The two options you listed are usually used because of the differences in how applications update:</p>
-<p>1) Event-Driven is usually used because your application is responding to a user.<br>2) Loop-Driven is used when the application needs to update, regardless of user interaction.  (Games, ie: XNA, often use this because the screen is updating even if the user is doing nothing).</p>
-<p>The two are not mutually exclusive (互斥).  In fact, it’s quite common to see an event based application start a timer that will trigger an “event” in a repeated “loop”.  Typically, this is done differently than a loop-driven application, but the effect is similar.</p>
-<p>I would recommend <strong>not</strong> using a <strong>full render loop style loop</strong> in a GUI-based application, however.  They are very oriented towards games and attempts to have a near-realtime experience, and tend to cause user interaction to suffer.  Instead, use a timer, such as the <strong>DispatcherTimer</strong>, or subscribe to <strong>CompositionTarget.Rendering</strong> when you need to have a loop-driven style.  You can easily remove the event handler when you are done with your continual update.</p>
-<p>他的意思是基于GUI的程序(普通GUI程序+图形动画程序)更适合用Timer去做. 而且, 放在Idle里面的话, 用户的输入会打断正在进行的逻辑处理.</p>
-<p>进一步, WPF和Silverlight同样可以做游戏(卡牌, 页游等)</p>
-<p><strong>Game Programming with Silverlight</strong>一书中提到3种图形动画开发方式<br><img src="/img/monogame-silverlightanimation.png" alt=""><br>其中有两种就是上面提到的DispatcherTimer和CompositionTarget.Rendering, 另外一种是故事板(storyboard)</p>
-<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">DispatcherTimer dispatcherTimer = <span class="keyword">new</span> DispatcherTimer(DispatcherPriority.Normal);</span><br><span class="line"></span><br><span class="line">dispatcherTimer.Tick += <span class="keyword">new</span> EventHandler(TickGameLoop);</span><br><span class="line">dispatcherTimer.Interval = TimeSpan.FromMilliseconds(<span class="number">40</span>);<span class="comment">//差不多24帧左右 </span></span><br><span class="line">dispatcherTimer.Start();</span><br></pre></td></tr></table></figure>
-<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">partial</span> <span class="keyword">class</span> <span class="title">Page</span> : <span class="title">UserControl</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Page</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        InitializeComponent();</span><br><span class="line">        CompositionTarget.Rendering += <span class="keyword">new</span> EventHandler(GameLoop);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>另外可以参考Channel 9上的Creating Games with Silverlight: A Simple Shooter<br><a href="https://channel9.msdn.com/coding4fun/articles/Creating-Games-with-Silverlight-A-Simple-Shooter" target="_blank" rel="noopener">https://channel9.msdn.com/coding4fun/articles/Creating-Games-with-Silverlight-A-Simple-Shooter</a><br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">Page</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    InitializeComponent();</span><br><span class="line">    keyHandler = <span class="keyword">new</span> KeyHandler(<span class="keyword">this</span>);</span><br><span class="line">    GenerateStarField(<span class="number">350</span>);</span><br><span class="line">    InitializeGame();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">InitializeGame</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    gameLoop = <span class="keyword">new</span> GameLoop(<span class="keyword">this</span>);</span><br><span class="line">    gameLoop.Update += <span class="keyword">new</span> GameLoop.UpdateHandler(gameLoop_Update);</span><br><span class="line"></span><br><span class="line">    PlayerShip = <span class="keyword">new</span> Ship(<span class="number">10</span>, <span class="number">10</span>, <span class="keyword">new</span> Point(<span class="number">100</span>, <span class="number">360</span>));</span><br><span class="line">    gameRoot.Children.Add(PlayerShip.SpriteCanvas);</span><br><span class="line"></span><br><span class="line">    gameLoop.Start();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>这就是用Timer去模拟loop-driven的方式.</p>
-<p>Silverlight在技术分类上等同于Flash, 可以想象Flash页游的GameLoop是怎样的一个实现, 关于Flash另外展开.</p>
-<p>这里提到的<strong>full render loop style loop</strong>代码如下, 就是上一篇笔记提到的game loop<br><a href="https://blogs.msdn.microsoft.com/tmiller/2005/05/05/my-last-post-on-render-loops-hopefully/" target="_blank" rel="noopener">https://blogs.msdn.microsoft.com/tmiller/2005/05/05/my-last-post-on-render-loops-hopefully/</a><br>用在ManagedDX中(托管的DX)<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//The most common topic on my blog returns again.  This time it will be brief as all I’m going to to do now is show you the render loop the June’05 SDK will be using.  A coworker in another group came up with this markedly simple, yet deceptively effective loop for that groups projects.  I liked it so much, i’m sharing it with everyone else. =)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//The basic loop (slightly modified from his original version and the version in the new SDK for ease of reading):</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">MainLoop</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">        <span class="comment">// Hook the application’s idle event</span></span><br><span class="line">        System.Windows.Forms.Application.Idle += <span class="keyword">new</span> EventHandler(OnApplicationIdle);</span><br><span class="line">        System.Windows.Forms.Application.Run(myForm);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">OnApplicationIdle</span>(<span class="params"><span class="keyword">object</span> sender, EventArgs e</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">while</span> (AppStillIdle)</span><br><span class="line">    &#123;</span><br><span class="line">         <span class="comment">// Render a frame during idle time (no messages are waiting)</span></span><br><span class="line">         UpdateEnvironment();</span><br><span class="line">         Render3DEnvironment();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">bool</span> AppStillIdle</span><br><span class="line">&#123;</span><br><span class="line">     <span class="keyword">get</span></span><br><span class="line">    &#123;</span><br><span class="line">        NativeMethods.Message msg;</span><br><span class="line">        <span class="keyword">return</span> !NativeMethods.PeekMessage(<span class="keyword">out</span> msg, IntPtr.Zero, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line">     &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">And the declarations <span class="keyword">for</span> those two native methods members:</span><br><span class="line"></span><br><span class="line">[<span class="meta">StructLayout(LayoutKind.Sequential)</span>]</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">struct</span> Message</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> IntPtr hWnd;</span><br><span class="line">    <span class="keyword">public</span> WindowMessage msg;</span><br><span class="line">    <span class="keyword">public</span> IntPtr wParam;</span><br><span class="line">    <span class="keyword">public</span> IntPtr lParam;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">uint</span> time;</span><br><span class="line">    <span class="keyword">public</span> System.Drawing.Point p;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">[<span class="meta">System.Security.SuppressUnmanagedCodeSecurity</span>] <span class="comment">// We won’t use this maliciously</span></span><br><span class="line">[<span class="meta">DllImport(“User32.dll”, CharSet=CharSet.Auto)</span>]</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">extern</span> <span class="keyword">bool</span> <span class="title">PeekMessage</span>(<span class="params"><span class="keyword">out</span> Message msg, IntPtr hWnd, <span class="keyword">uint</span> messageFilterMin, <span class="keyword">uint</span> messageFilterMax, <span class="keyword">uint</span> flags</span>)</span>;</span><br></pre></td></tr></table></figure></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1976,7 +1975,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">66</span>
+                  <span class="site-state-item-count">67</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -2035,7 +2034,7 @@
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>

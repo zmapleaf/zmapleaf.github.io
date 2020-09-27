@@ -259,6 +259,164 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/04/MonoGame笔记(六)Game与GUI的差异/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zmapleaf">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="远">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/12/04/MonoGame笔记(六)Game与GUI的差异/" itemprop="url">MonoGame笔记(六)Game与GUI的差异</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-12-04T18:10:37+08:00">
+                2017-12-04
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/编程/" itemprop="url" rel="index">
+                    <span itemprop="name">编程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>上一篇笔记最后提到游戏是一种背景工作(background work)吗? 回答这个问题先要了解游戏和普通的GUI的区别在于哪里. 游戏和普通GUI程序最大的差异在于即使用户没有输入, 游戏内部也在进行大量的逻辑处理(物理碰撞, 人工智能等), 而普通的GUI程序则是根据用户输入进行某种响应. background work可以把系统的闲置资源充分利用起来, 适合于大型游戏.</p>
+<p>在游戏和普通GUI程序之间, 还有第三个选择: 图形动画程序. 这种程序要将绘制逻辑放在Idle中来处理吗? 还是有其他的方法. 我觉得MSDN论坛的一个问题做了很好的解答.</p>
+<p>Event Driven WPF vs XNA style looping<br><a href="https://social.msdn.microsoft.com/Forums/en-US/356dd3b1-4168-46fa-bc1d-ba0137feb133/event-driven-wpf-vs-xna-style-looping?forum=wpf" target="_blank" rel="noopener">https://social.msdn.microsoft.com/Forums/en-US/356dd3b1-4168-46fa-bc1d-ba0137feb133/event-driven-wpf-vs-xna-style-looping?forum=wpf</a></p>
+<p>解答如下:</p>
+<p>The two options you listed are usually used because of the differences in how applications update:</p>
+<p>1) Event-Driven is usually used because your application is responding to a user.<br>2) Loop-Driven is used when the application needs to update, regardless of user interaction.  (Games, ie: XNA, often use this because the screen is updating even if the user is doing nothing).</p>
+<p>The two are not mutually exclusive (互斥).  In fact, it’s quite common to see an event based application start a timer that will trigger an “event” in a repeated “loop”.  Typically, this is done differently than a loop-driven application, but the effect is similar.</p>
+<p>I would recommend <strong>not</strong> using a <strong>full render loop style loop</strong> in a GUI-based application, however.  They are very oriented towards games and attempts to have a near-realtime experience, and tend to cause user interaction to suffer.  Instead, use a timer, such as the <strong>DispatcherTimer</strong>, or subscribe to <strong>CompositionTarget.Rendering</strong> when you need to have a loop-driven style.  You can easily remove the event handler when you are done with your continual update.</p>
+<p>他的意思是基于GUI的程序(普通GUI程序+图形动画程序)更适合用Timer去做. 而且, 放在Idle里面的话, 用户的输入会打断正在进行的逻辑处理.</p>
+<p>进一步, WPF和Silverlight同样可以做游戏(卡牌, 页游等)</p>
+<p><strong>Game Programming with Silverlight</strong>一书中提到3种图形动画开发方式<br><img src="/img/monogame-silverlightanimation.png" alt=""><br>其中有两种就是上面提到的DispatcherTimer和CompositionTarget.Rendering, 另外一种是故事板(storyboard)</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">DispatcherTimer dispatcherTimer = <span class="keyword">new</span> DispatcherTimer(DispatcherPriority.Normal);</span><br><span class="line"></span><br><span class="line">dispatcherTimer.Tick += <span class="keyword">new</span> EventHandler(TickGameLoop);</span><br><span class="line">dispatcherTimer.Interval = TimeSpan.FromMilliseconds(<span class="number">40</span>);<span class="comment">//差不多24帧左右 </span></span><br><span class="line">dispatcherTimer.Start();</span><br></pre></td></tr></table></figure>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">partial</span> <span class="keyword">class</span> <span class="title">Page</span> : <span class="title">UserControl</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Page</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        InitializeComponent();</span><br><span class="line">        CompositionTarget.Rendering += <span class="keyword">new</span> EventHandler(GameLoop);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>另外可以参考Channel 9上的Creating Games with Silverlight: A Simple Shooter<br><a href="https://channel9.msdn.com/coding4fun/articles/Creating-Games-with-Silverlight-A-Simple-Shooter" target="_blank" rel="noopener">https://channel9.msdn.com/coding4fun/articles/Creating-Games-with-Silverlight-A-Simple-Shooter</a><br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">Page</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    InitializeComponent();</span><br><span class="line">    keyHandler = <span class="keyword">new</span> KeyHandler(<span class="keyword">this</span>);</span><br><span class="line">    GenerateStarField(<span class="number">350</span>);</span><br><span class="line">    InitializeGame();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">InitializeGame</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    gameLoop = <span class="keyword">new</span> GameLoop(<span class="keyword">this</span>);</span><br><span class="line">    gameLoop.Update += <span class="keyword">new</span> GameLoop.UpdateHandler(gameLoop_Update);</span><br><span class="line"></span><br><span class="line">    PlayerShip = <span class="keyword">new</span> Ship(<span class="number">10</span>, <span class="number">10</span>, <span class="keyword">new</span> Point(<span class="number">100</span>, <span class="number">360</span>));</span><br><span class="line">    gameRoot.Children.Add(PlayerShip.SpriteCanvas);</span><br><span class="line"></span><br><span class="line">    gameLoop.Start();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这就是用Timer去模拟loop-driven的方式.</p>
+<p>Silverlight在技术分类上等同于Flash, 可以想象Flash页游的GameLoop是怎样的一个实现, 关于Flash另外展开.</p>
+<p>这里提到的<strong>full render loop style loop</strong>代码如下, 就是上一篇笔记提到的game loop<br><a href="https://blogs.msdn.microsoft.com/tmiller/2005/05/05/my-last-post-on-render-loops-hopefully/" target="_blank" rel="noopener">https://blogs.msdn.microsoft.com/tmiller/2005/05/05/my-last-post-on-render-loops-hopefully/</a><br>用在ManagedDX中(托管的DX)<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//The most common topic on my blog returns again.  This time it will be brief as all I’m going to to do now is show you the render loop the June’05 SDK will be using.  A coworker in another group came up with this markedly simple, yet deceptively effective loop for that groups projects.  I liked it so much, i’m sharing it with everyone else. =)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//The basic loop (slightly modified from his original version and the version in the new SDK for ease of reading):</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">MainLoop</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">        <span class="comment">// Hook the application’s idle event</span></span><br><span class="line">        System.Windows.Forms.Application.Idle += <span class="keyword">new</span> EventHandler(OnApplicationIdle);</span><br><span class="line">        System.Windows.Forms.Application.Run(myForm);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">OnApplicationIdle</span>(<span class="params"><span class="keyword">object</span> sender, EventArgs e</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">while</span> (AppStillIdle)</span><br><span class="line">    &#123;</span><br><span class="line">         <span class="comment">// Render a frame during idle time (no messages are waiting)</span></span><br><span class="line">         UpdateEnvironment();</span><br><span class="line">         Render3DEnvironment();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">bool</span> AppStillIdle</span><br><span class="line">&#123;</span><br><span class="line">     <span class="keyword">get</span></span><br><span class="line">    &#123;</span><br><span class="line">        NativeMethods.Message msg;</span><br><span class="line">        <span class="keyword">return</span> !NativeMethods.PeekMessage(<span class="keyword">out</span> msg, IntPtr.Zero, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line">     &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">And the declarations <span class="keyword">for</span> those two native methods members:</span><br><span class="line"></span><br><span class="line">[<span class="meta">StructLayout(LayoutKind.Sequential)</span>]</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">struct</span> Message</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> IntPtr hWnd;</span><br><span class="line">    <span class="keyword">public</span> WindowMessage msg;</span><br><span class="line">    <span class="keyword">public</span> IntPtr wParam;</span><br><span class="line">    <span class="keyword">public</span> IntPtr lParam;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">uint</span> time;</span><br><span class="line">    <span class="keyword">public</span> System.Drawing.Point p;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">[<span class="meta">System.Security.SuppressUnmanagedCodeSecurity</span>] <span class="comment">// We won’t use this maliciously</span></span><br><span class="line">[<span class="meta">DllImport(“User32.dll”, CharSet=CharSet.Auto)</span>]</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">extern</span> <span class="keyword">bool</span> <span class="title">PeekMessage</span>(<span class="params"><span class="keyword">out</span> Message msg, IntPtr hWnd, <span class="keyword">uint</span> messageFilterMin, <span class="keyword">uint</span> messageFilterMax, <span class="keyword">uint</span> flags</span>)</span>;</span><br></pre></td></tr></table></figure></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/04/MonoGame笔记(五)轮询/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
@@ -1730,170 +1888,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/04/2D Visualization笔记(X3) DynamicDataDisplay(sl)(五)/">
-
-    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="zmapleaf">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="远">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/02/04/2D Visualization笔记(X3) DynamicDataDisplay(sl)(五)/" itemprop="url">2D Visualization笔记(X3) DynamicDataDisplay(sl)(五)</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-02-04T13:35:35+08:00">
-                2017-02-04
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
-                  <a href="/categories/编程/" itemprop="url" rel="index">
-                    <span itemprop="name">编程</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>官方<br><a href="http://research.microsoft.com/en-us/um/cambridge/groups/science/tools/d3/dynamicdatadisplay.htm" target="_blank" rel="noopener">http://research.microsoft.com/en-us/um/cambridge/groups/science/tools/d3/dynamicdatadisplay.htm</a></p>
-<p>Tutorial<br><a href="http://research.microsoft.com/en-us/um/cambridge/projects/ddd/d3isdk/" target="_blank" rel="noopener">http://research.microsoft.com/en-us/um/cambridge/projects/ddd/d3isdk/</a></p>
-<p>D3Overview 必读<br><a href="http://research.microsoft.com/en-us/um/cambridge/groups/science/tools/d3/D3Overview.pdf" target="_blank" rel="noopener">http://research.microsoft.com/en-us/um/cambridge/groups/science/tools/d3/D3Overview.pdf</a></p>
-<p>Sliverlight版本: DynamicDataDisplay.2.0.907</p>
-<p>Dynamic Data Display 的Sliverlight版本和Wpf版本中的代码不一样.</p>
-<hr>
-<h3 id="Markers-Many-markers"><a href="#Markers-Many-markers" class="headerlink" title="Markers: Many markers"></a>Markers: Many markers</h3><p><strong>cs</strong><br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Copyright © 2010-2011 Microsoft Corporation, All Rights Reserved.</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> System.Collections.Generic;</span><br><span class="line"><span class="keyword">using</span> System.Globalization;</span><br><span class="line"><span class="keyword">using</span> System.IO;</span><br><span class="line"><span class="keyword">using</span> System.Linq;</span><br><span class="line"><span class="keyword">using</span> System.Windows;</span><br><span class="line"><span class="keyword">using</span> System.Windows.Controls;</span><br><span class="line"><span class="keyword">using</span> System.Windows.Resources;</span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">ManyMarkersSample</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">partial</span> <span class="keyword">class</span> <span class="title">MainPage</span> : <span class="title">UserControl</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">MainPage</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            InitializeComponent();</span><br><span class="line"></span><br><span class="line">            <span class="keyword">var</span> y = LoadData();</span><br><span class="line">            <span class="keyword">var</span> x = Enumerable.Range(<span class="number">0</span>, y.Length).Select(p =&gt; (<span class="keyword">double</span>)p).ToArray();</span><br><span class="line"></span><br><span class="line">            markers.MarkersBatchSize = <span class="number">750</span>;</span><br><span class="line">            markers.Plot(x, y);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">double</span>[] <span class="title">LoadData</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            List&lt;<span class="keyword">double</span>&gt; data = <span class="keyword">new</span> List&lt;<span class="keyword">double</span>&gt;(<span class="number">11000</span>);</span><br><span class="line">            StreamResourceInfo sri = Application.GetResourceStream(<span class="keyword">new</span> Uri(<span class="string">"r0001.csv"</span>, UriKind.Relative));</span><br><span class="line">            <span class="keyword">using</span> (<span class="keyword">var</span> sr = <span class="keyword">new</span> StreamReader(sri.Stream))</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">var</span> s = sr.ReadLine();</span><br><span class="line">                <span class="keyword">while</span> ((s = sr.ReadLine()) != <span class="literal">null</span>)</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="keyword">var</span> d = <span class="keyword">double</span>.Parse(s, CultureInfo.InvariantCulture);</span><br><span class="line">                    data.Add(d);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> data.ToArray();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<hr>
-<blockquote>
-<p>This sample renders 11000 markers. Note that markers appear on the screen gradually and quality of zoomed in/zoomed out image also increases gradually. This keeps the sample fully interactive even at the moments when rendering is in progress.</p>
-</blockquote>
-<p>MarkerGraph的继承关系<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">System.Object</span><br><span class="line">  System.Windows.DependencyObject</span><br><span class="line">    System.Windows.UIElement</span><br><span class="line">      System.Windows.FrameworkElement</span><br><span class="line">        System.Windows.Controls.Panel</span><br><span class="line">          Microsoft.Research.DynamicDataDisplay.PlotBase</span><br><span class="line">            Microsoft.Research.DynamicDataDisplay.MarkerGraph</span><br><span class="line">              Microsoft.Research.DynamicDataDisplay.BarGraph</span><br><span class="line">              Microsoft.Research.DynamicDataDisplay.CartesianMarkerGraph</span><br><span class="line">              Microsoft.Research.DynamicDataDisplay.VerticalIntervalGraph</span><br></pre></td></tr></table></figure></p>
-<hr>
-<h3 id="Rendering-optimization"><a href="#Rendering-optimization" class="headerlink" title="Rendering optimization"></a>Rendering optimization</h3><blockquote>
-<p>Silverlight has limited rendering performance and plotting more than a few thousands of elements takes signification amount of time which is enough to make application non-interactive. Scientific data sets often contain tens of thousands of data items. To overcome Silverlight limitation MarkerGraph uses <strong>bitmap caching</strong> and <strong>deferred rendering</strong>. You can see how it works in <strong>Many Markers sample</strong> in Interactive SDK. Markers appear on the screen in batches. <strong>Each new batch is rendered when application is idle</strong>, so when user navigated or interacts with UI in other manner markers rendering is suspended. When marker graph needs to be redrawn because of panning or zooming, all batches are instantly replaced with bitmaps which are translated and scaled according to user navigation. After that bitmaps are replaced with real markers batch by batch in application idle moments. You may see it clear when zooming in significantly. Markers became blurred because of bitmap scaling. Later, blurred markers are replaced with re-rendered ones which makes picture look sharp again</p>
-</blockquote>
-<blockquote>
-<p>User can control this process using two properties. <strong>MarkerBatchSize</strong> controls size of marker batch rendered at a single pass. Larger values can cause poor application resposiveness for complex marker templates, small values will result in increase of marker graph update time.</p>
-</blockquote>
-<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title">MarkerGraph</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span> MarkerBatchSize &#123; <span class="keyword">get</span>; <span class="keyword">set</span>; &#125; <span class="comment">// Dep. prop.</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span> MaxSnapshotSize &#123; <span class="keyword">get</span>; <span class="keyword">set</span>; &#125; <span class="comment">// Dep. prop.</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">long</span> <span class="title">Plot</span>(<span class="params"><span class="keyword">params</span> <span class="keyword">object</span>[] data</span>)</span>;</span><br><span class="line">    IObservable&lt;RenderCompletion&gt; RenderCompletion;</span><br><span class="line">    …</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>Marker graph rendering is restarted when data are changed. If data changes occur more frequently than application idle times when marker graph draws itself, most or even all of the data updates may be skipped and not shown. MarkerGraph provides technique to wait until current data is completely displayed. Plot method returns rendering task Id. When this task is either completed or skipped because new data arrives task id is observed on RenderCompletion subject. Using this technique, application can wait for markers complete draw before updating data. See ‘Background rendering’ sample in Interactive SDK</p>
-</blockquote>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1944,7 +1938,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">66</span>
+                  <span class="site-state-item-count">67</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -2003,7 +1997,7 @@
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>
